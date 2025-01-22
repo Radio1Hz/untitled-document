@@ -7,17 +7,35 @@
     <link rel="stylesheet" href="styles.css">
 </head>
 <body>
-    <div class="container">
-        <div class="video-player">
-            <div id="timer">00:00.00</div>
-            <div class="controls">
-                <button id="playPauseBtn">Play</button>
-                <button id="stopBtn">Stop</button>
+    <div class="layout">
+        <nav class="sidebar">
+            <div class="playlist-menu" id="playlist-menu">
+                <!-- Playlist items will be inserted here -->
+            </div>
+        </nav>
+        <div class="main-content">
+            <div class="container">
+                <div class="track-section">
+                    <div class="track-header">
+                        <h1 id="track-title"></h1>
+                        <div class="track-meta">
+                            <div>key: <span id="track-key"></span></div>
+                            <div>tempo: <span id="track-tempo"></span> bpm</div>
+                            <div>time: <span id="track-time"></span></div>
+                            <div>duration: <span id="track-duration"></span></div>
+                        </div>
+                        <div class="track-controls">
+                            <button id="playPauseBtn">▶</button>
+                            <button id="stopBtn">⏹</button>
+                            <div id="currentTime">00:00</div>
+                        </div>
+                    </div>
+                    <div id="sentences-content"></div>
+                </div>
             </div>
         </div>
-        <div id="track-info"></div>
-        <div id="track-content"></div>
     </div>
+    <script src="playlist.js"></script>
     <script src="model.js"></script>
     <script src="app.js"></script>
 </body>

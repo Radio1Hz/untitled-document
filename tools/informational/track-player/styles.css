@@ -1,84 +1,220 @@
-.container {
-    max-width: 1200px;
-    margin: 0 auto;
-    padding: 20px;
-    font-family: Arial, sans-serif;
+:root {
+    --primary-color: #ff500d;
+    --text-color: #ffffff;
+    --background-color: #000000;
+    --secondary-background: #121212;
+    --hover-color: #282828;
+    --word-active-color: #ff520d62;
 }
 
-.video-player {
-    width: 1000px;
-    height: 1000px;
-    background-color: #000;
-    margin: 0 auto 20px;
-    position: relative;
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: "Courier New", Courier, monospace;
+    background-color: var(--background-color);
+    color: var(--text-color);
+    line-height: 1.6;
+}
+
+.container {
+    max-width: none;
+    width: 100%;
+    margin: 0 auto;
+    padding: 2rem;
+}
+
+.track-header {
+    margin-bottom: 2rem;
+    padding: 2rem;
+    border-radius: 8px;
+}
+
+#track-title {
+    font-size: 2rem;
+    margin-bottom: 1rem;
+}
+
+.track-meta {
+    display: flex;
+    gap: 2rem;
+    color: #888;
+    font-size: 0.9rem;
+}
+
+.layout {
+    display: flex;
+    min-height: 100vh;
+}
+
+.sidebar {
+    padding: 2rem 1rem;
+    border-right: 1px solid var(--hover-color);
+}
+
+.main-content {
+    flex: 1;
+    width: 100%;
+}
+
+.playlist-menu {
     display: flex;
     flex-direction: column;
+    gap: 0.5rem;
+}
+
+.playlist-item {
+    color: var(--text-color);
+    text-decoration: none;
+    padding: 0.75rem 1rem;
+    border-radius: 4px;
+    transition: background-color 0.2s;
+}
+
+.playlist-item:hover {
+    background-color: var(--hover-color);
+}
+
+.playlist-item.active {
+    background-color: var(--primary-color);
+}
+
+#sentences-content {
+    display: flex;
+    flex-direction: column;
+    gap: 0;
+    padding: 2rem;
+    border-radius: 8px;
+}
+
+.sentence-line {
+    font-size: 1.5rem;
+    line-height: 1.4;
+    padding: 0;
+    border-radius: 4px;
+}
+
+.sentence-id {
+    min-width: 100px !important;
+    height: 103px;
+    background-color: var(--secondary-background);
+    color: var(--primary-color);
+    display: flex;
+    align-items: center;
     justify-content: center;
+    border-bottom: 1px solid #333;
+}
+
+.sentence-id-content {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.sentence-id-content > div:first-child {
+    font-size: 1rem;
+    color: var(--text-color);
+}
+
+.sentence-id-content > div:last-child {
+    font-size: 2rem;
+    color: var(--primary-color);
+}
+
+.sentence-start-time {
+    font-size: 1rem;
+    color: var(--text-color);
+}
+
+.words-container {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0;
+    margin-top: 0;
+    min-height: 100px;
+}
+
+.word-square {
+    width: 170px;
+    min-width: 170px;
+    padding: 0.5rem;
+    background-color: var(--hover-color);
+    font-size: 0.9rem;
+    color: var(--text-color);
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    opacity: 0.8;
+    transition: background-color 0.1s ease, opacity 0.2s ease;
+    border-bottom: 1px solid #333;
+}
+
+.word-square.active {
+    background-color: var(--word-active-color);
+}
+
+.word-key, .word-mode, .word-time, .word-text {
+    white-space: nowrap;
+    text-overflow: ellipsis;
+}
+
+.word-key {
+    color: var(--primary-color);
+    font-size: 1.5rem;
+}
+
+.word-mode {
+    color: #aaaaaa;
+}
+
+.word-time {
+    color: #ffffff;
+    font-size: 0.8rem;
+}
+
+.word-text {
+    font-size: 0.7rem;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.track-controls {
+    margin-top: 1rem;
+    display: flex;
+    gap: 1rem;
     align-items: center;
 }
 
-#timer {
-    font-size: 48px;
-    color: #fff;
-    font-family: monospace;
-    margin-bottom: 20px;
-}
-
-.controls {
-    position: absolute;
-    bottom: 20px;
-    display: flex;
-    gap: 10px;
-}
-
-button {
-    padding: 10px 20px;
-    font-size: 16px;
-    cursor: pointer;
-    background-color: #fff;
+.track-controls button {
+    background-color: var(--hover-color);
     border: none;
-    border-radius: 5px;
+    color: var(--text-color);
+    padding: 0.5rem 1rem;
+    font-family: system-ui;
+    cursor: pointer;
+    font-size: 1.2rem;
+    min-width: 3rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
 }
 
-button:hover {
-    background-color: #e0e0e0;
+.track-controls button:hover {
+    background-color: var(--primary-color);
 }
 
-.track-info {
-    margin-bottom: 30px;
-    padding: 20px;
-    background-color: #f5f5f5;
-    border-radius: 5px;
+#currentTime {
+    font-size: 1.2rem;
+    color: var(--text-color);
 }
 
-.sentence {
-    margin-bottom: 20px;
-    padding: 10px;
-    background-color: #fff;
-    border: 1px solid #ddd;
-    border-radius: 5px;
-}
-
-.word {
-    display: inline-block;
-    padding: 10px;
-    margin: 5px;
-    background-color: #e9ecef;
-    border-radius: 3px;
-}
-
-.word.active {
-    background-color: #ffd700;
-    transition: background-color 0.3s ease;
-}
-
-.time {
-    color: #666;
-    font-size: 0.9em;
-}
-
-.divider {
-    display: inline-block;
-    margin: 0 5px;
-    color: #999;
+/* Only show pointer and full opacity when player is playing */
+.player-playing .word-square {
+    cursor: pointer;
+    opacity: 1;
 } 
