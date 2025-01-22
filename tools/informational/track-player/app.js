@@ -70,8 +70,8 @@ const track_timer = {
                     this.startTime = Date.now();
                 }
                 
-                // Update display with centiseconds
-                document.getElementById('currentTime').textContent = formatTimeWithCentiseconds(this.current_time);
+                // Update display with centiseconds using the new format
+                formatTimeWithCentiseconds(this.current_time);
                 
                 // Update word highlights
                 this.updateWordHighlights();
@@ -91,7 +91,8 @@ const track_timer = {
     stop: function() {
         this.pause();
         this.current_time = 0;
-        document.getElementById('currentTime').textContent = formatTimeWithCentiseconds(0);
+        document.querySelector('.time-main').textContent = '00:00.';
+        document.querySelector('.time-cents').textContent = '00';
         
         // Reset all word highlights
         document.querySelectorAll('.word-square').forEach(square => {
@@ -109,7 +110,11 @@ function formatTimeWithCentiseconds(seconds) {
     const minutes = Math.floor(seconds / 60);
     const secs = Math.floor(seconds % 60);
     const centiseconds = Math.floor((seconds % 1) * 100);
-    return `${minutes.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}.${centiseconds.toString().padStart(2, '0')}`;
+    
+    document.querySelector('.time-main').textContent = 
+        `${minutes.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}.`;
+    document.querySelector('.time-cents').textContent = 
+        centiseconds.toString().padStart(2, '0');
 }
 
 function displayTrack(trackIndex) {
@@ -157,7 +162,6 @@ function displayTrack(trackIndex) {
         const idNumber = document.createElement('div');
         idNumber.textContent = sentence.id;
         
-        idContent.appendChild(startTime);  // Time first
         idContent.appendChild(idNumber);   // ID second
         idDiv.appendChild(idContent);
         wordsContainer.appendChild(idDiv);

@@ -1,6 +1,6 @@
 :root {
     --primary-color: #ff500d;
-    --text-color: #ffffff;
+    --text-color: #b1b1b1;
     --background-color: #000000;
     --secondary-background: #121212;
     --hover-color: #282828;
@@ -100,8 +100,7 @@ body {
 .sentence-id {
     min-width: 100px !important;
     height: 103px;
-    background-color: var(--secondary-background);
-    color: var(--primary-color);
+    color: var(--text-color);
     display: flex;
     align-items: center;
     justify-content: center;
@@ -113,16 +112,12 @@ body {
     flex-direction: column;
     align-items: center;
     gap: 0.5rem;
-}
-
-.sentence-id-content > div:first-child {
-    font-size: 1rem;
-    color: var(--text-color);
+    color: var(--text-color) !important;
 }
 
 .sentence-id-content > div:last-child {
     font-size: 2rem;
-    color: var(--primary-color);
+    color: var(--text-color);
 }
 
 .sentence-start-time {
@@ -142,7 +137,6 @@ body {
     width: 170px;
     min-width: 170px;
     padding: 0.5rem;
-    background-color: var(--hover-color);
     font-size: 0.9rem;
     color: var(--text-color);
     display: flex;
@@ -208,13 +202,42 @@ body {
     background-color: var(--primary-color);
 }
 
-#currentTime {
-    font-size: 1.2rem;
-    color: var(--text-color);
+.time-display {
+    display: flex;
+    align-items: baseline;
+}
+
+.time-main {
+    font-size: 2.5rem;
+}
+
+.time-cents {
+    font-size: 1.25rem;
 }
 
 /* Only show pointer and full opacity when player is playing */
 .player-playing .word-square {
     cursor: pointer;
     opacity: 1;
-} 
+}
+
+@font-face {
+    font-family: "clockicons";
+    src: url("https://db.onlinewebfonts.com/t/84cb021d5f9af287ffff84b61beef6dc.eot");
+    src: url("https://db.onlinewebfonts.com/t/84cb021d5f9af287ffff84b61beef6dc.eot?#iefix")format("embedded-opentype"),
+    url("https://db.onlinewebfonts.com/t/84cb021d5f9af287ffff84b61beef6dc.woff2")format("woff2"),
+    url("https://db.onlinewebfonts.com/t/84cb021d5f9af287ffff84b61beef6dc.woff")format("woff"),
+    url("https://db.onlinewebfonts.com/t/84cb021d5f9af287ffff84b61beef6dc.ttf")format("truetype"),
+    url("https://db.onlinewebfonts.com/t/84cb021d5f9af287ffff84b61beef6dc.svg#clockicons")format("svg");
+}
+
+/* Remove the old font-face declaration */
+/* Apply to time displays and other numeric elements */
+#currentTime,
+.sentence-start-time,
+.word-time,
+.digits
+{
+    color: var(--primary-color);
+    font-family: "clockicons";
+}

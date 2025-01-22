@@ -3,7 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Musical Track Viewer</title>
+    <title>track-player-v1.1</title>
+    <link href="https://db.onlinewebfonts.com/c/84cb021d5f9af287ffff84b61beef6dc?family=clockicons" rel="stylesheet">
     <link rel="stylesheet" href="styles.css">
 </head>
 <body>
@@ -25,9 +26,11 @@
                             <div>duration: <span id="track-duration"></span></div>
                         </div>
                         <div class="track-controls">
+                            <div id="currentTime" class="time-display">
+                                <span class="time-main digits">00:00.</span><span class="time-cents digits">00</span>
+                            </div>
                             <button id="playPauseBtn">▶</button>
                             <button id="stopBtn">⏹</button>
-                            <div id="currentTime">00:00</div>
                         </div>
                     </div>
                     <div id="sentences-content"></div>
