@@ -40,7 +40,7 @@ const playlist = [
                         "text": ""
                     },
                     {
-                        "key": "F# G",
+                        "key": "F#m G",
                         "mode": "*",
                         "start": 6,
                         "end": 8,
@@ -105,7 +105,7 @@ const playlist = [
                         "text": ""
                     },
                     {
-                        "key": "F# G",
+                        "key": "F#m G",
                         "mode": "*",
                         "start": 22,
                         "end": 24,
@@ -170,7 +170,7 @@ const playlist = [
                         "text": ""
                     },
                     {
-                        "key": "F# G",
+                        "key": "F#m G",
                         "mode": "*",
                         "start": 38,
                         "end": 40,
