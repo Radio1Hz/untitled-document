@@ -172,16 +172,6 @@ function displayTrack(trackIndex) {
             wordSquare.dataset.start = word.start;
             wordSquare.dataset.end = word.end;
             
-            // Add click handler
-            wordSquare.addEventListener('click', () => {
-                if (track_timer.isPlaying) {  // Only handle clicks when playing
-                    track_timer.current_time = parseFloat(word.start);
-                    track_timer.startTime = Date.now() - (track_timer.current_time * 1000);
-                    document.getElementById('currentTime').textContent = formatTimeWithCentiseconds(track_timer.current_time);
-                    track_timer.updateWordHighlights();
-                }
-            });
-
             // Add time in mm:ss format
             const timeDiv = document.createElement('div');
             timeDiv.className = 'word-time';

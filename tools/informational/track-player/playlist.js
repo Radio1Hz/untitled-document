@@ -2,7 +2,7 @@ const playlist = [
     {
         "id": 2,
         "title": "2. đorđe-b ne lomite mi bagrenje",
-        "description": "to d",
+        "description": "for d.",
         "duration": 160,
         "numerator": 4,
         "denominator": 4,
