@@ -1,7 +1,217 @@
 const playlist = [
     {
+        "id": 1,
+        "title": "1. there is no wisdom without kindness",
+        "video-url": "https://untitled-document.net/images/1. there is no wisdom without kindness/video.mp4",
+        "description": "",
+        "duration": 48,
+        "numerator": 4,
+        "denominator": 4,
+        "key": "Em",
+        "tempo": 120,
+        "sentences":
+        [
+            {
+                "id": 1,
+                "title": "there is no wisdom without kindness",
+                "start": 0,
+                "end": 16, 
+                "words":
+                [
+                    {
+                        "key": "Em",
+                        "mode": "aeolian",
+                        "start": 0,
+                        "end": 2,
+                        "text": "there is no wisdom"
+                    },
+                    {
+                        "key": "Am",
+                        "mode": "dorian",
+                        "start": 2,
+                        "end": 4,
+                        "text": "without kindness"
+                    },
+                    {
+                        "key": "Em",
+                        "mode": "aeolian",
+                        "start": 4,
+                        "end": 6,
+                        "text": ""
+                    },
+                    {
+                        "key": "F# G",
+                        "mode": "*",
+                        "start": 6,
+                        "end": 8,
+                        "text": ""
+                    },
+                    {
+                        "key": "Am",
+                        "mode": "aeolian",
+                        "start": 8,
+                        "end": 10,
+                        "text": ""
+                    },
+                    {
+                        "key": "C",
+                        "mode": "lydian",
+                        "start": 10,
+                        "end": 12,
+                        "text": ""
+                    },
+                    {
+                        "key": "Am",
+                        "mode": "aeolian",
+                        "start": 12,
+                        "end": 14,
+                        "text": ""
+                    },
+                    {
+                        "key": "Bm G",
+                        "mode": "*",
+                        "start": 14,
+                        "end": 16,
+                        "text": ""
+                    }
+                ]
+            },
+            {
+                "id": 2,
+                "title": "没有仁慈，就没有智慧",
+                "start": 16,
+                "end": 32, 
+                "words":
+                [
+                    {
+                        "key": "Em",
+                        "mode": "aeolian",
+                        "start": 16,
+                        "end": 18,
+                        "text": "没有仁慈，"
+                    },
+                    {
+                        "key": "Am",
+                        "mode": "dorian",
+                        "start": 18,
+                        "end": 20,
+                        "text": "就没有智慧"
+                    },
+                    {
+                        "key": "Em",
+                        "mode": "aeolian",
+                        "start": 20,
+                        "end": 22,
+                        "text": ""
+                    },
+                    {
+                        "key": "F# G",
+                        "mode": "*",
+                        "start": 22,
+                        "end": 24,
+                        "text": ""
+                    },
+                    {
+                        "key": "Am",
+                        "mode": "aeolian",
+                        "start": 24,
+                        "end": 26,
+                        "text": ""
+                    },
+                    {
+                        "key": "C",
+                        "mode": "lydian",
+                        "start": 26,
+                        "end": 28,
+                        "text": ""
+                    },
+                    {
+                        "key": "Am",
+                        "mode": "aeolian",
+                        "start": 28,
+                        "end": 30,
+                        "text": ""
+                    },
+                    {
+                        "key": "Bm G",
+                        "mode": "*",
+                        "start": 30,
+                        "end": 32,
+                        "text": ""
+                    }
+                ]
+            },
+            {
+                "id": 3,
+                "title": "Без доброты нет мудрости",
+                "start": 32,
+                "end": 48, 
+                "words":
+                [
+                    {
+                        "key": "Em",
+                        "mode": "aeolian",
+                        "start": 32,
+                        "end": 34,
+                        "text": "Без доброты"
+                    },
+                    {
+                        "key": "Am",
+                        "mode": "dorian",
+                        "start": 34,
+                        "end": 36,
+                        "text": "нет мудрости"
+                    },
+                    {
+                        "key": "Em",
+                        "mode": "aeolian",
+                        "start": 36,
+                        "end": 38,
+                        "text": ""
+                    },
+                    {
+                        "key": "F# G",
+                        "mode": "*",
+                        "start": 38,
+                        "end": 40,
+                        "text": ""
+                    },
+                    {
+                        "key": "Am",
+                        "mode": "aeolian",
+                        "start": 40,
+                        "end": 42,
+                        "text": ""
+                    },
+                    {
+                        "key": "C",
+                        "mode": "lydian",
+                        "start": 42,
+                        "end": 44,
+                        "text": ""
+                    },
+                    {
+                        "key": "Am",
+                        "mode": "aeolian",
+                        "start": 44,
+                        "end": 46,
+                        "text": ""
+                    },
+                    {
+                        "key": "Bm G",
+                        "mode": "*",
+                        "start": 46,
+                        "end": 48,
+                        "text": ""
+                    }
+                ]
+            }
+        ]
+    },
+    {
         "id": 2,
         "title": "2. đorđe-b ne lomite mi bagrenje",
+        "video-url": "https://untitled-document.net/images/1. there is no wisdom without kindness/video.mp4",
         "description": "for d.",
         "duration": 160,
         "numerator": 4,

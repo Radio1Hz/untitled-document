@@ -48,6 +48,9 @@ body {
 .layout {
     display: flex;
     min-height: 100vh;
+    position: relative;
+    z-index: 1;
+    background-color: rgba(0, 0, 0, 0.5);
 }
 
 .sidebar {
@@ -234,4 +237,27 @@ body {
     url("https://db.onlinewebfonts.com/t/84cb021d5f9af287ffff84b61beef6dc.woff")format("woff"),
     url("https://db.onlinewebfonts.com/t/84cb021d5f9af287ffff84b61beef6dc.ttf")format("truetype"),
     url("https://db.onlinewebfonts.com/t/84cb021d5f9af287ffff84b61beef6dc.svg#clockicons")format("svg");
+}
+
+.video-background {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    height: 100%;
+    z-index: -1;
+    overflow: hidden;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 100%;
+}
+
+#background-video {
+    position: relative;
+    width: 85vh;
+    height: 85vh;
+    object-fit: cover;
+    opacity: 1.5;
+    transform: none;
 }

@@ -3,4 +3,5 @@
 
 i use knowledge and tools to thrive
 
-/viktor-r
+viktor-r
+untitled-document.net
