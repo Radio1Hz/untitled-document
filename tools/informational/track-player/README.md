@@ -1,6 +1,4 @@
-Here is the revised README.md with GitHub-compatible LaTeX syntax for mathematical symbols:
 
-```markdown
 ### Track-Player: Formal Mathematical Specification  
 A visual tool for interacting with temporal structures ("tracks") through playback control (play, pause, rewind, etc.) and visualization. The system is defined hierarchically as follows:  
 
@@ -75,6 +73,3 @@ A track Θ is a tuple:
   \( \delta = 7\,\text{days} \implies \text{The track begins with a 1-week lead-in period}. \)  
 
 This formalism enables precise temporal manipulation and visualization, with τ as the foundational unit of measure.  
-```
-
-You can now update your README.md file in the repository with this content.
