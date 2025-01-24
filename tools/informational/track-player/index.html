@@ -3,48 +3,51 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>track-player-v1.1</title>
+    <title>track-player-v1.0</title>
     <link href="https://db.onlinewebfonts.com/c/84cb021d5f9af287ffff84b61beef6dc?family=clockicons" rel="stylesheet">
     <link rel="stylesheet" href="styles.css">
 </head>
 <body>
-    <div class="video-background">
-        <video id="background-video" autoplay loop playsinline>
-            <!-- Video source will be added here -->
-        </video>
-    </div>
     <div class="layout">
-        <nav class="sidebar">
-            <div class="playlist-menu" id="playlist-menu">
-                <!-- Playlist items will be inserted here -->
-            </div>
-        </nav>
         <div class="main-content">
             <div class="container">
                 <div class="track-section">
                     <div class="track-header">
-                        <h1 id="track-title"></h1>
+                        <h1 id="track-title">untitled-track</h1>
                         <div class="track-meta">
-                            <div>key: <span id="track-key"></span></div>
-                            <div>tempo: <span id="track-tempo"></span> bpm</div>
-                            <div>time: <span id="track-time"></span></div>
                             <div>duration: <span id="track-duration"></span></div>
+                            <div>speed: <span id="track-speed">1.0x</span></div>
                         </div>
                         <div class="track-controls">
                             <div id="currentTime" class="time-display">
-                                <span class="time-main digits">00:00.</span><span class="time-cents digits">00</span>
+                                <span class="time-main digits">00:00.</span>
+                                <span class="time-cents digits">00</span>
                             </div>
                             <button id="playPauseBtn">▶</button>
                             <button id="stopBtn">⏹</button>
+                            <button id="speedBtn">1x</button>
+                        </div>
+                        <div class="track-state">
+                            <div class="state-info">
+                                <div class="state-label">Section:</div>
+                                <div id="current-section" class="state-value">-</div>
+                            </div>
+                            <div class="state-info">
+                                <div class="state-label">Box:</div>
+                                <div id="current-box" class="state-value">-</div>
+                            </div>
+                            <div class="state-info">
+                                <div class="state-label">Position:</div>
+                                <div id="current-position" class="state-value">-</div>
+                            </div>
                         </div>
                     </div>
-                    <div id="sentences-content"></div>
+                    <div id="timeline" class="timeline"></div>
+                    <div id="sections-content"></div>
                 </div>
             </div>
         </div>
     </div>
-    <script src="playlist.js"></script>
-    <script src="model.js"></script>
-    <script src="app.js"></script>
+    <script type="module" src="app.js"></script>
 </body>
-</html> 
+</html>

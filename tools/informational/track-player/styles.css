@@ -261,3 +261,74 @@ body {
     opacity: 1.5;
     transform: none;
 }
+
+.section {
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 8px;
+    padding: 15px;
+    margin-bottom: 15px;
+}
+
+.section-header {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    margin-bottom: 10px;
+}
+
+.section-image {
+    width: 50px;
+    height: 50px;
+    border-radius: 4px;
+    object-fit: cover;
+}
+
+.timeboxes-info {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.timebox {
+    background: rgba(255, 255, 255, 0.05);
+    padding: 8px;
+    border-radius: 4px;
+    font-size: 0.9em;
+}
+
+h1, h2, h3, h4, h5, h6 {
+    font-weight: normal;
+    margin: 0;
+    color: #fff;
+}
+
+.track-state {
+    background: rgba(255, 255, 255, 0.05);
+    padding: 1rem;
+    border-radius: 4px;
+    margin-top: 1rem;
+    display: flex;
+    gap: 2rem;
+}
+
+.state-info {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.state-label {
+    color: var(--primary-color);
+    font-size: 0.9rem;
+}
+
+.state-value {
+    font-family: "clockicons";
+    font-size: 1.2rem;
+    color: var(--text-color);
+}
+
+.section.current-section {
+    border-left: 3px solid var(--primary-color);
+    padding-left: 12px;
+}
