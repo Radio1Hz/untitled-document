@@ -121,6 +121,14 @@ function displayTrack(trackIndex) {
     currentTrackIndex = trackIndex;
     const track = playlist[trackIndex];
     
+    // Update background video
+    const backgroundVideo = document.getElementById('background-video');
+    if (track['video-url']) {
+        backgroundVideo.src = track['video-url'];
+        backgroundVideo.load();  // Reload video with new source
+        backgroundVideo.play();  // Start playing
+    }
+    
     // Set duration for timer
     track_timer.setDuration(track.duration);
     

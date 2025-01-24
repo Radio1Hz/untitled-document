@@ -13,15 +13,20 @@
 # User-specific files (MonoDevelop/Xamarin Studio)
 *.userprefs
 
-knowledge/agents/viktor-r/tracks/1. there is no wisdom without kindness/code/python311/env311/
-knowledge/agents/viktor-r/tracks/1. there is no wisdom without kindness/code/python311/TTS/
-knowledge/agents/viktor-r/tracks/1. there is no wisdom without kindness/*.aup3
+knowledge/agents/viktor-r/projects/vikktør/tracks/1. there is no wisdom without kindness/code/python311/env311/
+knowledge/agents/viktor-r/projects/vikktør/tracks/1. there is no wisdom without kindness/code/python311/TTS/
+knowledge/agents/viktor-r/projects/vikktør/tracks/1. there is no wisdom without kindness/*.aup3
 
-knowledge/agents/viktor-r/tracks/2. đorđe-b ne lomite mi bagrenje/code/python311/env311/
-knowledge/agents/viktor-r/tracks/2. đorđe-b ne lomite mi bagrenje/code/python311/TTS/
-knowledge/agents/viktor-r/tracks/2. đorđe-b ne lomite mi bagrenje/*.aup3
+knowledge/agents/viktor-r/projects/vikktør/tracks/2. đorđe-b ne lomite mi bagrenje/code/python311/env311/
+knowledge/agents/viktor-r/projects/vikktør/tracks/2. đorđe-b ne lomite mi bagrenje/code/python311/TTS/
+knowledge/agents/viktor-r/projects/vikktør/tracks/2. đorđe-b ne lomite mi bagrenje/*.aup3
 
-# Mono auto generated files
+knowledge/agents/viktor-r/projects/vikktør/tracks/9. untitled-track/code/python311/env311/
+knowledge/agents/viktor-r/projects/vikktør/tracks/9. untitled-track/code/python311/TTS/
+knowledge/agents/viktor-r/projects/vikktør/tracks/9. untitled-track/*.aup3
+
+
+# Mono auto generated files 
 mono_crash.*
 
 # Build results
@@ -409,3 +414,5 @@ FodyWeavers.xsd
 knowledge/agents/viktor-r/tracks/2. đorđe-b ne lomite mi bagrenje/images/Duck Player - SLAVIJA _ CEO PROTEST _ 22.12.2024 - DuckDuckGo 2025-01-22 16-47-13.mp4
 knowledge/agents/viktor-r/tracks/timer-20m.mp4
 tools/informational/track-player/images/timer-20m.mp4
+knowledge/agents/viktor-r/projects/vikktør/tracks/1. there is no wisdom without kindness (rel)/1. there is no wisdom without kindness.aup3
+knowledge/agents/viktor-r/projects/vikktør/tracks/2. đorđe-b ne lomite mi bagrenje/images/Duck Player - SLAVIJA _ CEO PROTEST _ 22.12.2024 - DuckDuckGo 2025-01-22 16-47-13.mp4
