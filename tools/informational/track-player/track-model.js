@@ -17,11 +17,18 @@ class TimeUnit {
 class TimeBox {
     /**
      * @param {number} tStart - Start time relative to track's origin
+     * @param {Object|string} desc - Description of timebox content in multiple languages
      */
     constructor(tStart, desc = "") {
-        this.tStart = tStart;  // Start time relative to track's origin
-        this.n = 8;           // Default number of time units
-        this.desc = desc;     // Description of timebox content
+        this.tStart = tStart;
+        this.n = 8;
+        // Ensure desc is an object with language keys
+        this.desc = (typeof desc === 'string') ? {
+            en: desc,
+            zh: desc,
+            ru: desc,
+            ar: desc
+        } : desc;
     }
 
     /**
@@ -152,13 +159,24 @@ class TrackState {
 class Section {
     /**
      * @param {number} index - Section index in track
-     * @param {string} desc - Section description
+     * @param {Object} desc - Section description in multiple languages
      * @param {string|null} imageUrl - URL of section image
      */
-    constructor(index = 0, desc = "", imageUrl = null) {
+    constructor(index = 0, desc = {
+        en: "",
+        zh: "",
+        ru: "",
+        ar: ""
+    }, imageUrl = null) {
         this.timeboxes = [];
         this.index = index;
-        this.desc = desc;
+        // Ensure desc is an object with language keys
+        this.desc = (typeof desc === 'string') ? {
+            en: desc,
+            zh: desc,
+            ru: desc,
+            ar: desc
+        } : desc;
         this.imageUrl = imageUrl;
     }
 
@@ -179,7 +197,15 @@ class Section {
      * @returns {TimeBox} The newly created timebox
      */
     addTimebox(tStart, desc = "") {
-        const box = new TimeBox(tStart, desc);
+        // Ensure desc is an object with language keys
+        const description = (typeof desc === 'string') ? {
+            en: desc,
+            zh: desc,
+            ru: desc,
+            ar: desc
+        } : desc;
+
+        const box = new TimeBox(tStart, description);
         this.timeboxes.push(box);
         return box;
     }
@@ -199,13 +225,24 @@ class Track {
      */
     constructor({
         id = "\\author\\tracks\\untitled-track",
-        desc = "undescribed",
+        desc = {
+            en: "undescribed",
+            zh: "未描述",
+            ru: "не описано",
+            ar: "غير موصوف"
+        },
         tau = 0.5,
         delta = 5,
         n = 8
     } = {}) {
         this.id = id;
-        this.desc = desc;
+        // Ensure desc is an object with language keys
+        this.desc = (typeof desc === 'string') ? {
+            en: desc,
+            zh: desc,
+            ru: desc,
+            ar: desc
+        } : desc;
         this.tau = tau;
         this.delta = delta;
         this.n = n;
@@ -219,8 +256,16 @@ class Track {
      * @param {string|null} imageUrl - URL of section image
      * @returns {Section} The newly created section
      */
-    addSection(desc = "", imageUrl = null) {
-        const section = new Section(this.sections.length, desc, imageUrl);
+    addSection(desc, imageUrl) {
+        // Ensure desc is an object with language keys
+        const description = (typeof desc === 'string') ? {
+            en: desc,
+            zh: desc,
+            ru: desc,
+            ar: desc
+        } : desc;
+
+        const section = new Section(this.sections.length, description, imageUrl);
         this.sections.push(section);
         return section;
     }

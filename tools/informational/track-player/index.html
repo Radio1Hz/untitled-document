@@ -9,6 +9,10 @@
     <script src="tracks/9. untitled-track.js"></script>
 </head>
 <body>
+    <div class="background-container">
+        <div class="background-image fade"></div>
+        <div class="background-image fade"></div>
+    </div>
     <div class="layout">
         <div class="main-content">
             <div class="container">
@@ -18,6 +22,14 @@
                         <div class="track-meta">
                             <div>duration: <span id="track-duration"></span></div>
                             <div>speed: <span id="track-speed">1.0x</span></div>
+                            <div class="language-selector">
+                                <select id="langSelect">
+                                    <option value="en">English</option>
+                                    <option value="zh">中文</option>
+                                    <option value="ru">Русский</option>
+                                    <option value="ar">العربية</option>
+                                </select>
+                            </div>
                         </div>
                         <div class="track-controls">
                             <div id="currentTime" class="time-display">
@@ -27,18 +39,12 @@
                             <button id="playPauseBtn">▶</button>
                             <button id="stopBtn">⏹</button>
                             <button id="speedBtn">1x</button>
+                            <button id="loopBtn" class="control-button" title="Toggle loop"></button>
                         </div>
                         <div class="track-state">
                             <div class="state-info">
-                                <div class="state-label">section:</div>
                                 <div id="current-section" class="state-value">-</div>
-                            </div>
-                            <div class="state-info">
-                                <div class="state-label">timebox:</div>
                                 <div id="current-box" class="state-value">-</div>
-                            </div>
-                            <div class="state-info">
-                                <div class="state-label">position:</div>
                                 <div id="current-position" class="state-value">-</div>
                             </div>
                         </div>
@@ -49,6 +55,7 @@
             </div>
         </div>
     </div>
+    <div class="bottom-text">viktor-r@radio-1hz #vikktør #untitled-document</div>
     <script type="module" src="app.js"></script>
 </body>
 </html>

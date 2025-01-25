@@ -1,4 +1,4 @@
-### Track-Player: Formal Mathematical Specification  
+### Track-Player: Formal Mathematical Model  
 A visual tool for interacting with temporal structures ("tracks") through playback control (play, pause, rewind, etc.) and visualization. The system is defined hierarchically as follows:  
 
 ---  
