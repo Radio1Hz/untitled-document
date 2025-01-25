@@ -23,6 +23,7 @@ class TrackPlayer {
         this.mode = PlaybackMode.STOPPED;  // ρ (playback mode)
         this.speed = speed;           // ν (speed multiplier)
         this.time = 0;
+        this.accumulatedTime = 0;  // Add accumulator for time quantization
     }
 
     /**
@@ -54,6 +55,7 @@ class TrackPlayer {
         this.mode = PlaybackMode.STOPPED;
         this.state = new TrackState();
         this.time = 0;
+        this.accumulatedTime = 0;
         return this;
     }
 
@@ -77,18 +79,34 @@ class TrackPlayer {
     tick(deltaTime) {
         if (this.mode === PlaybackMode.PLAYING) {
             this.time += deltaTime * this.speed;
+            this.accumulatedTime += deltaTime * this.speed;
+
+            // Get current timebox duration
+            const currentSection = this.track.sections[this.state.i];
+            if (!currentSection) return this;
+
+            const currentBox = currentSection.timeboxes[this.state.j];
+            if (!currentBox) return this;
+
+            // Use tau (time unit) instead of full box duration
+            const timeUnit = this.track.tau;
             
-            // Update state based on current time
-            const quantumTime = this.track.tau;
-            const currentQuantum = Math.floor(this.time / quantumTime);
-            
-            // Update state to match current time
-            while (this.state.absoluteTime(this.track) < currentQuantum * quantumTime) {
+            // Check if we've accumulated enough time to advance state
+            while (this.accumulatedTime >= timeUnit) {  // Changed from boxDuration to timeUnit
                 const nextState = this.state.advance(this.track);
-                if (!nextState) break;
+                if (!nextState) {
+                    console.log(`Track state: End of track reached. Stopping.`);
+                    this.stop();
+                    break;
+                }
+                
+                // Log state transition
+                console.log(`Track state changed: (${this.state.i},${this.state.j},${this.state.k}) -> (${nextState.i},${nextState.j},${nextState.k}) at time ${this.time.toFixed(2)}s`);
+                
                 this.state = nextState;
+                this.accumulatedTime -= timeUnit;  // Subtract time unit instead of box duration
             }
-            
+
             if (this.time >= this.track.totalDuration()) {
                 this.time = this.track.totalDuration();
                 this.stop();

@@ -285,8 +285,10 @@ body {
 
 .timeboxes-info {
     display: flex;
-    flex-direction: column;
+    flex-direction: row;
     gap: 8px;
+    overflow-x: auto;
+    padding: 8px 0;
 }
 
 .timebox {
@@ -294,6 +296,13 @@ body {
     padding: 8px;
     border-radius: 4px;
     font-size: 0.9em;
+    min-width: 200px;
+    flex-shrink: 0;
+    position: relative;
+}
+
+.timebox.current-box {
+    background-color: #00000080;
 }
 
 h1, h2, h3, h4, h5, h6 {
@@ -329,6 +338,6 @@ h1, h2, h3, h4, h5, h6 {
 }
 
 .section.current-section {
-    border-left: 3px solid var(--primary-color);
     padding-left: 12px;
+    background-color: rgba(255, 255, 255, 0.15);
 }

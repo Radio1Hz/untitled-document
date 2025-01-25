@@ -14,11 +14,13 @@ Let $\tau \in \mathbb{T}$ denote the **time unit**, an indivisible temporal inte
 #### **2. Timebox ($T$)**  
 A timebox $T$ represents a contiguous interval within a track, defined by:  
 $$  
-T = t_{\text{start}}
+T = (t_{\text{start}}, \text{desc})
 $$  
 **where**:  
 - $t_{\text{start}} \in \mathbb{D}$: Start time of $T$, relative to the track's origin.  
   - *Default*: $t_{\text{start}} = 0$.
+- $\text{desc} \in \mathbb{S}$: Description of the timebox content.
+  - *Default*: $\text{desc} = \text{""}$ (empty string).
 
 ---  
 
@@ -29,7 +31,7 @@ S = \left\langle T_1, T_2, \ldots, T_k \right\rangle
 $$  
 **with properties**:  
 - $\text{index}(S) \in \mathbb{N}$: Position of $S$ in the track.  
-- $\text{description}(S) \in \mathbb{S}$: Brief textual summary of $S$.  
+- $\text{desc}(S) \in \mathbb{S}$: Brief textual summary of $S$.  
 - $\text{image}(S) \in \mathbb{U}$: URL of a visual asset for $S$.  
 
 ---  
@@ -42,7 +44,7 @@ $$
 **where**:  
 - $\text{id} \in \mathbb{S}$: Unique identifier for $\Theta$.  
   - *Default*: $\text{id} = \text{"untitled-track"}$.  
-- $\text{description} \in \mathbb{S}$: Single-sentence description of $\Theta$.  
+- $\text{desc} \in \mathbb{S}$: Single-sentence description of $\Theta$.  
   - *Default*: $\text{desc} = \text{"undescribed"}$.  
 - $\tau \in \mathbb{T}$: Duration of one time unit (see §1).  
   - *Default*: $\tau = 0.5\,s$.  

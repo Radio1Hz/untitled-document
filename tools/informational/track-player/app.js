@@ -2,46 +2,26 @@ import { Track } from './track-model.js';
 import { TrackPlayer, PlaybackMode } from './track-player-model.js';
 import { TrackPlayerScreen } from './track-player-screen-model.js';
 
-document.addEventListener('DOMContentLoaded', () => {
-    // Create a demo track
+document.addEventListener('DOMContentLoaded', async () => {
+    // Load track from JSON
+    const trackData = untitled_track;
+    
+    // Create track from JSON data
     const track = new Track({
-        id: "\\vikktør\\tracks\\9. untitled-track",
-        description: "før sofia.",
-        tau: 0.5,  // 0.5 second units
-        delta: 0,  // no padding
-        n: 8      // 8 time units per box
+        id: trackData.id,
+        desc: trackData.desc,
+        tau: trackData.tau,
+        delta: trackData.delta,
+        n: trackData.n
     });
 
-    // Add some sections with timeboxes
-    const section1 = track.addSection("1. a track Θ is a tuple: Θ = (id, desc, τ, δ, n, ⟨S1, S2, …, Sm⟩)", "images/image-section-1.jpg");
-    section1.addTimebox(0);    // First box starts at 0
-    section1.addTimebox(8);    // Second box starts at 8 units
-    section1.addTimebox(16);    
-    section1.addTimebox(24);    
-    section1.addTimebox(32);   
-    section1.addTimebox(40);  
-    section1.addTimebox(48);   
-    section1.addTimebox(56);  
-
-    const section2 = track.addSection("2. a track state Ψ represents a specific temporal position within a track, defined as: ", "images/image-section-2.jpg");
-    section2.addTimebox(64);   
-    section2.addTimebox(72);  
-    section2.addTimebox(80);   
-    section2.addTimebox(88);   
-    section2.addTimebox(96);   
-    section2.addTimebox(104);  
-    section2.addTimebox(112);   
-    section2.addTimebox(120);   
-
-    const section3 = track.addSection("3. A track player Π is a stateful system that manages playback of a track, defined as: Π = (Θ, Ψ, τ, δ, n, ⟨S1, S2, …, Sm⟩)", "images/image-section-3.jpg");
-    section3.addTimebox(128);   
-    section3.addTimebox(136);  
-    section3.addTimebox(144);   
-    section3.addTimebox(152);   
-    section3.addTimebox(160);   
-    section3.addTimebox(168);  
-    section3.addTimebox(176);   
-    section3.addTimebox(184);   
+    // Add sections and timeboxes from JSON
+    trackData.sections.forEach(sectionData => {
+        const section = track.addSection(sectionData.desc, sectionData.imageUrl);
+        sectionData.timeboxes.forEach(boxData => {
+            section.addTimebox(boxData.tStart, boxData.desc);
+        });
+    });
 
     // Create player and screen
     const player = new TrackPlayer(track);
@@ -64,7 +44,12 @@ document.addEventListener('DOMContentLoaded', () => {
     trackTitle.textContent = track.id;
 
     // Display track duration
-    durationDisplay.textContent = `${track.totalDuration().toFixed(1)}s`;
+    durationDisplay.textContent = `${track.totalDuration().toFixed(0)}s`;
+
+    // Initialize track state display
+    currentSection.textContent = '0';  // Changed from 1 to 0
+    currentBox.textContent = '0';      // Changed from 1 to 0
+    currentPosition.textContent = '0';  // Already 0
 
     // Setup playback controls
     playPauseBtn.addEventListener('click', () => {
@@ -102,17 +87,61 @@ document.addEventListener('DOMContentLoaded', () => {
         const header = document.createElement('div');
         header.className = 'section-header';
 
+        // Calculate section start time
+        let sectionStartTime = 0;
+        for (let i = 0; i < index; i++) {
+            sectionStartTime += track.sections[i].duration(track.tau, track.n);
+        }
+        
+        // Format time as mm:ss
+        const minutes = Math.floor(sectionStartTime / 60);
+        const seconds = Math.floor(sectionStartTime % 60);
+        const timePrefix = `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+
         const title = document.createElement('h3');
-        title.textContent = section.description;
+        title.textContent = `[${timePrefix}] ${section.desc}`;
         header.appendChild(title);
 
         const timeboxes = document.createElement('div');
         timeboxes.className = 'timeboxes-info';
+        timeboxes.style.minWidth = '200px';
+        timeboxes.style.display = 'flex';  // Add flex display
+        timeboxes.style.flexWrap = 'wrap'; // Enable wrapping
+        timeboxes.style.gap = '4px';       // Add some spacing between boxes
 
-        section.timeboxes.forEach(box => {
+        section.timeboxes.forEach((box, boxIndex) => {
             const timeboxElement = document.createElement('div');
             timeboxElement.className = 'timebox';
-            timeboxElement.textContent = `Duration: ${box.duration(track.tau, track.n)}s`;
+            timeboxElement.style.flexGrow = '0';     
+            timeboxElement.style.flexShrink = '0';   
+            
+            // Create container for text and positions
+            const textContainer = document.createElement('div');
+            textContainer.textContent = `${box.desc}`;
+            
+            // Create container for position indicators
+            const positionsContainer = document.createElement('div');
+            positionsContainer.className = 'positions-container';
+            positionsContainer.style.display = 'flex';
+            positionsContainer.style.justifyContent = 'space-between'; // Distribute dots evenly
+            positionsContainer.style.width = '100%';  // Take full width
+            positionsContainer.style.marginTop = '4px';
+            
+            // Add position indicators (0 to n-1)
+            for (let pos = 0; pos < track.n; pos++) {
+                const positionDot = document.createElement('div');
+                positionDot.className = 'position-dot';
+                positionDot.dataset.position = pos;
+                positionDot.style.width = '4px';
+                positionDot.style.height = '4px';
+                positionDot.style.borderRadius = '50%';
+                positionDot.style.backgroundColor = '#ddd';
+                // Remove gap since we're using space-between
+                positionsContainer.appendChild(positionDot);
+            }
+            
+            timeboxElement.appendChild(textContainer);
+            timeboxElement.appendChild(positionsContainer);
             timeboxes.appendChild(timeboxElement);
         });
 
@@ -121,15 +150,17 @@ document.addEventListener('DOMContentLoaded', () => {
         sectionsContent.appendChild(sectionElement);
     });
 
-    // Setup update loop
+    // Setup timer-based updates instead
+    const UPDATE_INTERVAL = 50; // Update every 50ms (20 times per second)
+    
     let lastTime = performance.now();
-    function update() {
+    const timer = setInterval(() => {
         const currentTime = performance.now();
         const deltaTime = (currentTime - lastTime) / 1000;
         lastTime = currentTime;
 
-        // Ensure deltaTime is reasonable (prevent large jumps)
-        const maxDeltaTime = 1/30;
+        // Ensure deltaTime is reasonable
+        const maxDeltaTime = 1/20; // max 1/20th of a second
         const clampedDeltaTime = Math.min(deltaTime, maxDeltaTime);
 
         player.tick(clampedDeltaTime);
@@ -148,22 +179,30 @@ document.addEventListener('DOMContentLoaded', () => {
 
         // Update state display
         const state = player.state;
-        currentSection.textContent = `${state.sectionIndex + 1}`;
-        currentBox.textContent = `${state.boxIndex + 1}`;
-        currentPosition.textContent = `${state.position}`;
+        currentSection.textContent = `${state.i}`;
+        currentBox.textContent = `${state.j}`;
+        currentPosition.textContent = `${state.k}`;
 
-        // Highlight current section in the sections list
-        document.querySelectorAll('.section').forEach((section, index) => {
-            if (index === state.sectionIndex) {
-                section.classList.add('current-section');
-            } else {
-                section.classList.remove('current-section');
-            }
+        // Highlight current section and timebox
+        document.querySelectorAll('.section').forEach((section, sectionIndex) => {
+            const isCurrentSection = sectionIndex === state.i;
+            section.classList.toggle('current-section', isCurrentSection);
+            
+            section.querySelectorAll('.timebox').forEach((timebox, boxIndex) => {
+                const isCurrentBox = isCurrentSection && boxIndex === state.j;
+                timebox.classList.toggle('current-box', isCurrentBox);
+                
+                // Update position dots
+                timebox.querySelectorAll('.position-dot').forEach((dot, posIndex) => {
+                    const isCurrentPosition = isCurrentBox && posIndex === state.k;
+                    dot.style.backgroundColor = isCurrentPosition ? '#ffffff' : '#888888';
+                });
+            });
         });
+    }, UPDATE_INTERVAL);
 
-        requestAnimationFrame(update);
-    }
-
-    // Start update loop
-    requestAnimationFrame(update);
+    // Clean up timer when page unloads
+    window.addEventListener('unload', () => {
+        clearInterval(timer);
+    });
 });

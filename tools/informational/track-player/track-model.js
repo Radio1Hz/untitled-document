@@ -12,14 +12,16 @@ class TimeUnit {
 }
 
 /**
- * Represents a contiguous interval within a track: T = t_start
+ * Represents a contiguous interval within a track: T = (t_start, desc)
  */
 class TimeBox {
     /**
      * @param {number} tStart - Start time relative to track's origin
      */
-    constructor(tStart) {
+    constructor(tStart, desc = "") {
         this.tStart = tStart;  // Start time relative to track's origin
+        this.n = 8;           // Default number of time units
+        this.desc = desc;     // Description of timebox content
     }
 
     /**
@@ -29,7 +31,7 @@ class TimeBox {
      * @returns {number} Duration in seconds
      */
     duration(tau, n) {
-        return n * tau;
+        return tau * n;  // Changed from this.n to use track's n parameter
     }
 }
 
@@ -60,7 +62,7 @@ class TrackState {
         const timebox = section.timeboxes[this.j];
         if (!timebox) return undefined;
 
-        if (this.k + 1 < timebox.n) {
+        if (this.k + 1 < track.n) {
             return new TrackState(this.i, this.j, this.k + 1);
         }
 
@@ -86,14 +88,16 @@ class TrackState {
         }
 
         if (this.j > 0) {
-            const prevBox = track.sections[this.i].timeboxes[this.j - 1];
-            return new TrackState(this.i, this.j - 1, prevBox.n - 1);
+            return new TrackState(this.i, this.j - 1, track.n - 1);
         }
 
         if (this.i > 0) {
             const prevSection = track.sections[this.i - 1];
-            const lastBox = prevSection.timeboxes[prevSection.timeboxes.length - 1];
-            return new TrackState(this.i - 1, prevSection.timeboxes.length - 1, lastBox.n - 1);
+            return new TrackState(
+                this.i - 1, 
+                prevSection.timeboxes.length - 1, 
+                track.n - 1
+            );
         }
 
         return undefined;
@@ -148,13 +152,13 @@ class TrackState {
 class Section {
     /**
      * @param {number} index - Section index in track
-     * @param {string} description - Section description
+     * @param {string} desc - Section description
      * @param {string|null} imageUrl - URL of section image
      */
-    constructor(index = 0, description = "", imageUrl = null) {
+    constructor(index = 0, desc = "", imageUrl = null) {
         this.timeboxes = [];
         this.index = index;
-        this.description = description;
+        this.desc = desc;
         this.imageUrl = imageUrl;
     }
 
@@ -171,10 +175,11 @@ class Section {
     /**
      * Add a new timebox to the section
      * @param {number} tStart - Start time
+     * @param {string} desc - Description of timebox content
      * @returns {TimeBox} The newly created timebox
      */
-    addTimebox(tStart) {
-        const box = new TimeBox(tStart);
+    addTimebox(tStart, desc = "") {
+        const box = new TimeBox(tStart, desc);
         this.timeboxes.push(box);
         return box;
     }
@@ -187,20 +192,20 @@ class Track {
     /**
      * @param {Object} params - Track parameters
      * @param {string} params.id - Track identifier
-     * @param {string} params.description - Track description
+     * @param {string} params.desc - Track description
      * @param {number} params.tau - Time unit duration
      * @param {number} params.delta - Padding duration
      * @param {number} params.n - Number of time units per box
      */
     constructor({
         id = "\\author\\tracks\\untitled-track",
-        description = "undescribed",
+        desc = "undescribed",
         tau = 0.5,
         delta = 5,
         n = 8
     } = {}) {
         this.id = id;
-        this.description = description;
+        this.desc = desc;
         this.tau = tau;
         this.delta = delta;
         this.n = n;
@@ -210,12 +215,12 @@ class Track {
 
     /**
      * Add a new section to the track
-     * @param {string} description - Section description
+     * @param {string} desc - Section description
      * @param {string|null} imageUrl - URL of section image
      * @returns {Section} The newly created section
      */
-    addSection(description = "", imageUrl = null) {
-        const section = new Section(this.sections.length, description, imageUrl);
+    addSection(desc = "", imageUrl = null) {
+        const section = new Section(this.sections.length, desc, imageUrl);
         this.sections.push(section);
         return section;
     }
