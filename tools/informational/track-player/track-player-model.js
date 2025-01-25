@@ -207,6 +207,39 @@ class TrackPlayer {
             }
         };
     }
+
+    calculateStateForTime(time) {
+        const totalTau = Math.floor(time / this.track.tau);
+        let remainingTau = totalTau;
+        let i = 0, j = 0, k = 0;
+        
+        // Find the correct section and box
+        for (i = 0; i < this.track.sections.length; i++) {
+            const section = this.track.sections[i];
+            for (j = 0; j < section.timeboxes.length; j++) {
+                const boxDuration = this.track.n; // number of positions * tau
+                if (remainingTau < boxDuration) {
+                    k = remainingTau;
+                    // Return a proper TrackState instance instead of plain object
+                    return new TrackState(i, j, k);
+                }
+                remainingTau -= boxDuration;
+            }
+        }
+        
+        // If we've gone past the end, return the last valid state
+        return new TrackState(
+            this.track.sections.length - 1,
+            this.track.sections[this.track.sections.length - 1].timeboxes.length - 1,
+            this.track.n - 1
+        );
+    }
+
+    seekTo(time) {
+        this.state = this.calculateStateForTime(time);
+        this.time = time;  // Also update the current time
+        this.accumulatedTime = time % this.track.tau;  // Update accumulated time
+    }
 }
 
 export { PlaybackMode, TrackPlayer }; 

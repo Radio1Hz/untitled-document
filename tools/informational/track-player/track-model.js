@@ -158,26 +158,24 @@ class TrackState {
  */
 class Section {
     /**
-     * @param {number} index - Section index in track
-     * @param {Object} desc - Section description in multiple languages
-     * @param {string|null} imageUrl - URL of section image
+     * @param {Object} desc - Multilingual description object with language codes as keys
+     * @param {string} imageUrl - URL of the section image
      */
-    constructor(index = 0, desc = {
-        en: "",
-        zh: "",
-        ru: "",
-        ar: ""
-    }, imageUrl = null) {
-        this.timeboxes = [];
-        this.index = index;
-        // Ensure desc is an object with language keys
-        this.desc = (typeof desc === 'string') ? {
-            en: desc,
-            zh: desc,
-            ru: desc,
-            ar: desc
-        } : desc;
+    constructor(desc, imageUrl = '') {
+        this.desc = desc;  // Changed from string to object to support multiple languages
         this.imageUrl = imageUrl;
+        this.timeboxes = [];
+    }
+
+    /**
+     * Add a timebox to this section
+     * @param {number} tStart - Start time
+     * @param {Object} desc - Multilingual description object
+     * @returns {Section} This section instance
+     */
+    addTimebox(tStart, desc) {
+        this.timeboxes.push(new TimeBox(tStart, desc));
+        return this;
     }
 
     /**
@@ -189,26 +187,6 @@ class Section {
     duration(tau, n) {
         return this.timeboxes.reduce((sum, box) => sum + box.duration(tau, n), 0);
     }
-
-    /**
-     * Add a new timebox to the section
-     * @param {number} tStart - Start time
-     * @param {string} desc - Description of timebox content
-     * @returns {TimeBox} The newly created timebox
-     */
-    addTimebox(tStart, desc = "") {
-        // Ensure desc is an object with language keys
-        const description = (typeof desc === 'string') ? {
-            en: desc,
-            zh: desc,
-            ru: desc,
-            ar: desc
-        } : desc;
-
-        const box = new TimeBox(tStart, description);
-        this.timeboxes.push(box);
-        return box;
-    }
 }
 
 /**
@@ -217,32 +195,15 @@ class Section {
 class Track {
     /**
      * @param {Object} params - Track parameters
-     * @param {string} params.id - Track identifier
-     * @param {string} params.desc - Track description
-     * @param {number} params.tau - Time unit duration
-     * @param {number} params.delta - Padding duration
-     * @param {number} params.n - Number of time units per box
+     * @param {string} params.id - Track ID
+     * @param {Object} params.desc - Multilingual track description
+     * @param {number} params.tau - Time unit (τ)
+     * @param {number} params.delta - Time quantum (δ)
+     * @param {number} params.n - Positions per timebox
      */
-    constructor({
-        id = "\\author\\tracks\\untitled-track",
-        desc = {
-            en: "undescribed",
-            zh: "未描述",
-            ru: "не описано",
-            ar: "غير موصوف"
-        },
-        tau = 0.5,
-        delta = 5,
-        n = 8
-    } = {}) {
+    constructor({ id, desc, tau, delta, n }) {
         this.id = id;
-        // Ensure desc is an object with language keys
-        this.desc = (typeof desc === 'string') ? {
-            en: desc,
-            zh: desc,
-            ru: desc,
-            ar: desc
-        } : desc;
+        this.desc = desc;
         this.tau = tau;
         this.delta = delta;
         this.n = n;
@@ -251,21 +212,13 @@ class Track {
     }
 
     /**
-     * Add a new section to the track
-     * @param {string} desc - Section description
-     * @param {string|null} imageUrl - URL of section image
+     * Add a section to this track
+     * @param {Object} desc - Multilingual section description
+     * @param {string} imageUrl - URL of the section image
      * @returns {Section} The newly created section
      */
-    addSection(desc, imageUrl) {
-        // Ensure desc is an object with language keys
-        const description = (typeof desc === 'string') ? {
-            en: desc,
-            zh: desc,
-            ru: desc,
-            ar: desc
-        } : desc;
-
-        const section = new Section(this.sections.length, description, imageUrl);
+    addSection(desc, imageUrl = '') {
+        const section = new Section(desc, imageUrl);
         this.sections.push(section);
         return section;
     }

@@ -6,6 +6,10 @@ document.addEventListener('DOMContentLoaded', async () => {
     // Load track from JSON
     const trackData = untitled_track;
     
+    // Create audio element
+    const audioElement = new Audio(trackData.audioUrl);
+    audioElement.preload = 'auto';
+
     // Create track from JSON data
     const track = new Track({
         id: trackData.id,
@@ -54,38 +58,53 @@ document.addEventListener('DOMContentLoaded', async () => {
     currentBox.textContent = '0';      // Changed from 1 to 0
     currentPosition.textContent = '0';  // Already 0
 
-    // Setup playback controls
+    // Modify the player controls to handle audio
     playPauseBtn.addEventListener('click', () => {
         if (player.mode === PlaybackMode.PLAYING) {
             player.pause();
+            audioElement.pause();
             playPauseBtn.textContent = '▶';
         } else {
+            // Reset accumulated time when starting playback
+            accumulatedTime = 0;
+            lastTickTime = null;
+            
+            // Sync player state with audio time before starting
+            if (audioElement.currentTime > 0) {
+                player.seekTo(audioElement.currentTime);
+            }
+            
             player.play();
+            audioElement.play();
             playPauseBtn.textContent = '⏸';
         }
     });
 
     stopBtn.addEventListener('click', () => {
         player.stop();
+        audioElement.pause();
+        audioElement.currentTime = 0;
         playPauseBtn.textContent = '▶';
     });
 
-    // Setup speed control
+    // Update speed control to affect audio playback
     const speeds = [0.5, 1.0, 1.5, 2.0];
     let speedIndex = 1;
     speedBtn.addEventListener('click', () => {
         speedIndex = (speedIndex + 1) % speeds.length;
         const newSpeed = speeds[speedIndex];
         player.setSpeed(newSpeed);
+        audioElement.playbackRate = newSpeed;  // Set audio playback rate
         speedBtn.textContent = `${newSpeed}x`;
         speedDisplay.textContent = `${newSpeed}x`;
     });
 
-    // Setup loop control
+    // Update loop control to handle audio
     let isLooping = false;
     loopBtn.addEventListener('click', () => {
         isLooping = !isLooping;
         player.setLooping(isLooping);
+        audioElement.loop = isLooping;  // Set audio loop
         loopBtn.classList.toggle('loop-active', isLooping);
         loopBtn.classList.toggle('loop-inactive', !isLooping);
         loopBtn.title = isLooping ? 'Looping enabled' : 'Looping disabled';
@@ -132,7 +151,7 @@ document.addEventListener('DOMContentLoaded', async () => {
             const timePrefix = `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
 
             const title = document.createElement('h3');
-            title.textContent = `[${timePrefix}] ${section.desc[current_lang_code]}`;
+            title.textContent = `[${timePrefix}] ${section.desc[current_lang_code] || section.desc.en}`;
             header.appendChild(title);
 
             const timeboxes = document.createElement('div');
@@ -216,22 +235,43 @@ document.addEventListener('DOMContentLoaded', async () => {
     function update(currentTime) {
         if (lastTickTime === null) {
             lastTickTime = currentTime;
+            return requestAnimationFrame(update);
         }
 
         // Calculate precise time since last frame
         const deltaTime = (currentTime - lastTickTime) / 1000;
         lastTickTime = currentTime;
 
-        // Accumulate time and update state only when needed
-        accumulatedTime += deltaTime;
-        
-        // Update visual elements every frame for smoothness
-        updateVisuals(player.currentTime());
+        // If playing, sync visual player with audio time
+        if (player.mode === PlaybackMode.PLAYING) {
+            const audioTime = audioElement.currentTime;
+            
+            // Calculate the current state based on audio time
+            const totalTau = Math.floor(audioTime / player.track.tau);
+            const expectedState = player.calculateStateForTime(audioTime);
+            
+            // Update player state if it doesn't match
+            if (player.state.i !== expectedState.i || 
+                player.state.j !== expectedState.j || 
+                player.state.k !== expectedState.k) {
+                player.state = expectedState;
+                accumulatedTime = audioTime % player.track.tau;
+            }
+        }
 
-        // But update track state only at precise tau intervals
-        while (accumulatedTime >= player.track.tau) {
-            player.tick(player.track.tau); // Use exact tau value instead of accumulated deltaTime
-            accumulatedTime -= player.track.tau;
+        // Update visual elements every frame for smoothness
+        updateVisuals(audioElement.currentTime);
+
+        // Only tick if we're playing
+        if (player.mode === PlaybackMode.PLAYING) {
+            // Accumulate time and update state only when needed
+            accumulatedTime += deltaTime;
+            
+            // Update track state at precise tau intervals
+            while (accumulatedTime >= player.track.tau) {
+                player.tick(player.track.tau);
+                accumulatedTime -= player.track.tau;
+            }
         }
 
         requestAnimationFrame(update);
@@ -306,6 +346,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     // Clean up when page unloads
     window.addEventListener('unload', () => {
-        // No need to clear interval anymore
+        audioElement.pause();
+        audioElement.src = '';
     });
 });
