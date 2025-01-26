@@ -255,17 +255,33 @@ class TrackPlayer {
         
         return {
             subscribe: (callback) => {
+                console.log('Event subscription added');
                 listeners.add(callback);
                 return () => listeners.delete(callback);
             },
             dispatch: () => {
+                // Calculate current time based on state if available
+                const currentTime = this.state ? 
+                    this.state.absoluteTime(this.currentTrack) : 
+                    this.time;
+                    
                 const event = {
-                    currentTime: this.currentTime(),
+                    currentTime,
                     remainingTime: this.remainingTime(),
+                    totalDuration: this.currentTrack.totalDuration(),
                     mode: this.mode,
                     speed: this.speed,
                     state: this.state
                 };
+
+                console.log('Dispatching to', listeners.size, 'listeners:', {
+                    currentTime: currentTime.toFixed(3),
+                    mode: this.mode,
+                    state: this.state ? 
+                        `(${this.state.i},${this.state.j},${this.state.k})` : 
+                        'null'
+                });
+
                 listeners.forEach(callback => callback(event));
             }
         };

@@ -50,7 +50,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     });
 
     // Create player with custom screen_to_dot_ratio
-    const player = new TrackPlayer(null, 1.0, 250, true, 50);  // Last parameter is screen_to_dot_ratio
+    const player = new TrackPlayer(null, 1.0, 0, true, 50);  // Last parameter is screen_to_dot_ratio
     player.addTrack(track1Obj);
     player.addTrack(track9Obj);
 
@@ -130,11 +130,13 @@ document.addEventListener('DOMContentLoaded', async () => {
     audioElement.addEventListener('playing', () => console.log('Audio playing'));
     audioElement.addEventListener('pause', () => console.log('Audio paused'));
 
-    // Get the container element
+    // Create single dispatcher instance
+    const dispatcher = player.createEventDispatcher();
+    console.log('Dispatcher created');
+
+    // Create screen with the same dispatcher
     const container = document.querySelector('.container');
-    
-    // Create screen with default dimensions
-    const screen = new TrackPlayerScreen(3000, 3000, player);
+    const screen = new TrackPlayerScreen(3000, 3000, player, dispatcher);  // Pass dispatcher to screen
     
     // Initial mount
     screen.mount(container);
@@ -204,6 +206,7 @@ document.addEventListener('DOMContentLoaded', async () => {
             player.pause();
             audioElement.pause();
             playPauseBtn.textContent = '▶';
+            dispatcher.dispatch();  // Final dispatch when pausing
         } else {
             console.log('Starting playback');
             try {
@@ -217,10 +220,11 @@ document.addEventListener('DOMContentLoaded', async () => {
                 }
                 
                 // Start playback immediately if audio is loaded
-                if (audioElement.readyState >= 3) { // HAVE_FUTURE_DATA or better
+                if (audioElement.readyState >= 3) {
                     await audioElement.play();
                     player.play();
                     playPauseBtn.textContent = '⏸';
+                    dispatcher.dispatch();  // Initial dispatch
                 } else {
                     // If audio isn't loaded, show loading state and wait
                     playPauseBtn.textContent = '⌛';
@@ -228,6 +232,8 @@ document.addEventListener('DOMContentLoaded', async () => {
                     await audioElement.play();
                     player.play();
                     playPauseBtn.textContent = '⏸';
+                    // Initial dispatch when starting playback after loading
+                    dispatcher.dispatch();
                 }
             } catch (error) {
                 console.error('Playback failed:', error);
@@ -290,62 +296,15 @@ document.addEventListener('DOMContentLoaded', async () => {
     // Modify the update function to handle predelay
     let playStartTime = null;
     
-    function update(currentTime) {
-        if (lastTickTime === null) {
-            lastTickTime = currentTime;
-            return requestAnimationFrame(update);
-        }
-
-        const deltaTime = (currentTime - lastTickTime) / 1000;
-        lastTickTime = currentTime;
-
-        if (player.mode === PlaybackMode.PLAYING) {
-            const audioTime = audioElement.currentTime;
-            
-            if (playStartTime === null) {
-                playStartTime = currentTime;
-            }
-            
-            const timeSincePlay = currentTime - playStartTime;
-            if (timeSincePlay < player.predelay_ms) {
-                player.state = new TrackState();
-            } else {
-                const adjustedAudioTime = audioTime - (player.predelay_ms / 1000);
-                
-                // Find the last transition that should have occurred by now
-                const currentTransition = player.transitionTimes
-                    .filter(t => t.time <= adjustedAudioTime)
-                    .pop();
-
-                if (currentTransition) {
-                    console.log(`At time ${adjustedAudioTime.toFixed(3)}, using transition:`, 
-                        currentTransition.time.toFixed(3), 
-                        `state: (${currentTransition.state.i},${currentTransition.state.j},${currentTransition.state.k})`
-                    );
-                    
-                    player.state = new TrackState(
-                        currentTransition.state.i,
-                        currentTransition.state.j,
-                        currentTransition.state.k
-                    );
-                }
-            }
-        }
-
-        // Update visual elements
-        updateVisuals(audioElement.currentTime);
-
-        requestAnimationFrame(update);
-    }
-
-    function updateVisuals(time) {
-        // Skip visual updates if player state is not initialized
+    // Separate visual updates from state checks
+    function updateVisuals(currentTime) {
+        // Only update time display and visual elements
         if (!player.state) return;
 
         // Calculate minutes, seconds, and cents
-        const minutes = Math.floor(time / 60);
-        const seconds = Math.floor(time % 60);
-        const cents = Math.floor((time % 1) * 100);
+        const minutes = Math.floor(currentTime / 60);
+        const seconds = Math.floor(currentTime % 60);
+        const cents = Math.floor((currentTime % 1) * 100);
         
         const timeMain = document.querySelector('.time-main');
         const timeCents = document.querySelector('.time-cents');
@@ -353,51 +312,62 @@ document.addEventListener('DOMContentLoaded', async () => {
         timeMain.textContent = `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}.`;
         timeCents.textContent = cents.toString().padStart(2, '0');
 
-        // Update state display
-        const state = player.state;
-        const prevSection = currentSection.textContent;
-        const prevBox = currentBox.textContent;
-        const prevPosition = currentPosition.textContent;
-        
-        // Update display elements with leading zeros
-        currentSection.textContent = state.i.toString().padStart(2, '0');
-        currentBox.textContent = state.j.toString().padStart(2, '0');
-        currentPosition.textContent = state.k.toString().padStart(2, '0');
+        // Update visual elements
+        requestAnimationFrame(() => updateVisuals(audioElement.currentTime));
+    }
 
-        // Update dot highlighting
-        document.querySelectorAll('.section').forEach((section, sectionIndex) => {
-            const isCurrentSection = sectionIndex === state.i;
-            section.classList.toggle('current-section', isCurrentSection);
+    // Check state transitions at a lower frequency
+    function checkStateTransitions() {
+        if (player.mode === PlaybackMode.PLAYING) {
+            const audioTime = audioElement.currentTime;
             
-            section.querySelectorAll('.timebox').forEach((timebox, boxIndex) => {
-                const isCurrentBox = isCurrentSection && boxIndex === state.j;
-                timebox.classList.toggle('current-box', isCurrentBox);
+            if (playStartTime === null) {
+                playStartTime = performance.now();
+            }
+            
+            const timeSincePlay = performance.now() - playStartTime;
+            if (timeSincePlay < player.predelay_ms) {
+                const previousState = player.state;
+                player.state = new TrackState();
+                if (!previousState || previousState.i !== 0 || previousState.j !== 0 || previousState.k !== 0) {
+                    console.log('Initial state transition, dispatching at:', audioTime);
+                    dispatcher.dispatch();
+                }
+            } else {
+                const adjustedAudioTime = audioTime - (player.predelay_ms / 1000);
                 
-                // Clear or set highlighting for all dots in this box
-                timebox.querySelectorAll('.position-dot').forEach((dot, posIndex) => {
-                    // Only highlight if we're in current box AND it's the current position
-                    dot.classList.toggle('current', isCurrentBox && posIndex === state.k);
-                });
-            });
-        });
+                const currentTransition = player.transitionTimes
+                    .filter(t => t.time <= adjustedAudioTime)
+                    .pop();
 
-        // Log state transitions if any value changed
-        if (prevSection !== state.i.toString().padStart(2, '0') || 
-            prevBox !== state.j.toString().padStart(2, '0') || 
-            prevPosition !== state.k.toString().padStart(2, '0')) {
-            
-            const timestamp = performance.now();
-            console.log(
-                `[${timestamp.toFixed(3)}ms] State transition:`,
-                `section: ${prevSection}->${state.i.toString().padStart(2, '0')}`,
-                `box: ${prevBox}->${state.j.toString().padStart(2, '0')}`,
-                `pos: ${prevPosition}->${state.k.toString().padStart(2, '0')}`
-            );
+                if (currentTransition) {
+                    const previousState = player.state;
+                    player.state = new TrackState(
+                        currentTransition.state.i,
+                        currentTransition.state.j,
+                        currentTransition.state.k
+                    );
+                    
+                    if (!previousState || 
+                        previousState.i !== player.state.i || 
+                        previousState.j !== player.state.j || 
+                        previousState.k !== player.state.k) {
+                        console.log('State transition detected, dispatching at:', audioTime, 
+                            'from:', previousState ? `(${previousState.i},${previousState.j},${previousState.k})` : 'null',
+                            'to:', `(${player.state.i},${player.state.j},${player.state.k})`);
+                        dispatcher.dispatch();
+                    }
+                }
+                player.time = audioTime;
+            }
         }
     }
 
-    // Start the animation loop
-    requestAnimationFrame(update);
+    // Start visual updates
+    requestAnimationFrame(() => updateVisuals(audioElement.currentTime));
+
+    // Check state transitions every 100ms
+    setInterval(checkStateTransitions, 100);
 
     // Clean up when page unloads
     window.addEventListener('unload', () => {
@@ -448,14 +418,14 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     // Update section time formatting in renderTrackContent
     function renderTrackContent() {
-        // Clear existing content
-        sectionsContent.innerHTML = '';
-        
         // Render track title
         trackTitle.textContent = player.currentTrack.id;
         
-        // Let SectionView handle the rendering
-        screen.sectionView.render();
+        // Update section view state instead of re-rendering
+        screen.sectionView.setState({
+            currentTrack: player.currentTrack,
+            currentLanguage: current_lang_code
+        });
     }
 
     // Add ended event listener to handle track completion
