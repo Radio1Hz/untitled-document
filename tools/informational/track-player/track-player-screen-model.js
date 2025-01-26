@@ -93,32 +93,32 @@ class Screen {
      * @param {HTMLElement} container - Container element
      */
     mount(container) {
-        // Get client screen dimensions
+        // 1. Get current browser window dimensions
         const clientWidth = document.documentElement.clientWidth;
         const clientHeight = document.documentElement.clientHeight;
         
-        // Update dimensions to match client screen exactly
+        // 2. Update screen dimensions to match window size
         this.dimension = {
             width: clientWidth,
             height: clientHeight
         };
         
-        // Update tau_width_px based on actual screen width
+        // 3. Calculate width of each time unit (tau) in pixels
         this.tau_width_px = clientWidth / this.screen_to_dot_ratio;
-        console.log(`Screen dimension: ${clientWidth}x${clientHeight}px, tau_width_px: ${this.tau_width_px}px`);
         
-        // Set container size to match screen exactly
+        // 4. Size the container to fill window
         container.style.width = `${clientWidth}px`;
         container.style.height = `${clientHeight}px`;
-        
-        // Remove centering styles, let it fill screen
         container.style.margin = '0';
         container.style.position = 'relative';
         
-        // Render components in hierarchy order
+        // 5. Re-render components
         this.renderHierarchy(container);
         
-        // Attach event handlers
+        // 6. Re-render section view with current state
+        this.sectionView.render();
+        
+        // 7. Attach event handlers
         this.attachHandlers(container);
     }
 
@@ -130,6 +130,12 @@ class Screen {
         // Find root components (no parent)
         const roots = new Set(this.components.keys());
         this.hierarchy.forEach((_, childId) => roots.delete(childId));
+
+        // Only clear dynamic components (timeline), preserve static structure
+        const timeline = document.querySelector('.timeline');
+        if (timeline) {
+            timeline.remove();
+        }
 
         // Render each tree
         roots.forEach(rootId => {
@@ -285,27 +291,11 @@ class Timeline extends Component {
     }
 
     setState(newState) {
-        console.log('Timeline setState called with:', {
-            hasState: !!newState.currentState,
-            hasTrack: !!this.props.track,
-            state: newState.currentState ? 
-                `(${newState.currentState.i},${newState.currentState.j},${newState.currentState.k})` : 
-                'null',
-            track: this.props.track ? this.props.track.id : 'null'
-        });
-
         // Calculate new active width if state changed
         if (newState.currentState && this.props.track) {
             const absoluteTime = newState.currentState.absoluteTime(this.props.track);
             const totalDuration = this.props.track.totalDuration();
             newState.activeWidth = (absoluteTime / totalDuration) * 100;
-            
-            console.log('Timeline width calculation:', {
-                absoluteTime: absoluteTime.toFixed(3),
-                totalDuration: totalDuration.toFixed(3),
-                activeWidth: newState.activeWidth.toFixed(1) + '%',
-                state: `(${newState.currentState.i},${newState.currentState.j},${newState.currentState.k})`
-            });
         } else {
             newState.activeWidth = 0;
             console.log('Timeline width set to 0% due to missing state or track');
@@ -416,7 +406,7 @@ class SectionView extends Component {
                 const timeboxElement = document.createElement('div');
                 timeboxElement.className = 'timebox';
                 
-                console.log('Raw timebox object:', timebox); // Debug log
+                //console.log('Raw timebox object:', timebox); // Debug log
                 
                 // Use timebox's nT if defined, otherwise use track's n
                 const nT = timebox.nT !== undefined ? timebox.nT : this.state.currentTrack.n;
@@ -429,12 +419,11 @@ class SectionView extends Component {
                     width: `${width_px}px`,
                     flexGrow: '0',
                     flexShrink: '0',
-                    padding: '10pt',
                     borderRadius: '4px',
                     margin: '2px'
                 });
                 
-                console.log(`Timebox ${timeboxIndex} width: ${width_px}px (nT: ${nT}, tau_width_px: ${this.screen.tau_width_px})`);
+                //console.log(`Timebox ${timeboxIndex} width: ${width_px}px (nT: ${nT}, tau_width_px: ${this.screen.tau_width_px})`);
 
                 // Add timebox content with current language
                 const timeboxContent = document.createElement('div');
@@ -518,11 +507,6 @@ class SectionView extends Component {
         const currentDot = currentBox.querySelectorAll('.position-dot')[state.k];
         if (currentDot) {
             currentDot.classList.add('current');
-            console.log('Highlighting position:', {
-                section: state.i,
-                box: state.j,
-                position: state.k
-            });
         }
     }
 }
@@ -623,21 +607,19 @@ class TrackPlayerScreen extends Screen {
     handlePlayerUpdate(event) {
         const { currentTime, totalDuration, mode, speed, state } = event;
         
-        // Log section changes
+        // Only log when section changes
         if (state) {
             const previousState = this.sectionView.state.currentSection;
             const newSection = this.player.currentTrack.sections[state.i];
             
             if (!previousState || previousState !== newSection) {
-                console.log('Section changed:', {
-                    timestamp: performance.now().toFixed(3),
-                    audioTime: currentTime.toFixed(3),
-                    from: previousState ? 
-                        `Section ${this.player.currentTrack.sections.indexOf(previousState)}` : 
-                        'null',
-                    to: `Section ${state.i}`,
-                    state: `(${state.i},${state.j},${state.k})`
+                // Section started
+                /*
+                console.log('Section started at:', currentTime.toFixed(3), 'seconds:', {
+                    index: state.i,
+                    section: newSection
                 });
+                */
             }
         }
         

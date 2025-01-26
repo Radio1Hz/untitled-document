@@ -155,7 +155,7 @@ class TrackPlayer {
             // Apply the last relevant transition (most recent state)
             if (relevantTransitions.length > 0) {
                 const lastTransition = relevantTransitions[relevantTransitions.length - 1];
-                console.log(`Transitioning to state (${lastTransition.state.i},${lastTransition.state.j},${lastTransition.state.k}) at time ${lastTransition.time.toFixed(3)}s`);
+                //console.log(`Transitioning to state (${lastTransition.state.i},${lastTransition.state.j},${lastTransition.state.k}) at time ${lastTransition.time.toFixed(3)}s`);
                 
                 this.state = new TrackState(
                     lastTransition.state.i,
@@ -273,14 +273,6 @@ class TrackPlayer {
                     speed: this.speed,
                     state: this.state
                 };
-
-                console.log('Dispatching to', listeners.size, 'listeners:', {
-                    currentTime: currentTime.toFixed(3),
-                    mode: this.mode,
-                    state: this.state ? 
-                        `(${this.state.i},${this.state.j},${this.state.k})` : 
-                        'null'
-                });
 
                 listeners.forEach(callback => callback(event));
             }

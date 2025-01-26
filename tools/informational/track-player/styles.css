@@ -46,8 +46,6 @@ body {
     background: transparent;
     width: 100%;
     height: auto;
-    margin-bottom: 2rem;
-    padding: 2rem;
     border-radius: 8px;
 }
 
@@ -114,8 +112,6 @@ body {
     height: calc(100vh - 200px); /* Adjust based on your header height */
     display: flex;
     flex-direction: column;
-    gap: 1rem;
-    padding: 1rem;
     overflow-y: auto;
     position: relative;
 }
@@ -275,12 +271,9 @@ body {
 .section {
     display: flex;
     flex-direction: column;
-    gap: 8px;
     background: transparent;
     border: 1px solid transparent;
     border-radius: 8px;
-    padding: 15px;
-    margin-bottom: 15px;
     transition: border-color 0.2s;
 }
 
@@ -316,12 +309,12 @@ body {
 
 .timebox {
     border: 1px solid transparent;
-    padding: 10pt;
     border-radius: 4px;
     min-height: 60px;
-    flex: 0 0 auto; /* Don't grow, don't shrink, use auto basis */
+    flex: 0 0 auto;
     position: relative;
     transition: border-color 0.2s;
+    min-width: 50px;
 }
 
 .timebox-content {
@@ -553,7 +546,7 @@ h1, h2, h3, h4, h5, h6 {
     }
     
     .track-header {
-        padding: 1rem;
+        
     }
     
     .track-controls {
@@ -609,8 +602,6 @@ h1, h2, h3, h4, h5, h6 {
 .sections-container {
     display: flex;
     flex-direction: column;
-    gap: 16px;
-    padding: 16px;
 }
 
 /* Scrollbar styles for Firefox */

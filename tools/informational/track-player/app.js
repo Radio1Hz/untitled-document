@@ -244,10 +244,20 @@ document.addEventListener('DOMContentLoaded', async () => {
     });
 
     stopBtn.addEventListener('click', () => {
+        // Stop playback
         player.stop();
         audioElement.pause();
         audioElement.currentTime = 0;
         playPauseBtn.textContent = '▶';
+        
+        // Reset player state to initial
+        player.state = new TrackState(0, 0, 0);
+        player.time = 0;
+        accumulatedTime = 0;
+        playStartTime = null;
+        
+        // Dispatch event to update UI
+        dispatcher.dispatch();
     });
 
     // Update speed control to affect audio playback
@@ -316,7 +326,13 @@ document.addEventListener('DOMContentLoaded', async () => {
         requestAnimationFrame(() => updateVisuals(audioElement.currentTime));
     }
 
-    // Check state transitions at a lower frequency
+    function formatTime(seconds) {
+        const minutes = Math.floor(seconds / 60);
+        const secs = Math.floor(seconds % 60);
+        const cents = Math.floor((seconds % 1) * 100);
+        return `${minutes.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}.${cents.toString().padStart(2, '0')}`;
+    }
+
     function checkStateTransitions() {
         if (player.mode === PlaybackMode.PLAYING) {
             const audioTime = audioElement.currentTime;
@@ -330,7 +346,11 @@ document.addEventListener('DOMContentLoaded', async () => {
                 const previousState = player.state;
                 player.state = new TrackState();
                 if (!previousState || previousState.i !== 0 || previousState.j !== 0 || previousState.k !== 0) {
-                    console.log('Initial state transition, dispatching at:', audioTime);
+                    console.log('State transition:', {
+                        time: formatTime(0), // Initial state always at time 0
+                        from: previousState ? `(${previousState.i},${previousState.j},${previousState.k})` : 'null',
+                        to: '(0,0,0)'
+                    });
                     dispatcher.dispatch();
                 }
             } else {
@@ -352,9 +372,11 @@ document.addEventListener('DOMContentLoaded', async () => {
                         previousState.i !== player.state.i || 
                         previousState.j !== player.state.j || 
                         previousState.k !== player.state.k) {
-                        console.log('State transition detected, dispatching at:', audioTime, 
-                            'from:', previousState ? `(${previousState.i},${previousState.j},${previousState.k})` : 'null',
-                            'to:', `(${player.state.i},${player.state.j},${player.state.k})`);
+                        console.log('State transition:', {
+                            time: formatTime(currentTransition.time), // Use transition time from array
+                            from: previousState ? `(${previousState.i},${previousState.j},${previousState.k})` : 'null',
+                            to: `(${player.state.i},${player.state.j},${player.state.k})`
+                        });
                         dispatcher.dispatch();
                     }
                 }
