@@ -46,18 +46,22 @@ class Component {
 }
 
 /**
- * Represents a screen: Σ = (R, C, I, H)
+ * Represents a screen: Σ = (R, C, I, H, D)
  */
 class Screen {
     /**
      * @param {number} width - Screen width
      * @param {number} height - Screen height
+     * @param {number} screen_to_dot_ratio - Ratio for screen width to dot width
      */
-    constructor(width, height) {
+    constructor(width, height, screen_to_dot_ratio = 25) {
         this.resolution = { width, height };
         this.components = new Map();  // C: Set of components
         this.handlers = new Map();    // I: Set of input handlers
         this.hierarchy = new Map();   // H: Component hierarchy
+        this.dimension = { width: 3000, height: 3000 }; // D: Default dimension
+        this.screen_to_dot_ratio = screen_to_dot_ratio;
+        this.tau_width_px = this.dimension.width / this.screen_to_dot_ratio; // Default time unit width in pixels
     }
 
     /**
@@ -85,12 +89,28 @@ class Screen {
     }
 
     /**
-     * Mount screen to DOM element
+     * Mount screen to DOM element with responsive sizing
      * @param {HTMLElement} container - Container element
      */
     mount(container) {
-        container.style.width = `${this.resolution.width}px`;
-        container.style.height = `${this.resolution.height}px`;
+        // Get client screen dimensions
+        const clientWidth = document.documentElement.clientWidth;
+        const clientHeight = document.documentElement.clientHeight;
+        
+        // Calculate the size based on minimum screen dimension to maintain 1:1 ratio
+        const minDimension = Math.min(clientWidth, clientHeight, this.dimension.width);
+        
+        // Update tau_width_px based on actual screen size using the ratio
+        this.tau_width_px = minDimension / this.screen_to_dot_ratio;
+        console.log(`Screen dimension: ${minDimension}px, tau_width_px: ${this.tau_width_px}px`);
+        
+        // Set container size maintaining 1:1 ratio
+        container.style.width = `${minDimension}px`;
+        container.style.height = `${minDimension}px`;
+        
+        // Center the container
+        container.style.margin = '0 auto';
+        container.style.position = 'relative';
         
         // Render components in hierarchy order
         this.renderHierarchy(container);
@@ -193,15 +213,26 @@ class SectionView extends Component {
         super(id, 'section-view', {}, {
             currentSection: null,
             currentTrack: null,
-            currentLanguage: 'en',  // Add language state
-            elements: []
+            currentLanguage: 'en'
         });
+        this.screen = null;  // Reference to parent screen
+    }
+
+    /**
+     * Set parent screen reference
+     * @param {Screen} screen - Parent screen instance
+     */
+    setScreen(screen) {
+        this.screen = screen;
     }
 
     render() {
-        const div = document.createElement('div');
-        div.className = 'section-view';
-        div.dataset.lang = this.state.currentLanguage;  // Set language at root level
+        // Use the existing sections-content element
+        const div = document.getElementById('sections-content');
+        if (!div) {
+            console.error('sections-content element not found');
+            return document.createElement('div');
+        }
         
         if (!this.state.currentTrack) {
             return div;
@@ -210,10 +241,6 @@ class SectionView extends Component {
         // Create sections container
         const sectionsContainer = document.createElement('div');
         sectionsContainer.className = 'sections-container';
-        sectionsContainer.style.display = 'flex';
-        sectionsContainer.style.flexDirection = 'column';
-        sectionsContainer.style.gap = '16px';
-        sectionsContainer.style.padding = '16px';
         
         // Calculate cumulative section start times
         let cumulativeTime = 0;
@@ -222,9 +249,6 @@ class SectionView extends Component {
             const sectionElement = document.createElement('div');
             sectionElement.className = 'section';
             sectionElement.dataset.index = sectionIndex;
-            sectionElement.style.display = 'flex';
-            sectionElement.style.flexDirection = 'column';
-            sectionElement.style.gap = '8px';
             
             // Add section header with time
             const header = document.createElement('div');
@@ -247,8 +271,8 @@ class SectionView extends Component {
             const timeboxesContainer = document.createElement('div');
             timeboxesContainer.className = 'timeboxes-container';
             timeboxesContainer.style.display = 'flex';
-            timeboxesContainer.style.width = '100%';
             timeboxesContainer.style.gap = '2px';
+            timeboxesContainer.style.overflowX = 'auto';  // Make container scrollable
 
             // Calculate total duration for the section
             const sectionDuration = section.timeboxes.reduce((sum, timebox) => {
@@ -260,18 +284,25 @@ class SectionView extends Component {
                 const timeboxElement = document.createElement('div');
                 timeboxElement.className = 'timebox';
                 
-                // Calculate width based on actual duration proportion
-                const timeboxDuration = timebox.duration(this.state.currentTrack.tau, this.state.currentTrack.n);
-                const widthPercentage = (timeboxDuration / sectionDuration) * 100;
+                console.log('Raw timebox object:', timebox); // Debug log
                 
-                timeboxElement.style.width = `${widthPercentage}%`;
-                timeboxElement.style.backgroundColor = '#333';
-                timeboxElement.style.padding = '8px';
-                timeboxElement.style.borderRadius = '4px';
-                timeboxElement.style.minHeight = '60px';
-                timeboxElement.style.display = 'flex';
-                timeboxElement.style.flexDirection = 'column';
-                timeboxElement.style.justifyContent = 'space-between';
+                // Use timebox's nT if defined, otherwise use track's n
+                const nT = timebox.nT !== undefined ? timebox.nT : this.state.currentTrack.n;
+                
+                // Calculate width based on nT and tau_width_px
+                const width_px = Math.round(nT * this.screen.tau_width_px);
+                
+                // Set all inline styles for timebox
+                Object.assign(timeboxElement.style, {
+                    width: `${width_px}px`,
+                    flexGrow: '0',
+                    flexShrink: '0',
+                    padding: '10pt',
+                    borderRadius: '4px',
+                    margin: '2px'
+                });
+                
+                console.log(`Timebox ${timeboxIndex} width: ${width_px}px (nT: ${nT}, tau_width_px: ${this.screen.tau_width_px})`);
 
                 // Add timebox content with current language
                 const timeboxContent = document.createElement('div');
@@ -282,20 +313,10 @@ class SectionView extends Component {
                 // Add position indicators
                 const positionsContainer = document.createElement('div');
                 positionsContainer.className = 'positions-container';
-                positionsContainer.style.display = 'flex';
-                positionsContainer.style.gap = '2px';
-                positionsContainer.style.marginTop = '8px';
-                positionsContainer.style.justifyContent = 'space-between';
                 
-                // Use the timebox's effective nT value for position indicators
-                const effectiveN = timebox.getEffectiveN(this.state.currentTrack);
-                for (let i = 0; i < effectiveN; i++) {
+                for (let i = 0; i < nT; i++) {
                     const positionDot = document.createElement('div');
                     positionDot.className = 'position-dot';
-                    positionDot.style.width = '8px';
-                    positionDot.style.height = '8px';
-                    positionDot.style.borderRadius = '50%';
-                    positionDot.style.backgroundColor = '#666';
                     positionsContainer.appendChild(positionDot);
                 }
                 
@@ -337,13 +358,19 @@ class TrackPlayerScreen extends Screen {
      * @param {TrackPlayer} player - Track player instance
      */
     constructor(width, height, player) {
-        super(width, height);
+        // Pass player's screen_to_dot_ratio to parent Screen class
+        super(width, height, player.screen_to_dot_ratio);
+        
+        // Inherit dimension from parent Screen class
+        this.dimension = this.dimension || { width: 3000, height: 3000 };
+        
         this.player = player;
 
         // Initialize core components
         this.timeline = new Timeline('timeline');
         this.controls = new ControlPanel('controls');
         this.sectionView = new SectionView('section-view');
+        this.sectionView.setScreen(this);  // Set screen reference
 
         // Add components to screen
         this.addComponent(this.timeline);
@@ -414,6 +441,27 @@ class TrackPlayerScreen extends Screen {
         this.sectionView.setState({
             currentSection: this.player.currentTrack.sections[state.i],
             currentTrack: this.player.currentTrack
+        });
+
+        // Scroll to current section
+        this.scrollToCurrentSection(state.i);
+    }
+
+    /**
+     * Scroll the sections container to make current section visible
+     * @param {number} sectionIndex - Index of current section
+     */
+    scrollToCurrentSection(sectionIndex) {
+        const sectionsContent = document.getElementById('sections-content');
+        if (!sectionsContent) return;
+
+        const currentSection = sectionsContent.querySelector(`[data-index="${sectionIndex}"]`);
+        if (!currentSection) return;
+
+        // Scroll the section into view
+        currentSection.scrollIntoView({
+            behavior: 'smooth',
+            block: 'start'
         });
     }
 

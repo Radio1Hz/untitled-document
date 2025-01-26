@@ -300,13 +300,14 @@ This formalism provides a complete specification for implementing track playback
 #### **7. Screen ($\Sigma$)**
 A screen $\Sigma$ is a visual interface that maps internal state to user-visible elements:
 $$
-\Sigma = \left(R,\ \mathcal{C},\ \mathcal{I},\ \mathcal{H} \right)
+\Sigma = \left(R,\ \mathcal{C},\ \mathcal{I},\ \mathcal{H},\ D \right)
 $$
 **where**:
 - $R = (w,\ h) \in \mathbb{N}^2$: Screen resolution/dimensions
 - $\mathcal{C}$: Set of visual components
 - $\mathcal{I}$: Set of input handlers
 - $\mathcal{H}$: Component hierarchy
+- $D = (3000,\ 3000) \in \mathbb{N}^2$: Default dimension (width, height)
 
 **Key Aspects**:
 

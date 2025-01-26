@@ -19,8 +19,9 @@ class TrackPlayer {
      * @param {number} speed - Playback speed multiplier
      * @param {number} predelay_ms - Milliseconds to delay time counting after play (default 500ms)
      * @param {boolean} looping - Whether track should loop by default (default true)
+     * @param {number} screen_to_dot_ratio - Ratio for screen width to dot width (default 25)
      */
-    constructor(initialTrack, speed = 1.0, predelay_ms = 500, looping = true) {
+    constructor(initialTrack, speed = 1.0, predelay_ms = 500, looping = true, screen_to_dot_ratio = 25) {
         this.playlist = [];  // Initialize empty playlist
         this.currentTrackIndex = -1;
         this.currentTrack = null;
@@ -31,6 +32,7 @@ class TrackPlayer {
         this.accumulatedTime = 0;
         this.predelay_ms = predelay_ms;
         this.looping = looping;  // Add looping property
+        this.screen_to_dot_ratio = screen_to_dot_ratio;
         
         if (initialTrack) {
             this.addTrack(initialTrack);
@@ -139,17 +141,25 @@ class TrackPlayer {
             this.time += deltaTime * this.speed;
             this.accumulatedTime += deltaTime * this.speed;
 
-            // Get current timebox duration
             const currentSection = this.currentTrack.sections[this.state.i];
             if (!currentSection) return this;
 
             const currentBox = currentSection.timeboxes[this.state.j];
             if (!currentBox) return this;
 
-            // Use tau (time unit) instead of full box duration
             const timeUnit = this.currentTrack.tau;
             
-            // Check if we've accumulated enough time to advance state
+            console.log('Tick:', {
+                deltaTime,
+                accumulatedTime: this.accumulatedTime,
+                timeUnit,
+                currentBox: {
+                    nT: currentBox.nT,
+                    effectiveN: currentBox.getEffectiveN(this.currentTrack),
+                    position: this.state.k
+                }
+            });
+            
             while (this.accumulatedTime >= timeUnit) {
                 const nextState = this.state.advance(this.currentTrack);
                 if (!nextState) {

@@ -19,14 +19,13 @@
                 <div class="track-section">
                     <div class="track-header">
                         <div class="track-controls">
+                            <button id="playPauseBtn" class="untitled-button">▶</button>
+                            <button id="stopBtn" class="untitled-button">⏹</button>
                             <div id="currentTime" class="time-display">
                                 <span class="time-main digits">00:00.</span>
                                 <span class="time-cents digits">00</span>
                             </div>
-                            <button id="playPauseBtn">▶</button>
-                            <button id="stopBtn">⏹</button>
-                            <button id="speedBtn">1x</button>
-                            <button id="loopBtn" class="control-button" title="Toggle loop"></button>
+                            <div class="track-duration"> / <span id="track-duration"></span></div>
                         </div>
                         <div class="track-state">
                             <div class="state-info">
@@ -39,8 +38,7 @@
                         <div id="sections-content"></div>
                         <div id="track-title">untitled-track</div>
                         <div class="track-meta">
-                            <div>duration: <span id="track-duration"></span></div>
-                            <div>speed: <span id="track-speed">1.0x</span></div>
+                            
                             <div class="language-selector">
                                 <select id="langSelect">
                                     <option value="en">English</option>
@@ -48,6 +46,8 @@
                                     <option value="ru">Русский</option>
                                     <option value="ar">العربية</option>
                                 </select>
+                                <button id="speedBtn" class="untitled-button">1x</button>
+                                <button id="loopBtn" class="untitled-button" title="Toggle loop"></button>
                             </div>
                         </div>
                     </div>

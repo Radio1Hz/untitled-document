@@ -44,12 +44,13 @@ document.addEventListener('DOMContentLoaded', async () => {
     track1Data.track1.sections.forEach(sectionData => {
         const section = track1Obj.addSection(sectionData.description, sectionData.imageUrl);
         sectionData.timeboxes.forEach(boxData => {
-            section.addTimebox(boxData.tStart, boxData.description);
+            // Use addTimeboxToSection instead of section.addTimebox
+            track1Obj.addTimeboxToSection(section, boxData.tStart, boxData.description, boxData.nT);
         });
     });
 
-    // Create player and add tracks with predelay and default looping
-    const player = new TrackPlayer(null, 1.0, 250, true);
+    // Create player with custom screen_to_dot_ratio
+    const player = new TrackPlayer(null, 1.0, 250, true, 25);  // Last parameter is screen_to_dot_ratio
     player.addTrack(track1Obj);
     player.addTrack(track9Obj);
 
@@ -129,8 +130,19 @@ document.addEventListener('DOMContentLoaded', async () => {
     audioElement.addEventListener('playing', () => console.log('Audio playing'));
     audioElement.addEventListener('pause', () => console.log('Audio paused'));
 
-    // Create screen
-    const screen = new TrackPlayerScreen(800, 600, player);
+    // Get the container element
+    const container = document.querySelector('.container');
+    
+    // Create screen with default dimensions
+    const screen = new TrackPlayerScreen(3000, 3000, player);
+    
+    // Initial mount
+    screen.mount(container);
+    
+    // Handle window resize
+    window.addEventListener('resize', () => {
+        screen.mount(container);
+    });
 
     // Add global language state
     let current_lang_code = 'en';  // Changed: Set default to English
@@ -165,8 +177,12 @@ document.addEventListener('DOMContentLoaded', async () => {
     // Set track title
     trackTitle.textContent = player.currentTrack.id;
 
-    // Display track duration
-    durationDisplay.textContent = `${player.currentTrack.totalDuration().toFixed(0)}s`;
+    // Format duration as hh:mm:ss
+    const totalSeconds = Math.floor(player.currentTrack.totalDuration());
+    const hours = Math.floor(totalSeconds / 3600);
+    const minutes = Math.floor((totalSeconds % 3600) / 60);
+    const seconds = totalSeconds % 60;
+    durationDisplay.textContent = `${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
 
     // Initialize track state display
     currentSection.textContent = '0';
@@ -431,95 +447,25 @@ document.addEventListener('DOMContentLoaded', async () => {
         }
     };
 
-    // Separate rendering logic into a function for reuse
+    // Add helper function for Arabic numeral conversion
+    function toArabicNumerals(str) {
+        const numerals = {
+            '0': '٠', '1': '١', '2': '٢', '3': '٣', '4': '٤',
+            '5': '٥', '6': '٦', '7': '٧', '8': '٨', '9': '٩'
+        };
+        return str.replace(/[0-9]/g, d => numerals[d]);
+    }
+
+    // Update section time formatting in renderTrackContent
     function renderTrackContent() {
         // Clear existing content
         sectionsContent.innerHTML = '';
         
-        // Render track title - use ID instead of description
+        // Render track title
         trackTitle.textContent = player.currentTrack.id;
         
-        // Render sections
-        player.currentTrack.sections.forEach((section, index) => {
-            const sectionElement = document.createElement('div');
-            sectionElement.className = 'section';
-            sectionElement.dataset.index = index;
-
-            const header = document.createElement('div');
-            header.className = 'section-header';
-
-            // Calculate section start time
-            let sectionStartTime = 0;
-            for (let i = 0; i < index; i++) {
-                sectionStartTime += player.currentTrack.sections[i].duration(player.currentTrack.tau, player.currentTrack.n);
-            }
-            
-            const minutes = Math.floor(sectionStartTime / 60);
-            const seconds = Math.floor(sectionStartTime % 60);
-            const timePrefix = `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
-
-            const title = document.createElement('h3');
-            // Get section description with fallback
-            const sectionDesc = section.desc || section.description || {};  // Try both desc and description
-            const sectionText = sectionDesc[current_lang_code] || sectionDesc['en'] || `Section ${index + 1}`;
-            title.textContent = `[${timePrefix}] ${sectionText}`;
-            header.appendChild(title);
-
-            const timeboxes = document.createElement('div');
-            timeboxes.className = 'timeboxes-info';
-            timeboxes.style.minWidth = '200px';
-            timeboxes.style.display = 'flex';
-            timeboxes.style.flexWrap = 'wrap';
-            timeboxes.style.gap = '4px';
-
-            section.timeboxes.forEach((box, boxIndex) => {
-                const timeboxElement = document.createElement('div');
-                timeboxElement.className = 'timebox';
-                timeboxElement.style.flexGrow = '0';     
-                timeboxElement.style.flexShrink = '0';   
-                timeboxElement.style.padding = '4px';    
-                timeboxElement.style.backgroundColor = '#333';  
-                timeboxElement.style.borderRadius = '4px';  
-                timeboxElement.style.margin = '2px';     
-                
-                // Create container for text and positions
-                const textContainer = document.createElement('div');
-                textContainer.style.color = '#fff';
-                textContainer.style.marginBottom = '4px';
-                
-                // Get box description with fallback
-                const boxDesc = box.desc || box.description || {};  // Try both desc and description
-                const boxText = boxDesc[current_lang_code] || boxDesc['en'] || `Box ${boxIndex + 1}`;
-                textContainer.textContent = boxText;
-                
-                // Create container for position indicators
-                const positionsContainer = document.createElement('div');
-                positionsContainer.className = 'positions-container';
-                positionsContainer.style.display = 'flex';
-                positionsContainer.style.justifyContent = 'space-between';
-                positionsContainer.style.width = '100%';
-                positionsContainer.style.marginTop = '4px';
-                
-                // Add position indicators (0 to n-1)
-                for (let pos = 0; pos < player.currentTrack.n; pos++) {
-                    const positionLine = document.createElement('div');
-                    positionLine.className = 'position-line';
-                    positionLine.dataset.position = pos;
-                    positionLine.style.width = '8px';
-                    positionLine.style.height = '2px';
-                    positionLine.style.backgroundColor = '#888888';
-                    positionsContainer.appendChild(positionLine);
-                }
-                
-                timeboxElement.appendChild(textContainer);
-                timeboxElement.appendChild(positionsContainer);
-                timeboxes.appendChild(timeboxElement);
-            });
-
-            sectionElement.appendChild(header);
-            sectionElement.appendChild(timeboxes);
-            sectionsContent.appendChild(sectionElement);
-        });
+        // Let SectionView handle the rendering
+        screen.sectionView.render();
     }
 
     // Add ended event listener to handle track completion

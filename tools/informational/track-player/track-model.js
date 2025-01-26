@@ -33,15 +33,6 @@ class TimeBox {
     }
 
     /**
-     * Get effective number of time units for this timebox
-     * @param {Track} track - Parent track for default n value
-     * @returns {number} Number of time units
-     */
-    getEffectiveN(track) {
-        return this.nT !== undefined ? this.nT : track.n;
-    }
-
-    /**
      * Calculate duration of timebox in seconds
      * @param {number} tau - Time unit duration
      * @param {number} n - Number of time units
@@ -49,6 +40,15 @@ class TimeBox {
      */
     duration(tau, n) {
         return tau * n;  // Changed from this.n to use track's n parameter
+    }
+
+    /**
+     * Get effective number of time units for this timebox
+     * @param {Track} track - Parent track for default n value
+     * @returns {number} Number of time units
+     */
+    getEffectiveN(track) {
+        return this.nT !== undefined ? this.nT : track.n;
     }
 }
 
@@ -79,14 +79,20 @@ class TrackState {
         const timebox = section.timeboxes[this.j];
         if (!timebox) return undefined;
 
-        if (this.k + 1 < track.n) {
+        // Use timebox's effective nT value instead of track's n
+        const effectiveN = timebox.getEffectiveN(track);
+
+        // Check if we can advance within current timebox
+        if (this.k + 1 < effectiveN) {
             return new TrackState(this.i, this.j, this.k + 1);
         }
 
+        // Move to next timebox if available
         if (this.j + 1 < section.timeboxes.length) {
             return new TrackState(this.i, this.j + 1, 0);
         }
 
+        // Move to next section if available
         if (this.i + 1 < track.sections.length) {
             return new TrackState(this.i + 1, 0, 0);
         }
@@ -105,15 +111,21 @@ class TrackState {
         }
 
         if (this.j > 0) {
-            return new TrackState(this.i, this.j - 1, track.n - 1);
+            const prevBox = track.sections[this.i].timeboxes[this.j - 1];
+            // Use previous timebox's effective nT
+            const prevN = prevBox.getEffectiveN(track);
+            return new TrackState(this.i, this.j - 1, prevN - 1);
         }
 
         if (this.i > 0) {
             const prevSection = track.sections[this.i - 1];
+            const lastBox = prevSection.timeboxes[prevSection.timeboxes.length - 1];
+            // Use last timebox's effective nT
+            const lastN = lastBox.getEffectiveN(track);
             return new TrackState(
                 this.i - 1, 
                 prevSection.timeboxes.length - 1, 
-                track.n - 1
+                lastN - 1
             );
         }
 
