@@ -50,7 +50,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     });
 
     // Create player with custom screen_to_dot_ratio
-    const player = new TrackPlayer(null, 1.0, 250, true, 25);  // Last parameter is screen_to_dot_ratio
+    const player = new TrackPlayer(null, 1.0, 250, true, 50);  // Last parameter is screen_to_dot_ratio
     player.addTrack(track1Obj);
     player.addTrack(track9Obj);
 

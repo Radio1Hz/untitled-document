@@ -97,19 +97,22 @@ class Screen {
         const clientWidth = document.documentElement.clientWidth;
         const clientHeight = document.documentElement.clientHeight;
         
-        // Calculate the size based on minimum screen dimension to maintain 1:1 ratio
-        const minDimension = Math.min(clientWidth, clientHeight, this.dimension.width);
+        // Update dimensions to match client screen exactly
+        this.dimension = {
+            width: clientWidth,
+            height: clientHeight
+        };
         
-        // Update tau_width_px based on actual screen size using the ratio
-        this.tau_width_px = minDimension / this.screen_to_dot_ratio;
-        console.log(`Screen dimension: ${minDimension}px, tau_width_px: ${this.tau_width_px}px`);
+        // Update tau_width_px based on actual screen width
+        this.tau_width_px = clientWidth / this.screen_to_dot_ratio;
+        console.log(`Screen dimension: ${clientWidth}x${clientHeight}px, tau_width_px: ${this.tau_width_px}px`);
         
-        // Set container size maintaining 1:1 ratio
-        container.style.width = `${minDimension}px`;
-        container.style.height = `${minDimension}px`;
+        // Set container size to match screen exactly
+        container.style.width = `${clientWidth}px`;
+        container.style.height = `${clientHeight}px`;
         
-        // Center the container
-        container.style.margin = '0 auto';
+        // Remove centering styles, let it fill screen
+        container.style.margin = '0';
         container.style.position = 'relative';
         
         // Render components in hierarchy order
@@ -317,6 +320,8 @@ class SectionView extends Component {
                 for (let i = 0; i < nT; i++) {
                     const positionDot = document.createElement('div');
                     positionDot.className = 'position-dot';
+                    // Set width as percentage based on nT
+                    positionDot.style.width = `${100/nT}%`;
                     positionsContainer.appendChild(positionDot);
                 }
                 
@@ -362,8 +367,10 @@ class TrackPlayerScreen extends Screen {
         // Pass player's screen_to_dot_ratio to parent Screen class
         super(width, height, player.screen_to_dot_ratio);
         
-        // Inherit dimension from parent Screen class
-        this.dimension = this.dimension || { width: 3000, height: 3000 };
+        // Initialize dimension to client screen size
+        const clientWidth = document.documentElement.clientWidth;
+        const clientHeight = document.documentElement.clientHeight;
+        this.dimension = { width: clientWidth, height: clientHeight };
         
         this.player = player;
 

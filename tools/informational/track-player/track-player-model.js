@@ -21,7 +21,7 @@ class TrackPlayer {
      * @param {boolean} looping - Whether track should loop by default (default true)
      * @param {number} screen_to_dot_ratio - Ratio for screen width to dot width (default 25)
      */
-    constructor(initialTrack, speed = 1.0, predelay_ms = 500, looping = true, screen_to_dot_ratio = 25) {
+    constructor(initialTrack, speed = 1.0, predelay_ms = 0, looping = true, screen_to_dot_ratio = 25) {
         this.playlist = [];  // Initialize empty playlist
         this.currentTrackIndex = -1;
         this.currentTrack = null;
