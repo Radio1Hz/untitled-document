@@ -14,13 +14,15 @@ Let $\tau \in \mathbb{T}$ denote the **time unit**, an indivisible temporal inte
 #### **2. Timebox ($T$)**  
 A timebox $T$ represents a contiguous interval within a track, defined by:  
 $$  
-T = (t_{\text{start}}, \text{desc})
+T = (t_{\text{start}}, \text{description}, n_T)
 $$  
 **where**:  
-- $t_{\text{start}} \in \mathbb{D}$: Start time of $T$, relative to the track's origin.  
+- $t_{\text{start}} \in \mathbb{T}$: Start time of $T$, relative to the track's origin.
   - *Default*: $t_{\text{start}} = 0$.
-- $\text{desc} \in \mathbb{S}$: Description of the timebox content.
-  - *Default*: $\text{desc} = \text{""}$ (empty string).
+- $\text{description} \in \mathbb{S}$: Description of the timebox content.
+  - *Default*: $\text{description} = \text{""}$ (empty string).
+- $n_T \in \mathbb{N}$: Number of time units in this timebox.
+  - *Optional*: If undefined, inherits from track's $n$ attribute.
 
 ---  
 
@@ -31,7 +33,7 @@ S = \left\langle T_1, T_2, \ldots, T_k \right\rangle
 $$  
 **with properties**:  
 - $\text{index}(S) \in \mathbb{N}$: Position of $S$ in the track.  
-- $\text{desc}(S) \in \mathbb{S}$: Brief textual summary of $S$.  
+- $\text{description}(S) \in \mathbb{S}$: Brief textual summary of $S$.  
 - $\text{image}(S) \in \mathbb{U}$: URL of a visual asset for $S$.  
 
 ---  
@@ -39,20 +41,30 @@ $$
 #### **4. Track ($\Theta$)**  
 A track $\Theta$ is a tuple:  
 $$  
-\Theta = \left( \text{id},\ \text{desc},\ \tau,\ \delta,\ n,\ \left\langle S_1, S_2, \ldots, S_m \right\rangle \right)  
+\Theta = \left( \text{id},\ \text{description},\ \tau,\ \delta,\ n,\ \tau_\omega,\ \text{dedication},\ \left\langle S_1, S_2, \ldots, S_m \right\rangle \right)  
 $$  
 **where**:  
 - $\text{id} \in \mathbb{S}$: Unique identifier for $\Theta$.  
   - *Default*: $\text{id} = \text{"untitled-track"}$.  
-- $\text{desc} \in \mathbb{S}$: Single-sentence description of $\Theta$.  
-  - *Default*: $\text{desc} = \text{"undescribed"}$.  
+- $\text{description} \in \mathbb{S}$: Single-sentence description of $\Theta$.  
+  - *Default*: $\text{description} = \text{"undescribed"}$.  
 - $\tau \in \mathbb{T}$: Duration of one time unit (see §1).  
   - *Default*: $\tau = 0.5\,s$.  
 - $\delta \in \mathbb{T}$: Padding duration prepended to the track.  
-  - *Default*: $\delta = 5$.  
+  - *Default*: $\delta = 0$.  
   - *Example*: $\delta = 1\,\text{day}$.  
-- $n \in \mathbb{N}$: Number of time units per timebox
-  - *Default*: $n = 8$ (e.g., 2 musical measures of 4/4).  
+- $n \in \mathbb{N}$: Default number of time units per timebox
+  - *Default*: $n = 8$ (e.g., 2 musical measures of 4/4).
+  - *Note*: Individual timeboxes may override this value with their own $n_T$.
+- $\tau_\omega \in \mathbb{T}_\omega$: World time anchor point for track start
+  - *Format*: $\text{yyyy-mm-dd hh:mm:ss.cc}$
+  - *Type*: High-resolution timestamp
+  - *Example*: $\tau_\omega = \text{"2024-03-19 15:30:00.00"}$
+  - *Optional*: If undefined, this value is set to current time when track playback is initiated manually
+- $\text{dedication} \in \mathbb{S}$: Dedication text
+  - *Type*: Optional textual dedication
+  - *Default*: empty string
+  - *Example*: $\text{dedication} = \text{"To the concept of eternal return"}$
 - $\left\langle S_1, S_2, \ldots, S_m \right\rangle$: Ordered sequence of sections (see §3).  
   - *Default*: Empty sequence $\left\langle \right\rangle$.  
 
@@ -172,9 +184,15 @@ These operations form a complete algebra for manipulating track state, enabling:
 ### **Formal Relationships**  
 1. **Total Duration of a Track**:  
    $$  
-   \text{Duration}(\Theta) = \delta + \sum_{S \in \Theta} \sum_{T \in S} n_T \cdot \tau  
+   \text{Duration}(\Theta) = \delta + \sum_{S \in \Theta} \sum_{T \in S} n_{T,\text{eff}} \cdot \tau  
    $$  
-   where $n_T$ is the number of time units in timebox $T$.  
+   where $n_{T,\text{eff}}$ is the effective number of time units for timebox $T$:
+   $$
+   n_{T,\text{eff}} = \begin{cases}
+   n_T & \text{if}\ n_T\ \text{is defined} \\
+   \Theta.n & \text{otherwise}
+   \end{cases}
+   $$
 
 2. **Structure Hierarchy**:  
    $$  
@@ -203,90 +221,77 @@ This formalism enables precise temporal manipulation and visualization, with $\t
 #### **6. Track Player ($\Pi$)**
 A track player $\Pi$ is a stateful system that manages playback of a track, defined as:
 $$
-\Pi = \left(\Theta,\ \Psi,\ \rho,\ \nu \right)
+\Pi = (\mathcal{P},\ \Theta_\text{current},\ \Psi,\ \rho,\ \nu,\ \lambda,\ \delta_p,\ t,\ t_a)
 $$
 **where**:
-- $\Theta$: The track being played (see §4)
-- $\Psi$: Current track state (see §5)
-- $\rho \in \{\text{PLAYING}, \text{PAUSED}, \text{STOPPED}\}$: Playback mode
-- $\nu \in \mathbb{R}$: Playback speed multiplier
-  - *Default*: $\nu = 1.0$
-  - *Example*: $\nu = 2.0$ for double speed
-
-**Basic Operators**:
-
-a. **Play** ($\text{play}: \Pi \to \Pi$):
-   $$
-   \text{play}(\Pi) = \begin{cases}
-   (\Theta,\ \Psi,\ \text{PLAYING},\ \nu) & \text{if } \text{isValid}(\Psi) \\
-   (\Theta,\ \Psi_0,\ \text{PLAYING},\ \nu) & \text{if } \Psi \text{ undefined}
-   \end{cases}
-   $$
-
-b. **Pause** ($\text{pause}: \Pi \to \Pi$):
-   $$
-   \text{pause}(\Pi) = (\Theta,\ \Psi,\ \text{PAUSED},\ \nu)
-   $$
-
-c. **Stop** ($\text{stop}: \Pi \to \Pi$):
-   $$
-   \text{stop}(\Pi) = (\Theta,\ \Psi_0,\ \text{STOPPED},\ \nu)
-   $$
-
-d. **Set Speed** ($\text{setSpeed}: \Pi \times \mathbb{R} \to \Pi$):
-   $$
-   \text{setSpeed}(\Pi,\ \nu') = \begin{cases}
-   (\Theta,\ \Psi,\ \rho,\ \nu') & \text{if } \nu' > 0 \\
-   \Pi & \text{otherwise}
-   \end{cases}
-   $$
-
-e. **Update State** ($\text{tick}: \Pi \times \Delta t \to \Pi$):
-   $$
-   \text{tick}(\Pi,\ \Delta t) = \begin{cases}
-   (\Theta,\ \text{advance}(\Psi),\ \rho,\ \nu) & \text{if } \rho = \text{PLAYING} \land \Delta t \geq \tau/\nu \\
-   \Pi & \text{otherwise}
-   \end{cases}
-   $$
-
-f. **Get Current Time** ($\text{currentTime}: \Pi \to \mathbb{R}$):
-   $$
-   \text{currentTime}(\Pi) = t(\Psi)
-   $$
-
-g. **Get Remaining Time** ($\text{remainingTime}: \Pi \to \mathbb{R}$):
-   $$
-   \text{remainingTime}(\Pi) = \text{Duration}(\Theta) - t(\Psi)
-   $$
-
-**State Transitions**:
-$$
-\begin{matrix}
-\text{STOPPED} & \xrightarrow{\text{play}} & \text{PLAYING} & \xrightarrow{\text{pause}} & \text{PAUSED} \\
-& & \downarrow\text{stop} & & \downarrow\text{stop} \\
-& & \text{STOPPED} & \xleftarrow{\text{stop}} & \text{PAUSED} \\
-& & & \xrightarrow{\text{play}} &
-\end{matrix}
-$$
+- $\mathcal{P} = \{\Theta_1, \Theta_2, ..., \Theta_n\}$: Ordered set of tracks (playlist)
+- $\Theta_\text{current} \in \mathcal{P}$: Currently selected track
+- $\Psi$: Current state of $\Theta_\text{current}$
+- $\rho \in \{\text{PLAYING}, \text{PAUSED}, \text{STOPPED}, \text{LOADING}\}$: Playback mode
+- $\nu > 0$: Speed multiplier
+- $\lambda \in \{\text{true}, \text{false}\}$: Looping enabled state
+- $\delta_p \in \mathbb{R}^+$: Playback predelay in milliseconds
+- $t \in \mathbb{R}^+$: Current absolute time position
+- $t_a \in \mathbb{R}^+$: Accumulated time since last state update
 
 **Properties**:
-1. **Time Quantization**:
+
+1. **Playlist Operations**:
+   
+   a. **Add Track** ($\text{addTrack}: \Theta \to \mathcal{P}$):
+      $$
+      \text{addTrack}(\Theta) = \mathcal{P} \cup \{\Theta\}
+      $$
+
+   b. **Remove Track** ($\text{removeTrack}: \Theta \to \mathcal{P}$):
+      $$
+      \text{removeTrack}(\Theta) = \mathcal{P} \setminus \{\Theta\}
+      $$
+
+   c. **Select Track** ($\text{selectTrack}: \mathbb{N} \to \Theta$):
+      $$
+      \text{selectTrack}(i) = \begin{cases}
+      \Theta_i & \text{if } 0 \leq i < |\mathcal{P}| \\
+      \text{undefined} & \text{otherwise}
+      \end{cases}
+      $$
+
+2. **Time Quantization**:
    - All state updates are quantized to track's time unit ($\tau$)
    - $\text{tick}$ advances state only when accumulated time ≥ $\tau/\nu$
 
-2. **State Invariants**:
+3. **State Invariants**:
    $$
    \begin{aligned}
    & \forall \Pi: \text{isValid}(\Pi.\Psi) \\
    & \forall \Pi: \Pi.\nu > 0 \\
-   & \forall \Pi: \Pi.\rho \in \{\text{PLAYING}, \text{PAUSED}, \text{STOPPED}\}
+   & \forall \Pi: \Pi.\rho \in \{\text{PLAYING}, \text{PAUSED}, \text{STOPPED}, \text{LOADING}\} \\
+   & \forall \Pi: \Pi.\lambda \in \{\text{true}, \text{false}\}
    \end{aligned}
    $$
 
-3. **Playback Constraints**:
+4. **Playback Constraints**:
    - State advances only in PLAYING mode
    - STOPPED state always implies $\Psi = \Psi_0$
    - Speed changes preserve current position
+   - When $\lambda = \text{true}$, reaching end of track resets to $\Psi_0$ and continues playing
+   - When $\lambda = \text{false}$, reaching end of track transitions to STOPPED mode
+
+5. **Looping Behavior**:
+   $$
+   \text{advance}(\Psi, \lambda) = \begin{cases}
+   \Psi_0 & \text{if}\ \lambda = \text{true}\ \text{and}\ \text{advance}(\Psi) = \text{undefined} \\
+   \text{advance}(\Psi) & \text{otherwise}
+   \end{cases}
+   $$
+
+   $$
+   \text{calculateState}(t, \lambda) = \begin{cases}
+   \Psi_0 & \text{if}\ \lambda = \text{true}\ \text{and}\ t \geq \text{Duration}(\Theta_\text{current}) \\
+   \text{seek}(t) & \text{if}\ t < \text{Duration}(\Theta_\text{current}) \\
+   \Psi_\text{final} & \text{otherwise}
+   \end{cases}
+   $$
 
 This formalism provides a complete specification for implementing track playback with precise temporal control and state management.
 
@@ -411,5 +416,27 @@ $$
    $$
 
 This formalism provides a complete specification for implementing the visual interface of a track player, ensuring consistent mapping between internal state and user interface elements.
+
+**Additional State Properties**:
+$$
+\text{currentIndex}(\Pi) = \begin{cases}
+i & \text{if}\ \Theta_\text{current} = \mathcal{P}[i] \\
+-1 & \text{if}\ \Theta_\text{current} = \text{null}
+\end{cases}
+$$
+
+**Time Management**:
+$$
+\text{effectiveTime}(t) = \max(0,\ t - \delta_p/1000)
+$$
+
+**State Advancement with Predelay**:
+$$
+\text{advance}(\Psi, \lambda, t) = \begin{cases}
+\Psi_0 & \text{if}\ t < \delta_p/1000 \\
+\Psi_0 & \text{if}\ \lambda = \text{true}\ \text{and}\ \text{advance}(\Psi) = \text{undefined} \\
+\text{advance}(\Psi) & \text{otherwise}
+\end{cases}
+$$
 
 

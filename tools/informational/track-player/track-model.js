@@ -18,10 +18,11 @@ class TimeBox {
     /**
      * @param {number} tStart - Start time relative to track's origin
      * @param {Object|string} desc - Description of timebox content in multiple languages
+     * @param {number} [nT] - Number of time units for this timebox (optional)
      */
-    constructor(tStart, desc = "") {
+    constructor(tStart, desc = "", nT = undefined) {
         this.tStart = tStart;
-        this.n = 8;
+        this.nT = nT;  // This is correctly storing the nT value
         // Ensure desc is an object with language keys
         this.desc = (typeof desc === 'string') ? {
             en: desc,
@@ -29,6 +30,15 @@ class TimeBox {
             ru: desc,
             ar: desc
         } : desc;
+    }
+
+    /**
+     * Get effective number of time units for this timebox
+     * @param {Track} track - Parent track for default n value
+     * @returns {number} Number of time units
+     */
+    getEffectiveN(track) {
+        return this.nT !== undefined ? this.nT : track.n;
     }
 
     /**
@@ -196,17 +206,23 @@ class Track {
     /**
      * @param {Object} params - Track parameters
      * @param {string} params.id - Track ID
-     * @param {Object} params.desc - Multilingual track description
+     * @param {Object} params.description - Multilingual track description
      * @param {number} params.tau - Time unit (τ)
      * @param {number} params.delta - Time quantum (δ)
      * @param {number} params.n - Positions per timebox
+     * @param {string} [params.tau_omega] - World time anchor point (τω)
+     * @param {string} [params.dedication] - Optional dedication text
+     * @param {string} [params.audioUrl] - URL to the track's audio file
      */
-    constructor({ id, desc, tau, delta, n }) {
+    constructor({ id, description, tau, delta, n, tau_omega, dedication, audioUrl }) {
         this.id = id;
-        this.desc = desc;
+        this.description = description;
         this.tau = tau;
         this.delta = delta;
         this.n = n;
+        this.tau_omega = tau_omega;
+        this.dedication = dedication;
+        this.audioUrl = audioUrl;
         this.sections = [];
         this.state = new TrackState();
     }
@@ -224,14 +240,30 @@ class Track {
     }
 
     /**
-     * Calculate total duration including padding
-     * @returns {number} Duration in seconds
+     * Add a timebox to a section
+     * @param {Section} section - Section to add timebox to
+     * @param {number} tStart - Start time
+     * @param {Object|string} description - Description
+     * @param {number} [nT] - Optional number of time units (defaults to track's n)
+     */
+    addTimeboxToSection(section, tStart, description, nT = undefined) {
+        const timebox = new TimeBox(tStart, description, nT);
+        section.timeboxes.push(timebox);
+        return timebox;
+    }
+
+    /**
+     * Calculate total duration of track
+     * @returns {number} Total duration in seconds
      */
     totalDuration() {
-        return this.delta + this.sections.reduce(
-            (sum, section) => sum + section.duration(this.tau, this.n),
-            0
-        );
+        let duration = this.delta;
+        for (const section of this.sections) {
+            for (const timebox of section.timeboxes) {
+                duration += timebox.getEffectiveN(this) * this.tau;
+            }
+        }
+        return duration;
     }
 
     /**
@@ -243,13 +275,23 @@ class Track {
             for (let i = 0; i < section.timeboxes.length - 1; i++) {
                 const currentBox = section.timeboxes[i];
                 const nextBox = section.timeboxes[i + 1];
-                const expectedStart = currentBox.tStart + currentBox.n * this.tau;
+                const expectedStart = currentBox.tStart + 
+                    currentBox.getEffectiveN(this) * this.tau;
                 
                 if (Math.abs(nextBox.tStart - expectedStart) > 1e-6) {
                     return false;
                 }
             }
         }
+
+        // Validate tau_omega format if present
+        if (this.tau_omega) {
+            const tau_omega_regex = /^\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}\.\d{2}$/;
+            if (!tau_omega_regex.test(this.tau_omega)) {
+                return false;
+            }
+        }
+
         return true;
     }
 }

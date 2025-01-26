@@ -192,6 +192,8 @@ class SectionView extends Component {
     constructor(id) {
         super(id, 'section-view', {}, {
             currentSection: null,
+            currentTrack: null,
+            currentLanguage: 'en',  // Add language state
             elements: []
         });
     }
@@ -199,8 +201,129 @@ class SectionView extends Component {
     render() {
         const div = document.createElement('div');
         div.className = 'section-view';
-        // ... implement section view
+        div.dataset.lang = this.state.currentLanguage;  // Set language at root level
+        
+        if (!this.state.currentTrack) {
+            return div;
+        }
+
+        // Create sections container
+        const sectionsContainer = document.createElement('div');
+        sectionsContainer.className = 'sections-container';
+        sectionsContainer.style.display = 'flex';
+        sectionsContainer.style.flexDirection = 'column';
+        sectionsContainer.style.gap = '16px';
+        sectionsContainer.style.padding = '16px';
+        
+        // Calculate cumulative section start times
+        let cumulativeTime = 0;
+        
+        this.state.currentTrack.sections.forEach((section, sectionIndex) => {
+            const sectionElement = document.createElement('div');
+            sectionElement.className = 'section';
+            sectionElement.dataset.index = sectionIndex;
+            sectionElement.style.display = 'flex';
+            sectionElement.style.flexDirection = 'column';
+            sectionElement.style.gap = '8px';
+            
+            // Add section header with time
+            const header = document.createElement('div');
+            header.className = 'section-header';
+            
+            // Format time as MM:SS
+            const minutes = Math.floor(cumulativeTime / 60);
+            const seconds = Math.floor(cumulativeTime % 60);
+            const timeStr = `[${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}]`;
+            const sectionText = section.desc?.[this.state.currentLanguage] || section.desc?.en || `Section ${sectionIndex + 1}`;
+            
+            // Order time and text based on language direction
+            header.textContent = this.state.currentLanguage === 'ar' 
+                ? `${sectionText} ${timeStr}`
+                : `${timeStr} ${sectionText}`;
+            
+            sectionElement.appendChild(header);
+            
+            // Create timeboxes container
+            const timeboxesContainer = document.createElement('div');
+            timeboxesContainer.className = 'timeboxes-container';
+            timeboxesContainer.style.display = 'flex';
+            timeboxesContainer.style.width = '100%';
+            timeboxesContainer.style.gap = '2px';
+
+            // Calculate total duration for the section
+            const sectionDuration = section.timeboxes.reduce((sum, timebox) => {
+                return sum + timebox.duration(this.state.currentTrack.tau, this.state.currentTrack.n);
+            }, 0);
+
+            // Use original order - RTL/LTR handled by CSS direction
+            section.timeboxes.forEach((timebox, timeboxIndex) => {
+                const timeboxElement = document.createElement('div');
+                timeboxElement.className = 'timebox';
+                
+                // Calculate width based on actual duration proportion
+                const timeboxDuration = timebox.duration(this.state.currentTrack.tau, this.state.currentTrack.n);
+                const widthPercentage = (timeboxDuration / sectionDuration) * 100;
+                
+                timeboxElement.style.width = `${widthPercentage}%`;
+                timeboxElement.style.backgroundColor = '#333';
+                timeboxElement.style.padding = '8px';
+                timeboxElement.style.borderRadius = '4px';
+                timeboxElement.style.minHeight = '60px';
+                timeboxElement.style.display = 'flex';
+                timeboxElement.style.flexDirection = 'column';
+                timeboxElement.style.justifyContent = 'space-between';
+
+                // Add timebox content with current language
+                const timeboxContent = document.createElement('div');
+                timeboxContent.className = 'timebox-content';
+                timeboxContent.textContent = timebox.desc?.[this.state.currentLanguage] || timebox.desc?.en || `Box ${timeboxIndex + 1}`;
+                timeboxElement.appendChild(timeboxContent);
+                
+                // Add position indicators
+                const positionsContainer = document.createElement('div');
+                positionsContainer.className = 'positions-container';
+                positionsContainer.style.display = 'flex';
+                positionsContainer.style.gap = '2px';
+                positionsContainer.style.marginTop = '8px';
+                positionsContainer.style.justifyContent = 'space-between';
+                
+                // Use the timebox's effective nT value for position indicators
+                const effectiveN = timebox.getEffectiveN(this.state.currentTrack);
+                for (let i = 0; i < effectiveN; i++) {
+                    const positionDot = document.createElement('div');
+                    positionDot.className = 'position-dot';
+                    positionDot.style.width = '8px';
+                    positionDot.style.height = '8px';
+                    positionDot.style.borderRadius = '50%';
+                    positionDot.style.backgroundColor = '#666';
+                    positionsContainer.appendChild(positionDot);
+                }
+                
+                timeboxElement.appendChild(positionsContainer);
+                timeboxesContainer.appendChild(timeboxElement);
+            });
+            
+            sectionElement.appendChild(timeboxesContainer);
+            sectionsContainer.appendChild(sectionElement);
+            
+            // Update cumulative time for next section
+            cumulativeTime += sectionDuration;
+        });
+        
+        div.appendChild(sectionsContainer);
         return div;
+    }
+
+    setState(newState) {
+        // Handle language updates
+        if (newState.currentLanguage) {
+            this.state.currentLanguage = newState.currentLanguage;
+        }
+        // Handle track updates
+        if (newState.currentTrack) {
+            this.state.currentTrack = newState.currentTrack;
+        }
+        super.setState(newState);
     }
 }
 
@@ -227,6 +350,12 @@ class TrackPlayerScreen extends Screen {
         this.addComponent(this.controls);
         this.addComponent(this.sectionView);
 
+        // Initialize section view with current track and language
+        this.sectionView.setState({
+            currentTrack: player.currentTrack,
+            currentLanguage: 'en'  // Default language
+        });
+
         // Setup input handlers
         this.setupHandlers();
 
@@ -250,7 +379,7 @@ class TrackPlayerScreen extends Screen {
         this.addHandler('click', (e, screen) => {
             if (e.target.closest('.timeline')) {
                 const pos = this.calculateTimelinePosition(e);
-                const time = pos * this.player.track.totalDuration();
+                const time = pos * this.player.currentTrack.totalDuration();
                 this.player.seek(time);
             }
         });
@@ -275,15 +404,16 @@ class TrackPlayerScreen extends Screen {
 
         // Update timeline
         this.timeline.setState({
-            position: currentTime / this.player.track.totalDuration()
+            position: currentTime / this.player.currentTrack.totalDuration()
         });
 
         // Update controls
         this.controls.setState({ mode, speed });
 
-        // Update section view
+        // Update section view with current section and track
         this.sectionView.setState({
-            currentSection: this.player.track.sections[state.i]
+            currentSection: this.player.currentTrack.sections[state.i],
+            currentTrack: this.player.currentTrack
         });
     }
 
@@ -306,6 +436,13 @@ class TrackPlayerScreen extends Screen {
     getSectionFromEvent(e) {
         const element = e.target.closest('.section');
         return element ? parseInt(element.dataset.index) : null;
+    }
+
+    // Add method to handle language changes
+    setLanguage(langCode) {
+        this.sectionView.setState({
+            currentLanguage: langCode
+        });
     }
 }
 

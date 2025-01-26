@@ -1,7 +1,7 @@
-const untitled_track = 
+export const track9 = 
 {
-  "id": "untitled-track",
-  "desc": {
+  "id": "\\vikktør\\tracks\\9. untitled-track",
+  "description": {
     "en": "untitled track før aurøra",
     "zh": "无题曲目 - 致 aurøra",
     "ru": "трек без названия для aurøra",
@@ -10,10 +10,12 @@ const untitled_track =
   "tau": 0.5,
   "delta": 0.05,
   "n": 8,
+  "tau_omega": "2024-03-19 15:30:00.00",
+  "dedication": "To aurøra",
   "audioUrl": "https://untitled-document.net/knowledge/agents/viktor-r/projects/vikktør/tracks/9. untitled-track/9. untitled-track.wav",
   "sections": [
     {
-      "desc": {
+      "description": {
         "en": "1. Time Unit (τ)",
         "zh": "1. 时间单位 (τ)",
         "ru": "1. Единица времени (τ)",
@@ -23,7 +25,7 @@ const untitled_track =
       "timeboxes": [
         {
           "tStart": 0,
-          "desc": {
+          "description": {
             "en": "G",
             "zh": "G",
             "ru": "G",
@@ -33,7 +35,7 @@ const untitled_track =
         },
         {
           "tStart": 4,
-          "desc": {
+          "description": {
             "en": "G",
             "zh": "G",
             "ru": "G",
@@ -43,7 +45,7 @@ const untitled_track =
         },
         {
           "tStart": 8,
-          "desc": {
+          "description": {
             "en": "G",
             "zh": "G",
             "ru": "G",
@@ -53,7 +55,7 @@ const untitled_track =
         },
         {
           "tStart": 12,
-          "desc": {
+          "description": {
             "en": "Bb-C",
             "zh": "Bb-C",
             "ru": "Bb-C",
@@ -64,7 +66,7 @@ const untitled_track =
       ]
     },
     {
-      "desc": {
+      "description": {
         "en": "2. Timebox (T)",
         "zh": "2. 时间盒 (T)",
         "ru": "2. Таймбокс (T)", 
@@ -74,7 +76,7 @@ const untitled_track =
       "timeboxes": [
         {
           "tStart": 16,
-          "desc": {
+          "description": {
             "en": "G",
             "zh": "G",
             "ru": "G",
@@ -84,7 +86,7 @@ const untitled_track =
         },
         {
           "tStart": 20,
-          "desc": {
+          "description": {
             "en": "G",
             "zh": "G",
             "ru": "G",
@@ -94,7 +96,7 @@ const untitled_track =
         },
         {
           "tStart": 24,
-          "desc": {
+          "description": {
             "en": "G",
             "zh": "G",
             "ru": "G",
@@ -104,7 +106,7 @@ const untitled_track =
         },
         {
           "tStart": 28,
-          "desc": {
+          "description": {
             "en": "Bb-C",
             "zh": "Bb-C",
             "ru": "Bb-C",
@@ -115,7 +117,7 @@ const untitled_track =
       ]
     },
     {
-      "desc": {
+      "description": {
         "en": "3. Section (S)",
         "zh": "3. 部分 (S)",
         "ru": "3. Секция (S)",
@@ -125,7 +127,7 @@ const untitled_track =
       "timeboxes": [
         {
           "tStart": 32,
-          "desc": {
+          "description": {
             "en": "D#-F",
             "zh": "D#-F",
             "ru": "D#-F",
@@ -135,7 +137,7 @@ const untitled_track =
         },
         {
           "tStart": 34,
-          "desc": {
+          "description": {
             "en": "G",
             "zh": "G",
             "ru": "G",
@@ -145,7 +147,7 @@ const untitled_track =
         },
         {
           "tStart": 38,
-          "desc": {
+          "description": {
             "en": "D#-F",
             "zh": "D#-F",
             "ru": "D#-F",
@@ -155,7 +157,7 @@ const untitled_track =
         },
         {
           "tStart": 42,
-          "desc": {
+          "description": {
             "en": "G",
             "zh": "G",
             "ru": "G",
@@ -166,7 +168,7 @@ const untitled_track =
       ]
     },
     {
-      "desc": {
+      "description": {
         "en": "4. Track (Θ)",
         "zh": "4. 轨道 (Θ)",
         "ru": "4. Трек (Θ)", 
@@ -176,7 +178,7 @@ const untitled_track =
       "timeboxes": [
         {
           "tStart": 48,
-          "desc": {
+          "description": {
             "en": "D#-F",
             "zh": "D#-F",
             "ru": "D#-F",
@@ -186,7 +188,7 @@ const untitled_track =
         },
         {
           "tStart": 52,
-          "desc": {
+          "description": {
             "en": "G",
             "zh": "G",
             "ru": "G",
@@ -196,7 +198,7 @@ const untitled_track =
         },
         {
           "tStart": 56,
-          "desc": {
+          "description": {
             "en": "D#-F",
             "zh": "D#-F",
             "ru": "D#-F",
@@ -206,7 +208,7 @@ const untitled_track =
         },
         {
           "tStart": 60,
-          "desc": {
+          "description": {
             "en": "G",
             "zh": "G",
             "ru": "G",

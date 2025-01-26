@@ -6,7 +6,8 @@ import { TrackState } from './track-model.js';
 const PlaybackMode = {
     PLAYING: 'PLAYING',
     PAUSED: 'PAUSED',
-    STOPPED: 'STOPPED'
+    STOPPED: 'STOPPED',
+    LOADING: 'LOADING'  // Added new state
 };
 
 /**
@@ -14,16 +15,73 @@ const PlaybackMode = {
  */
 class TrackPlayer {
     /**
-     * @param {Track} track - Track to play
+     * @param {Track} initialTrack - Initial track to play
      * @param {number} speed - Playback speed multiplier
+     * @param {number} predelay_ms - Milliseconds to delay time counting after play (default 500ms)
+     * @param {boolean} looping - Whether track should loop by default (default true)
      */
-    constructor(track, speed = 1.0) {
-        this.track = track;           // Θ (track being played)
-        this.state = track.state;     // Ψ (current track state)
-        this.mode = PlaybackMode.STOPPED;  // ρ (playback mode)
-        this.speed = speed;           // ν (speed multiplier)
+    constructor(initialTrack, speed = 1.0, predelay_ms = 500, looping = true) {
+        this.playlist = [];  // Initialize empty playlist
+        this.currentTrackIndex = -1;
+        this.currentTrack = null;
+        this.state = null;
+        this.mode = PlaybackMode.STOPPED;
+        this.speed = speed;
         this.time = 0;
-        this.accumulatedTime = 0;  // Add accumulator for time quantization
+        this.accumulatedTime = 0;
+        this.predelay_ms = predelay_ms;
+        this.looping = looping;  // Add looping property
+        
+        if (initialTrack) {
+            this.addTrack(initialTrack);
+        }
+        
+        // Initialize world time tracking if tau_omega is present
+        if (initialTrack && initialTrack.tau_omega) {
+            this.worldTimeStart = new Date(initialTrack.tau_omega);
+        }
+    }
+
+    /**
+     * Add track to playlist
+     * @param {Track} track - Track to add
+     */
+    addTrack(track) {
+        this.playlist.push(track);
+        if (this.currentTrackIndex === -1) {
+            this.selectTrack(0);
+        }
+    }
+
+    /**
+     * Remove track from playlist
+     * @param {number} index - Index of track to remove
+     */
+    removeTrack(index) {
+        if (index >= 0 && index < this.playlist.length) {
+            this.playlist.splice(index, 1);
+            if (index === this.currentTrackIndex) {
+                this.currentTrackIndex = Math.min(index, this.playlist.length - 1);
+                this.currentTrack = this.playlist[this.currentTrackIndex] || null;
+                this.state = this.currentTrack ? new TrackState() : null;
+            }
+        }
+    }
+
+    /**
+     * Select track from playlist
+     * @param {number} index - Index of track to select
+     */
+    async selectTrack(index) {
+        if (index >= 0 && index < this.playlist.length) {
+            this.mode = PlaybackMode.LOADING;
+            this.currentTrackIndex = index;
+            this.currentTrack = this.playlist[index];
+            this.state = new TrackState();
+            this.time = 0;
+            this.accumulatedTime = 0;
+            this.mode = PlaybackMode.STOPPED;
+        }
     }
 
     /**
@@ -31,7 +89,7 @@ class TrackPlayer {
      * @returns {TrackPlayer} Updated player instance
      */
     play() {
-        if (!this.state.isValid(this.track)) {
+        if (!this.state || !this.state.isValid(this.currentTrack)) {
             this.state = new TrackState();
         }
         this.mode = PlaybackMode.PLAYING;
@@ -53,7 +111,7 @@ class TrackPlayer {
      */
     stop() {
         this.mode = PlaybackMode.STOPPED;
-        this.state = new TrackState();
+        this.state = null;
         this.time = 0;
         this.accumulatedTime = 0;
         return this;
@@ -82,33 +140,37 @@ class TrackPlayer {
             this.accumulatedTime += deltaTime * this.speed;
 
             // Get current timebox duration
-            const currentSection = this.track.sections[this.state.i];
+            const currentSection = this.currentTrack.sections[this.state.i];
             if (!currentSection) return this;
 
             const currentBox = currentSection.timeboxes[this.state.j];
             if (!currentBox) return this;
 
             // Use tau (time unit) instead of full box duration
-            const timeUnit = this.track.tau;
+            const timeUnit = this.currentTrack.tau;
             
             // Check if we've accumulated enough time to advance state
-            while (this.accumulatedTime >= timeUnit) {  // Changed from boxDuration to timeUnit
-                const nextState = this.state.advance(this.track);
+            while (this.accumulatedTime >= timeUnit) {
+                const nextState = this.state.advance(this.currentTrack);
                 if (!nextState) {
-                    console.log(`Track state: End of track reached. Stopping.`);
-                    this.stop();
-                    break;
+                    if (this.looping) {
+                        // If looping, reset to initial state
+                        this.state = new TrackState();
+                        console.log('Track looping: Resetting to initial state');
+                    } else {
+                        console.log(`Track state: End of track reached. Stopping.`);
+                        this.stop();
+                        break;
+                    }
+                } else {
+                    this.state = nextState;
                 }
                 
-                // Log state transition
-                console.log(`Track state changed: (${this.state.i},${this.state.j},${this.state.k}) -> (${nextState.i},${nextState.j},${nextState.k}) at time ${this.time.toFixed(2)}s`);
-                
-                this.state = nextState;
-                this.accumulatedTime -= timeUnit;  // Subtract time unit instead of box duration
+                this.accumulatedTime -= timeUnit;
             }
 
-            if (this.time >= this.track.totalDuration()) {
-                this.time = this.track.totalDuration();
+            if (!this.looping && this.time >= this.currentTrack.totalDuration()) {
+                this.time = this.currentTrack.totalDuration();
                 this.stop();
             }
         }
@@ -128,7 +190,7 @@ class TrackPlayer {
      * @returns {number} Remaining time in seconds
      */
     remainingTime() {
-        return this.track.totalDuration() - this.currentTime();
+        return this.currentTrack.totalDuration() - this.currentTime();
     }
 
     /**
@@ -137,7 +199,7 @@ class TrackPlayer {
      * @returns {TrackPlayer} Updated player instance
      */
     seek(time) {
-        if (time < 0 || time > this.track.totalDuration()) {
+        if (time < 0 || time > this.currentTrack.totalDuration()) {
             return this;
         }
 
@@ -145,10 +207,10 @@ class TrackPlayer {
         let state = new TrackState();
 
         while (currentTime < time) {
-            const nextState = state.advance(this.track);
+            const nextState = state.advance(this.currentTrack);
             if (!nextState) break;
 
-            const nextTime = nextState.absoluteTime(this.track);
+            const nextTime = nextState.absoluteTime(this.currentTrack);
             if (nextTime > time) break;
 
             state = nextState;
@@ -165,7 +227,7 @@ class TrackPlayer {
      * @returns {TrackPlayer} Updated player instance
      */
     jumpToSection(sectionIndex) {
-        if (sectionIndex >= 0 && sectionIndex < this.track.sections.length) {
+        if (sectionIndex >= 0 && sectionIndex < this.currentTrack.sections.length) {
             this.state = new TrackState(sectionIndex, 0, 0);
         }
         return this;
@@ -177,7 +239,8 @@ class TrackPlayer {
      */
     isValid() {
         return (
-            this.state.isValid(this.track) &&
+            this.state &&
+            this.state.isValid(this.currentTrack) &&
             this.speed > 0 &&
             Object.values(PlaybackMode).includes(this.mode)
         );
@@ -209,36 +272,65 @@ class TrackPlayer {
     }
 
     calculateStateForTime(time) {
-        const totalTau = Math.floor(time / this.track.tau);
+        const totalTau = Math.floor(time / this.currentTrack.tau);
         let remainingTau = totalTau;
         let i = 0, j = 0, k = 0;
         
         // Find the correct section and box
-        for (i = 0; i < this.track.sections.length; i++) {
-            const section = this.track.sections[i];
+        for (i = 0; i < this.currentTrack.sections.length; i++) {
+            const section = this.currentTrack.sections[i];
             for (j = 0; j < section.timeboxes.length; j++) {
-                const boxDuration = this.track.n; // number of positions * tau
+                const boxDuration = this.currentTrack.n; // number of positions * tau
                 if (remainingTau < boxDuration) {
                     k = remainingTau;
-                    // Return a proper TrackState instance instead of plain object
                     return new TrackState(i, j, k);
                 }
                 remainingTau -= boxDuration;
             }
         }
         
-        // If we've gone past the end, return the last valid state
+        // If we've gone past the end and looping is enabled, wrap around to start
+        if (this.looping) {
+            return new TrackState(0, 0, 0);
+        }
+        
+        // If not looping, return the last valid state
         return new TrackState(
-            this.track.sections.length - 1,
-            this.track.sections[this.track.sections.length - 1].timeboxes.length - 1,
-            this.track.n - 1
+            this.currentTrack.sections.length - 1,
+            this.currentTrack.sections[this.currentTrack.sections.length - 1].timeboxes.length - 1,
+            this.currentTrack.n - 1
         );
     }
 
     seekTo(time) {
         this.state = this.calculateStateForTime(time);
         this.time = time;  // Also update the current time
-        this.accumulatedTime = time % this.track.tau;  // Update accumulated time
+        this.accumulatedTime = time % this.currentTrack.tau;  // Update accumulated time
+    }
+
+    /**
+     * Get current world time if track has tau_omega defined
+     * @returns {Date|null} Current world time or null if not anchored
+     */
+    currentWorldTime() {
+        if (!this.worldTimeStart) return null;
+        
+        const elapsed = this.time * 1000; // Convert to milliseconds
+        return new Date(this.worldTimeStart.getTime() + elapsed);
+    }
+
+    /**
+     * Get track metadata including dedication if present
+     * @returns {Object} Track metadata
+     */
+    getMetadata() {
+        return {
+            id: this.currentTrack.id,
+            description: this.currentTrack.description,
+            worldTimeAnchor: this.currentTrack.tau_omega,
+            dedication: this.currentTrack.dedication,
+            duration: this.currentTrack.totalDuration()
+        };
     }
 }
 

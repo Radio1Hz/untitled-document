@@ -296,7 +296,6 @@ body {
     padding: 8px;
     border-radius: 4px;
     font-size: 0.9em;
-    min-width: 200px;
     flex-shrink: 0;
     position: relative;
 }
@@ -409,10 +408,13 @@ h1, h2, h3, h4, h5, h6 {
 }
 
 /* Special handling for Arabic text direction */
-[data-lang="ar"] .timebox,
-[data-lang="ar"] h3 {
-    direction: rtl;
-    text-align: right;
+[data-lang="ar"] .timebox {
+    text-align: right;  /* Keep text alignment right-to-left */
+}
+
+/* Remove the RTL container styles since we're handling order in JS */
+[data-lang="ar"] .timeboxes-container {
+    /* Remove direction: rtl */
 }
 
 .bottom-text {
@@ -428,4 +430,22 @@ h1, h2, h3, h4, h5, h6 {
     display: flex;
     justify-content: center;
     align-items: center;
+}
+
+/* Default LTR direction */
+.section-header,
+.timeboxes-container,
+.timeboxes-info {
+    direction: ltr;
+}
+
+/* RTL direction for Arabic */
+[data-lang="ar"] .section-header,
+[data-lang="ar"] .timeboxes-container,
+[data-lang="ar"] .timeboxes-info {
+    direction: rtl;
+}
+
+[data-lang="ar"] .timebox {
+    text-align: right;
 }
