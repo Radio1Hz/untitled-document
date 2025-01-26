@@ -293,9 +293,20 @@ class Timeline extends Component {
     setState(newState) {
         // Calculate new active width if state changed
         if (newState.currentState && this.props.track) {
-            const absoluteTime = newState.currentState.absoluteTime(this.props.track);
-            const totalDuration = this.props.track.totalDuration();
-            newState.activeWidth = (absoluteTime / totalDuration) * 100;
+            // Get the next state
+            const nextState = newState.currentState.advance(this.props.track);
+            
+            if (nextState) {
+                // Use next state's time for progress bar
+                const absoluteTime = nextState.absoluteTime(this.props.track);
+                const totalDuration = this.props.track.totalDuration();
+                newState.activeWidth = (absoluteTime / totalDuration) * 100;
+            } else {
+                // If there is no next state (end of track), use current state
+                const absoluteTime = newState.currentState.absoluteTime(this.props.track);
+                const totalDuration = this.props.track.totalDuration();
+                newState.activeWidth = (absoluteTime / totalDuration) * 100;
+            }
         } else {
             newState.activeWidth = 0;
             console.log('Timeline width set to 0% due to missing state or track');
@@ -637,7 +648,7 @@ class TrackPlayerScreen extends Screen {
         }
         
         // Update timeline and controls as before
-        const progress = (currentTime / totalDuration) * 100;
+        const progress = ((currentTime + this.player.currentTrack.tau) / totalDuration) * 100;
         this.timeline.setState({
             currentState: state,
             progress: progress

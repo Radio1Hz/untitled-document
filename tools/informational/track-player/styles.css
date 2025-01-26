@@ -103,7 +103,7 @@ body {
 
 #sections-content {
     width: 100%;
-    height: calc(100vh - 200px); /* Adjust based on your header height */
+    height: 25vh;  /* Changed from calc(100vh - 200px) */
     display: flex;
     flex-direction: column;
     overflow-y: auto;
