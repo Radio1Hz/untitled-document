@@ -607,44 +607,42 @@ class TrackPlayerScreen extends Screen {
     handlePlayerUpdate(event) {
         const { currentTime, totalDuration, mode, speed, state } = event;
         
-        // Only log when section changes
+        // Update state info display with leading zeros
         if (state) {
+            const currentSection = document.getElementById('current-section');
+            const currentBox = document.getElementById('current-box');
+            const currentPosition = document.getElementById('current-position');
+            
+            if (currentSection && currentBox && currentPosition) {
+                currentSection.textContent = state.i.toString().padStart(2, '0');
+                currentBox.textContent = state.j.toString().padStart(2, '0');
+                currentPosition.textContent = state.k.toString().padStart(2, '0');
+            }
+
+            // Check if section changed
             const previousState = this.sectionView.state.currentSection;
             const newSection = this.player.currentTrack.sections[state.i];
             
             if (!previousState || previousState !== newSection) {
-                // Section started
-                /*
-                console.log('Section started at:', currentTime.toFixed(3), 'seconds:', {
-                    index: state.i,
-                    section: newSection
+                // Update section view state and scroll only on section change
+                this.sectionView.setState({
+                    currentSection: newSection,
+                    currentTrack: this.player.currentTrack
                 });
-                */
+                this.scrollToCurrentSection(state.i);
+            } else {
+                // Just update position highlighting without re-rendering section view
+                this.sectionView.updatePositionHighlighting();
             }
         }
         
-        // Calculate progress percentage
+        // Update timeline and controls as before
         const progress = (currentTime / totalDuration) * 100;
-        
-        // Update timeline with both progress and state
         this.timeline.setState({
             currentState: state,
             progress: progress
         });
-
-        // Update controls
         this.controls.setState({ mode, speed });
-
-        // Update section view
-        if (state) {
-            this.sectionView.setState({
-                currentSection: this.player.currentTrack.sections[state.i],
-                currentTrack: this.player.currentTrack
-            });
-
-            // Scroll to current section
-            this.scrollToCurrentSection(state.i);
-        }
     }
 
     /**

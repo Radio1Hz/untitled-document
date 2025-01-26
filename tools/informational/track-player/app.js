@@ -177,9 +177,17 @@ document.addEventListener('DOMContentLoaded', async () => {
     const durationDisplay = document.getElementById('track-duration');
     const speedDisplay = document.getElementById('track-speed');
     const sectionsContent = document.getElementById('sections-content');
+
+    // Initialize state info with leading zeros
     const currentSection = document.getElementById('current-section');
     const currentBox = document.getElementById('current-box');
     const currentPosition = document.getElementById('current-position');
+
+    if (currentSection && currentBox && currentPosition) {
+        currentSection.textContent = '00';
+        currentBox.textContent = '00';
+        currentPosition.textContent = '00';
+    }
 
     // Set track title
     trackTitle.textContent = player.currentTrack.id;
@@ -190,11 +198,6 @@ document.addEventListener('DOMContentLoaded', async () => {
     const minutes = Math.floor((totalSeconds % 3600) / 60);
     const seconds = totalSeconds % 60;
     durationDisplay.textContent = `${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
-
-    // Initialize track state display
-    currentSection.textContent = '0';
-    currentBox.textContent = '0';
-    currentPosition.textContent = '0';
 
     // Render initial track content
     renderTrackContent();
