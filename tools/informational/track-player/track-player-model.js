@@ -33,9 +33,11 @@ class TrackPlayer {
         this.predelay_ms = predelay_ms;
         this.looping = looping;  // Add looping property
         this.screen_to_dot_ratio = screen_to_dot_ratio;
+        this.transitionTimes = [];  // Array to store transition times
         
         if (initialTrack) {
             this.addTrack(initialTrack);
+            this.calculateTransitionTimes();  // Calculate times when track is added
         }
         
         // Initialize world time tracking if tau_omega is present
@@ -82,6 +84,7 @@ class TrackPlayer {
             this.state = new TrackState();
             this.time = 0;
             this.accumulatedTime = 0;
+            this.calculateTransitionTimes();  // Recalculate transitions for new track
             this.mode = PlaybackMode.STOPPED;
         }
     }
@@ -93,6 +96,9 @@ class TrackPlayer {
     play() {
         if (!this.state || !this.state.isValid(this.currentTrack)) {
             this.state = new TrackState();
+        }
+        if (this.transitionTimes.length === 0) {
+            this.calculateTransitionTimes();
         }
         this.mode = PlaybackMode.PLAYING;
         return this;
@@ -138,50 +144,34 @@ class TrackPlayer {
      */
     tick(deltaTime) {
         if (this.mode === PlaybackMode.PLAYING) {
+            const previousTime = this.time;
             this.time += deltaTime * this.speed;
-            this.accumulatedTime += deltaTime * this.speed;
-
-            const currentSection = this.currentTrack.sections[this.state.i];
-            if (!currentSection) return this;
-
-            const currentBox = currentSection.timeboxes[this.state.j];
-            if (!currentBox) return this;
-
-            const timeUnit = this.currentTrack.tau;
             
-            console.log('Tick:', {
-                deltaTime,
-                accumulatedTime: this.accumulatedTime,
-                timeUnit,
-                currentBox: {
-                    nT: currentBox.nT,
-                    effectiveN: currentBox.getEffectiveN(this.currentTrack),
-                    position: this.state.k
-                }
-            });
+            // Find all transitions that should occur between previousTime and current time
+            const relevantTransitions = this.transitionTimes.filter(t => 
+                t.time > previousTime && t.time <= this.time
+            );
             
-            while (this.accumulatedTime >= timeUnit) {
-                const nextState = this.state.advance(this.currentTrack);
-                if (!nextState) {
-                    if (this.looping) {
-                        // If looping, reset to initial state
-                        this.state = new TrackState();
-                        console.log('Track looping: Resetting to initial state');
-                    } else {
-                        console.log(`Track state: End of track reached. Stopping.`);
-                        this.stop();
-                        break;
-                    }
-                } else {
-                    this.state = nextState;
-                }
+            // Apply the last relevant transition (most recent state)
+            if (relevantTransitions.length > 0) {
+                const lastTransition = relevantTransitions[relevantTransitions.length - 1];
+                console.log(`Transitioning to state (${lastTransition.state.i},${lastTransition.state.j},${lastTransition.state.k}) at time ${lastTransition.time.toFixed(3)}s`);
                 
-                this.accumulatedTime -= timeUnit;
+                this.state = new TrackState(
+                    lastTransition.state.i,
+                    lastTransition.state.j,
+                    lastTransition.state.k
+                );
             }
-
-            if (!this.looping && this.time >= this.currentTrack.totalDuration()) {
-                this.time = this.currentTrack.totalDuration();
-                this.stop();
+            
+            // Check if we've reached the end
+            if (this.time >= this.transitionTimes[this.transitionTimes.length - 1].time) {
+                if (this.looping) {
+                    this.time = 0;
+                    this.state = new TrackState();
+                } else {
+                    this.stop();
+                }
             }
         }
         return this;
@@ -286,11 +276,11 @@ class TrackPlayer {
         let remainingTau = totalTau;
         let i = 0, j = 0, k = 0;
         
-        // Find the correct section and box
+        // Calculate state based on time
         for (i = 0; i < this.currentTrack.sections.length; i++) {
             const section = this.currentTrack.sections[i];
             for (j = 0; j < section.timeboxes.length; j++) {
-                const boxDuration = this.currentTrack.n; // number of positions * tau
+                const boxDuration = this.currentTrack.n;
                 if (remainingTau < boxDuration) {
                     k = remainingTau;
                     return new TrackState(i, j, k);
@@ -313,9 +303,16 @@ class TrackPlayer {
     }
 
     seekTo(time) {
-        this.state = this.calculateStateForTime(time);
-        this.time = time;  // Also update the current time
-        this.accumulatedTime = time % this.currentTrack.tau;  // Update accumulated time
+        const transition = this.transitionTimes.reduce((prev, curr) => {
+            return Math.abs(curr.time - time) < Math.abs(prev.time - time) ? curr : prev;
+        });
+        
+        this.state = new TrackState(
+            transition.state.i,
+            transition.state.j,
+            transition.state.k
+        );
+        this.time = time;
     }
 
     /**
@@ -341,6 +338,42 @@ class TrackPlayer {
             dedication: this.currentTrack.dedication,
             duration: this.currentTrack.totalDuration()
         };
+    }
+
+    /**
+     * Calculate all state transition times for the current track
+     */
+    calculateTransitionTimes() {
+        if (!this.currentTrack) return;
+        
+        this.transitionTimes = [];
+        
+        // Iterate through sections
+        this.currentTrack.sections.forEach((section, i) => {
+            // Iterate through timeboxes
+            section.timeboxes.forEach((timebox, j) => {
+                // For each timebox, create states for each position
+                const nT = timebox.getEffectiveN(this.currentTrack);
+                for (let k = 0; k < nT; k++) {
+                    this.transitionTimes.push({
+                        time: timebox.tStart * this.currentTrack.tau + (k * this.currentTrack.tau),
+                        state: new TrackState(i, j, k)
+                    });
+                }
+            });
+        });
+
+        // Sort transitions by time
+        this.transitionTimes.sort((a, b) => a.time - b.time);
+
+        // Log the transition times array
+        console.log('State transition times calculated:', 
+            this.transitionTimes.map(t => ({
+                time: t.time.toFixed(3),
+                state: `(${t.state.i},${t.state.j},${t.state.k})`,
+                realTime: `${Math.floor(t.time/60)}:${(t.time%60).toFixed(1)}`
+            }))
+        );
     }
 }
 

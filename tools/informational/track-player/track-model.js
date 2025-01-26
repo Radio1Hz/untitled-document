@@ -35,11 +35,11 @@ class TimeBox {
     /**
      * Calculate duration of timebox in seconds
      * @param {number} tau - Time unit duration
-     * @param {number} n - Number of time units
+     * @param {Track} track - Track context for default n value
      * @returns {number} Duration in seconds
      */
-    duration(tau, n) {
-        return tau * n;  // Changed from this.n to use track's n parameter
+    duration(tau, track) {
+        return tau * this.getEffectiveN(track);
     }
 
     /**
@@ -79,24 +79,25 @@ class TrackState {
         const timebox = section.timeboxes[this.j];
         if (!timebox) return undefined;
 
-        // Use timebox's effective nT value instead of track's n
+        // Get number of time units for current timebox
         const effectiveN = timebox.getEffectiveN(track);
 
-        // Check if we can advance within current timebox
+        // Try to advance within current timebox
         if (this.k + 1 < effectiveN) {
             return new TrackState(this.i, this.j, this.k + 1);
         }
 
-        // Move to next timebox if available
+        // Try to move to next timebox
         if (this.j + 1 < section.timeboxes.length) {
             return new TrackState(this.i, this.j + 1, 0);
         }
 
-        // Move to next section if available
+        // Try to move to next section
         if (this.i + 1 < track.sections.length) {
             return new TrackState(this.i + 1, 0, 0);
         }
 
+        // No more states available
         return undefined;
     }
 
@@ -142,13 +143,17 @@ class TrackState {
 
         // Add duration of previous sections
         for (let x = 0; x < this.i; x++) {
-            time += track.sections[x].duration(track.tau, track.n);
+            const section = track.sections[x];
+            for (const box of section.timeboxes) {
+                time += box.duration(track.tau, track);
+            }
         }
 
         // Add duration of previous timeboxes in current section
         const section = track.sections[this.i];
         for (let y = 0; y < this.j; y++) {
-            time += section.timeboxes[y].duration(track.tau, track.n);
+            const box = section.timeboxes[y];
+            time += box.duration(track.tau, track);
         }
 
         // Add current timebox partial duration

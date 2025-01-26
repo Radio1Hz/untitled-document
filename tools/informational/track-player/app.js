@@ -291,60 +291,44 @@ document.addEventListener('DOMContentLoaded', async () => {
             return requestAnimationFrame(update);
         }
 
-        // Calculate precise time since last frame
         const deltaTime = (currentTime - lastTickTime) / 1000;
         lastTickTime = currentTime;
 
-        // If playing, sync visual player with audio time
         if (player.mode === PlaybackMode.PLAYING) {
             const audioTime = audioElement.currentTime;
             
-            // Handle predelay when starting playback
             if (playStartTime === null) {
                 playStartTime = currentTime;
             }
             
-            // Only start counting time after predelay has passed
             const timeSincePlay = currentTime - playStartTime;
             if (timeSincePlay < player.predelay_ms) {
-                // During predelay, keep state at start but don't accumulate time
                 player.state = new TrackState();
-                accumulatedTime = 0;
             } else {
-                // After predelay, calculate the current state based on adjusted audio time
                 const adjustedAudioTime = audioTime - (player.predelay_ms / 1000);
-                const expectedState = player.calculateStateForTime(Math.max(0, adjustedAudioTime));
                 
-                // Update player state if it doesn't match
-                if (player.state.i !== expectedState.i || 
-                    player.state.j !== expectedState.j || 
-                    player.state.k !== expectedState.k) {
-                    player.state = expectedState;
-                    accumulatedTime = adjustedAudioTime % player.currentTrack.tau;
+                // Find the last transition that should have occurred by now
+                const currentTransition = player.transitionTimes
+                    .filter(t => t.time <= adjustedAudioTime)
+                    .pop();
+
+                if (currentTransition) {
+                    console.log(`At time ${adjustedAudioTime.toFixed(3)}, using transition:`, 
+                        currentTransition.time.toFixed(3), 
+                        `state: (${currentTransition.state.i},${currentTransition.state.j},${currentTransition.state.k})`
+                    );
+                    
+                    player.state = new TrackState(
+                        currentTransition.state.i,
+                        currentTransition.state.j,
+                        currentTransition.state.k
+                    );
                 }
             }
-        } else {
-            // Reset playStartTime when not playing
-            playStartTime = null;
         }
 
         // Update visual elements
         updateVisuals(audioElement.currentTime);
-
-        // Only tick if we're playing and past predelay
-        if (player.mode === PlaybackMode.PLAYING && 
-            playStartTime !== null && 
-            (currentTime - playStartTime) >= player.predelay_ms) {
-            
-            // Accumulate time and update state only when needed
-            accumulatedTime += deltaTime;
-            
-            // Update track state at precise tau intervals
-            while (accumulatedTime >= player.currentTrack.tau) {
-                player.tick(player.currentTrack.tau);
-                accumulatedTime -= player.currentTrack.tau;
-            }
-        }
 
         requestAnimationFrame(update);
     }
