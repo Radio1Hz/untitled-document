@@ -174,7 +174,6 @@ document.addEventListener('DOMContentLoaded', async () => {
         loopBtn.remove(); // Remove the loop button from DOM if it exists
     }
     const timeDisplay = document.getElementById('currentTime');
-    const durationDisplay = document.getElementById('track-duration');
     const speedDisplay = document.getElementById('track-speed');
     const sectionsContent = document.getElementById('sections-content');
 
@@ -197,8 +196,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     const hours = Math.floor(totalSeconds / 3600);
     const minutes = Math.floor((totalSeconds % 3600) / 60);
     const seconds = totalSeconds % 60;
-    durationDisplay.textContent = `${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
-
+    
     // Render initial track content
     renderTrackContent();
 

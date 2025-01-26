@@ -18,37 +18,42 @@
             <div class="container">
                 <div class="track-section">
                     <div class="track-header">
-                        <div class="track-controls">
-                            <button id="playPauseBtn" class="untitled-button">▶</button>
-                            <button id="stopBtn" class="untitled-button">⏹</button>
-                            <div id="currentTime" class="time-display">
-                                <span class="time-main digits">00:00.</span>
-                                <span class="time-cents digits">00</span>
-                            </div>
-                            <div class="track-duration"> / <span id="track-duration"></span></div>
-                        </div>
-                        <div class="track-state">
-                            <div class="state-info">
-                                <div id="current-section" class="state-value">-</div>
-                                <div id="current-box" class="state-value">-</div>
-                                <div id="current-position" class="state-value">-</div>
-                            </div>
-                        </div>
-                        <div id="sections-content"></div>
                         <div id="track-title">untitled-track</div>
-                        <div class="track-meta">
-                            
-                            <div class="language-selector">
-                                <select id="langSelect">
-                                    <option value="en">English</option>
-                                    <option value="zh">中文</option>
-                                    <option value="ru">Русский</option>
-                                    <option value="ar">العربية</option>
-                                </select>
-                                <button id="speedBtn" class="untitled-button">1x</button>
-                                <button id="loopBtn" class="untitled-button" title="Toggle loop"></button>
+                    </div>
+                    <div class="track-controls" role="group" aria-label="Playback controls">
+                        <button id="playPauseBtn" class="untitled-button" aria-label="Play or pause">▶</button>
+                        <button id="stopBtn" class="untitled-button" aria-label="Stop">⏹</button>
+                        <div id="currentTime" class="time-display" aria-label="Current time">
+                            <span class="time-main digits">00:00.</span>
+                            <span class="time-cents digits">00</span>
+                        </div>
+                        <div class="track-state" role="status" aria-label="Track position">
+                            <div class="state-info">
+                                <div class="state-group">
+                                    <div id="current-section" class="state-value">-</div>
+                                </div>
+                                <div class="state-group">
+                                    <div id="current-box" class="state-value">-</div>
+                                </div>
+                                <div class="state-group">
+                                    <div id="current-position" class="state-value">-</div>
+                                </div>
                             </div>
                         </div>
+                        <div class="secondary-controls">
+                            <button id="speedBtn" class="untitled-button" aria-label="Playback speed">1x</button>
+                            <button id="loopBtn" class="untitled-button" title="Toggle loop" aria-label="Toggle loop"></button>
+                        </div>
+                        <div class="language-selector">
+                            <select id="langSelect" aria-label="Select language">
+                                <option value="en">English</option>
+                                <option value="zh">中文</option>
+                                <option value="ru">Русский</option>
+                                <option value="ar">العربية</option>
+                            </select>
+                        </div>
+                        
+                        <div id="sections-content" role="main" aria-label="Track sections"></div>
                     </div>
                 </div>
             </div>
