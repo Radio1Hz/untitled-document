@@ -510,14 +510,13 @@ h1, h2, h3, h4, h5, h6 {
 
 /* Update position dots */
 .position-dot {
-    width: 8px;
-    height: 8px;
-    border-radius: 50%;
+    width: 27px;
+    height: 3px;
     border: 1px solid #444;
 }
 
 .position-dot.current {
-    background-color: transparent;
+    background-color: var(--primary-color);
 }
 
 /* Update positions container */

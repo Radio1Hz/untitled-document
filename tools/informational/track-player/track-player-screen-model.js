@@ -339,6 +339,7 @@ class SectionView extends Component {
         // Handle language updates
         if (newState.currentLanguage) {
             this.state.currentLanguage = newState.currentLanguage;
+            this.render(); // Force re-render when language changes
         }
         // Handle track updates
         if (newState.currentTrack) {

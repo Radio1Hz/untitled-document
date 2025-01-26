@@ -154,6 +154,11 @@ document.addEventListener('DOMContentLoaded', async () => {
     langSelect.addEventListener('change', (e) => {
         current_lang_code = e.target.value;
         document.body.dataset.lang = current_lang_code;
+        
+        // Update both the screen's language and re-render content
+        screen.sectionView.setState({
+            currentLanguage: current_lang_code
+        });
         renderTrackContent();
     });
 
@@ -359,6 +364,23 @@ document.addEventListener('DOMContentLoaded', async () => {
         currentBox.textContent = state.j.toString().padStart(2, '0');
         currentPosition.textContent = state.k.toString().padStart(2, '0');
 
+        // Update dot highlighting
+        document.querySelectorAll('.section').forEach((section, sectionIndex) => {
+            const isCurrentSection = sectionIndex === state.i;
+            section.classList.toggle('current-section', isCurrentSection);
+            
+            section.querySelectorAll('.timebox').forEach((timebox, boxIndex) => {
+                const isCurrentBox = isCurrentSection && boxIndex === state.j;
+                timebox.classList.toggle('current-box', isCurrentBox);
+                
+                // Clear or set highlighting for all dots in this box
+                timebox.querySelectorAll('.position-dot').forEach((dot, posIndex) => {
+                    // Only highlight if we're in current box AND it's the current position
+                    dot.classList.toggle('current', isCurrentBox && posIndex === state.k);
+                });
+            });
+        });
+
         // Log state transitions if any value changed
         if (prevSection !== state.i.toString().padStart(2, '0') || 
             prevBox !== state.j.toString().padStart(2, '0') || 
@@ -372,22 +394,6 @@ document.addEventListener('DOMContentLoaded', async () => {
                 `pos: ${prevPosition}->${state.k.toString().padStart(2, '0')}`
             );
         }
-
-        // Highlight current section and timebox
-        document.querySelectorAll('.section').forEach((section, sectionIndex) => {
-            const isCurrentSection = sectionIndex === state.i;
-            section.classList.toggle('current-section', isCurrentSection);
-            
-            section.querySelectorAll('.timebox').forEach((timebox, boxIndex) => {
-                const isCurrentBox = isCurrentSection && boxIndex === state.j;
-                timebox.classList.toggle('current-box', isCurrentBox);
-                
-                timebox.querySelectorAll('.position-line').forEach((line, posIndex) => {
-                    const isCurrentPosition = isCurrentBox && posIndex === state.k;
-                    line.style.backgroundColor = isCurrentPosition ? '#ffffff' : '#888888';
-                });
-            });
-        });
     }
 
     // Start the animation loop
