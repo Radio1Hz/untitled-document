@@ -309,21 +309,37 @@ document.addEventListener('DOMContentLoaded', async () => {
     
     // Separate visual updates from state checks
     function updateVisuals(currentTime) {
-        // Only update time display and visual elements
         if (!player.state) return;
 
-        // Calculate minutes, seconds, and cents
-        const minutes = Math.floor(currentTime / 60);
-        const seconds = Math.floor(currentTime % 60);
-        const cents = Math.floor((currentTime % 1) * 100);
-        
         const timeMain = document.querySelector('.time-main');
         const timeCents = document.querySelector('.time-cents');
         
-        timeMain.textContent = `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}.`;
+        if (player.currentTrack.tau_omega) {
+            // Calculate current world time based on tau_omega
+            const startTime = new Date(player.currentTrack.tau_omega);
+            const currentDateTime = new Date(startTime.getTime() + (currentTime * 1000));
+            
+            // Format the date-time string
+            const year = currentDateTime.getFullYear();
+            const month = String(currentDateTime.getMonth() + 1).padStart(2, '0');
+            const day = String(currentDateTime.getDate()).padStart(2, '0');
+            const hours = String(currentDateTime.getHours()).padStart(2, '0');
+            const minutes = String(currentDateTime.getMinutes()).padStart(2, '0');
+            const seconds = String(currentDateTime.getSeconds()).padStart(2, '0');
+            
+            timeMain.textContent = `${year}-${month}-${day} ${hours}:${minutes}:${seconds}`;
+        } else {
+            // Use original mm:ss format
+            const minutes = Math.floor(currentTime / 60);
+            const seconds = Math.floor(currentTime % 60);
+            timeMain.textContent = `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}.`;
+        }
+        
+        // Always show centiseconds
+        const cents = Math.floor((currentTime % 1) * 100);
         timeCents.textContent = cents.toString().padStart(2, '0');
 
-        // Update visual elements
+        // Continue with visual updates
         requestAnimationFrame(() => updateVisuals(audioElement.currentTime));
     }
 

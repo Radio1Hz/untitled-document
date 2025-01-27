@@ -192,6 +192,29 @@ class Timeline extends Component {
         });
     }
 
+    // Update formatTime method to handle both formats with shorter datetime for markers
+    formatTime(timeInSeconds, useTauOmega = false, track = null) {
+        if (useTauOmega && track && track.tau_omega) {
+            // Calculate absolute datetime based on tau_omega
+            const startTime = new Date(track.tau_omega);
+            const currentDateTime = new Date(startTime.getTime() + (timeInSeconds * 1000));
+            
+            // Format the shorter datetime string for markers
+            const year = currentDateTime.getFullYear();
+            const month = String(currentDateTime.getMonth() + 1).padStart(2, '0');
+            const day = String(currentDateTime.getDate()).padStart(2, '0');
+            const hours = String(currentDateTime.getHours()).padStart(2, '0');
+            const minutes = String(currentDateTime.getMinutes()).padStart(2, '0');
+            
+            return `${year}-${month}-${day} ${hours}:${minutes}`;
+        } else {
+            // Use relative time format (mm:ss)
+            const minutes = Math.floor(timeInSeconds / 60);
+            const seconds = Math.floor(timeInSeconds % 60);
+            return `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+        }
+    }
+
     render() {
         const timeline = document.createElement('div');
         timeline.className = 'timeline';
@@ -218,30 +241,35 @@ class Timeline extends Component {
         // Add section markers
         if (this.props.track) {
             let totalDuration = this.props.track.totalDuration();
-            let currentTime = this.props.track.delta;
+            
+            // Check if track has tau_omega defined
+            const useTauOmega = Boolean(this.props.track.tau_omega);
             
             // Create all markers at once
             const markerElements = this.props.track.sections.map((section, index) => {
                 const marker = document.createElement('div');
                 marker.className = 'timeline-marker';
-                const position = (currentTime / totalDuration) * 100;
+                
+                // Get the start time from the first timebox in this section
+                const firstTimebox = section.timeboxes[0];
+                const sectionStartTime = firstTimebox.tStart * this.props.track.tau + this.props.track.delta;
+                
+                // Calculate position on timeline
+                const position = (sectionStartTime / totalDuration) * 100;
                 marker.style.left = `${position}%`;
                 
-                // Add marker label
+                // Add marker label with appropriate time format
                 const label = document.createElement('div');
                 label.className = 'marker-label';
-                label.textContent = `${index + 1}`;
+                
+                // Use the timebox's tStart to calculate the marker time
+                label.textContent = `[${this.formatTime(sectionStartTime, useTauOmega, this.props.track)}] ${section.description?.en || ''}`;
                 marker.appendChild(label);
                 
                 // Highlight current section
                 if (this.state.currentState && this.state.currentState.i === index) {
                     marker.classList.add('current-marker');
                 }
-                
-                // Update currentTime for next marker
-                section.timeboxes.forEach(timebox => {
-                    currentTime += timebox.duration(this.props.track.tau, this.props.track);
-                });
                 
                 return marker;
             });
@@ -375,6 +403,9 @@ class SectionView extends Component {
         const sectionsContainer = document.createElement('div');
         sectionsContainer.className = 'sections-container';
         
+        // Get current state from screen's player
+        const currentState = this.screen.player.state;
+        
         // Calculate cumulative section start times
         let cumulativeTime = 0;
         
@@ -383,9 +414,14 @@ class SectionView extends Component {
             sectionElement.className = 'section';
             sectionElement.dataset.index = sectionIndex;
             
-            // Add section header with time
+            // Add section header with description
             const header = document.createElement('div');
             header.className = 'section-header';
+            
+            // Check if this section is currently active
+            if (currentState && currentState.i === sectionIndex) {
+                header.classList.add('active');
+            }
             
             // Format time as MM:SS
             const minutes = Math.floor(cumulativeTime / 60);
@@ -405,27 +441,15 @@ class SectionView extends Component {
             timeboxesContainer.className = 'timeboxes-container';
             timeboxesContainer.style.display = 'flex';
             timeboxesContainer.style.gap = '2px';
-            timeboxesContainer.style.overflowX = 'auto';  // Make container scrollable
+            timeboxesContainer.style.overflowX = 'auto';
 
-            // Calculate total duration for the section
-            const sectionDuration = section.timeboxes.reduce((sum, timebox) => {
-                return sum + timebox.duration(this.state.currentTrack.tau, this.state.currentTrack.n);
-            }, 0);
-
-            // Use original order - RTL/LTR handled by CSS direction
             section.timeboxes.forEach((timebox, timeboxIndex) => {
                 const timeboxElement = document.createElement('div');
                 timeboxElement.className = 'timebox';
                 
-                //console.log('Raw timebox object:', timebox); // Debug log
-                
-                // Use timebox's nT if defined, otherwise use track's n
                 const nT = timebox.nT !== undefined ? timebox.nT : this.state.currentTrack.n;
-                
-                // Calculate width based on nT and tau_width_px
                 const width_px = Math.round(nT * this.screen.tau_width_px);
                 
-                // Set all inline styles for timebox
                 Object.assign(timeboxElement.style, {
                     width: `${width_px}px`,
                     flexGrow: '0',
@@ -433,13 +457,19 @@ class SectionView extends Component {
                     borderRadius: '4px',
                     margin: '2px'
                 });
-                
-                //console.log(`Timebox ${timeboxIndex} width: ${width_px}px (nT: ${nT}, tau_width_px: ${this.screen.tau_width_px})`);
 
                 // Add timebox content with current language
                 const timeboxContent = document.createElement('div');
                 timeboxContent.className = 'timebox-content';
                 timeboxContent.textContent = timebox.desc?.[this.state.currentLanguage] || timebox.desc?.en || `Box ${timeboxIndex + 1}`;
+                
+                // Check if this is the current timebox and add appropriate class
+                if (currentState && 
+                    currentState.i === sectionIndex && 
+                    currentState.j === timeboxIndex) {
+                    timeboxContent.classList.add('current');
+                }
+                
                 timeboxElement.appendChild(timeboxContent);
                 
                 // Add position indicators
@@ -451,12 +481,10 @@ class SectionView extends Component {
                     positionDot.className = 'position-dot';
                     positionDot.style.width = `${100/nT}%`;
                     
-                    // Check if this is the current position
-                    const state = this.screen.player.state;
-                    if (state && 
-                        state.i === sectionIndex && 
-                        state.j === timeboxIndex && 
-                        state.k === i) {
+                    if (currentState && 
+                        currentState.i === sectionIndex && 
+                        currentState.j === timeboxIndex && 
+                        currentState.k === i) {
                         positionDot.classList.add('current');
                     }
                     
@@ -471,7 +499,9 @@ class SectionView extends Component {
             sectionsContainer.appendChild(sectionElement);
             
             // Update cumulative time for next section
-            cumulativeTime += sectionDuration;
+            cumulativeTime += section.timeboxes.reduce((sum, timebox) => {
+                return sum + timebox.duration(this.state.currentTrack.tau, this.state.currentTrack.n);
+            }, 0);
         });
         
         div.appendChild(sectionsContainer);
