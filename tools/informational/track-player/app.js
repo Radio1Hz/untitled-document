@@ -1,11 +1,16 @@
 import { Track, TrackState } from './track-model.js';
 import { TrackPlayer, PlaybackMode } from './track-player-model.js';
 import { TrackPlayerScreen } from './track-player-screen-model.js';
+import { Playlist, PlaylistMode } from './playlist-model.js';
 
 document.addEventListener('DOMContentLoaded', async () => {
     // Load track data
     const track9Data = await import('https://untitled-document.net/knowledge/agents/viktor-r/projects/vikktør/tracks/9. untitled-track/code/9. untitled-track.js');
     const track1Data = await import('https://untitled-document.net/knowledge/agents/viktor-r/projects/vikktør/tracks/1. there is no wisdom without kindness/code/1. there is no wisdom without kindness.js');
+
+    // Log raw track data
+    console.log('Raw track9 data:', track9Data.track9);
+    console.log('Raw track1 data:', track1Data.track1);
 
     // Create tracks from JSON data
     const track9Obj = new Track({
@@ -23,11 +28,13 @@ document.addEventListener('DOMContentLoaded', async () => {
     track9Data.track9.sections.forEach(sectionData => {
         const section = track9Obj.addSection(sectionData.description, sectionData.imageUrl);
         sectionData.timeboxes.forEach(boxData => {
-            // Pass duration as nT if it differs from track's default n
-            const nT = boxData.duration !== track9Obj.n ? boxData.duration : undefined;
-            section.addTimebox(boxData.tStart, boxData.description, nT);
+            // Use nT directly from the timebox data
+            track9Obj.addTimeboxToSection(section, boxData.tStart, boxData.description, boxData.nT);
         });
     });
+
+    // Log initialized track object
+    console.log('Initialized track9:', track9Obj);
 
     const track1Obj = new Track({
         id: track1Data.track1.id,
@@ -49,50 +56,71 @@ document.addEventListener('DOMContentLoaded', async () => {
         });
     });
 
-    // Create player with custom screen_to_dot_ratio
-    const player = new TrackPlayer(null, 1.0, 0, true, 50);  // Last parameter is screen_to_dot_ratio
-    player.addTrack(track1Obj);
-    player.addTrack(track9Obj);
+    // Create playlist and add tracks
+    const playlist = new Playlist();
+    playlist.addTrack(track1Obj);
+    playlist.addTrack(track9Obj);
 
-    // Initialize player with track1 explicitly
-    player.currentTrackIndex = 0;  // Set to first track (track1)
-    player.currentTrack = player.playlist[0];  // Set current track to track1
-    
-    // Log current track object for debugging
-    console.log('Current track after initialization:', {
-        id: player.currentTrack.id,
-        description: player.currentTrack.description,
-        sections: player.currentTrack.sections,
-        audioUrl: player.currentTrack.audioUrl,
-        tau: player.currentTrack.tau,
-        delta: player.currentTrack.delta,
-        n: player.currentTrack.n
-    });
-    
-    // Initialize player state after creating tracks
-    player.state = new TrackState();
-    
-    // Create audio element with current track's audio URL
+    // Create a map of track IDs to track objects for persistence
+    const trackMap = new Map();
+    [track1Obj, track9Obj].forEach(track => trackMap.set(track.id, track));
+
+    // Try to load saved playlist state
+    playlist.load(trackMap);
+
+    // Create player with custom screen_to_dot_ratio
+    const player = new TrackPlayer(null, 1.0, 0, true, 50);
+
+    // Initialize UI elements first
+    const playPauseBtn = document.getElementById('playPauseBtn');
+    const stopBtn = document.getElementById('stopBtn');
+    const speedBtn = document.getElementById('speedBtn');
+    const trackTitle = document.getElementById('track-title');
+    const loopBtn = document.getElementById('loopBtn');
+    if (loopBtn) {
+        loopBtn.remove(); // Remove the loop button from DOM if it exists
+    }
+    const timeDisplay = document.getElementById('currentTime');
+    const speedDisplay = document.getElementById('track-speed');
+    const sectionsContent = document.getElementById('sections-content');
+
+    // Initialize state info with leading zeros
+    const currentSection = document.getElementById('current-section');
+    const currentBox = document.getElementById('current-box');
+    const currentPosition = document.getElementById('current-position');
+
+    if (currentSection && currentBox && currentPosition) {
+        currentSection.textContent = '00';
+        currentBox.textContent = '00';
+        currentPosition.textContent = '00';
+    }
+
+    // Create audio element
+    const audioElement = new Audio();
+    audioElement.preload = 'auto';
+
+    // Add audio event listeners for debugging
+    audioElement.addEventListener('loadstart', () => console.log('Audio loading started'));
+    audioElement.addEventListener('loadeddata', () => console.log('Audio data loaded'));
+    audioElement.addEventListener('canplay', () => console.log('Audio can play'));
+    audioElement.addEventListener('error', (e) => console.error('Audio error:', e));
+    audioElement.addEventListener('playing', () => console.log('Audio playing'));
+    audioElement.addEventListener('pause', () => console.log('Audio paused'));
+
+    // Audio URL encoding helper
     const getEncodedAudioUrl = (url) => {
-        // Split the URL at the domain to preserve the protocol and domain
         const [domain, ...path] = url.split('/knowledge/');
-        // Encode only the path portion
         const encodedPath = path.join('/knowledge/').split('/').map(segment => 
-            // Don't encode forward slashes, but encode other special characters
             encodeURIComponent(segment).replace(/%2F/g, '/')
         ).join('/');
         return `${domain}/knowledge/${encodedPath}`;
     };
 
-    const audioElement = new Audio();
-    audioElement.preload = 'auto';
-    
-    // Create a function to preload audio
+    // Preload audio function
     const preloadAudio = async (url) => {
         const encodedUrl = getEncodedAudioUrl(url);
         audioElement.src = encodedUrl;
         
-        // Return a promise that resolves when audio is ready to play
         return new Promise((resolve, reject) => {
             const loadHandler = () => {
                 audioElement.removeEventListener('canplaythrough', loadHandler);
@@ -108,34 +136,159 @@ document.addEventListener('DOMContentLoaded', async () => {
             
             audioElement.addEventListener('canplaythrough', loadHandler);
             audioElement.addEventListener('error', errorHandler);
-            
-            // Start loading
             audioElement.load();
         });
     };
 
-    // Preload initial track's audio immediately
-    try {
-        await preloadAudio(player.currentTrack.audioUrl);
-        console.log('Initial audio preloaded successfully');
-    } catch (error) {
-        console.error('Error preloading initial audio:', error);
+    // Update audio source function
+    const updateAudioSource = async () => {
+        try {
+            playPauseBtn.textContent = '⌛';
+            await preloadAudio(player.currentTrack.audioUrl);
+            playPauseBtn.textContent = '▶';
+            console.log('New audio source loaded successfully');
+        } catch (error) {
+            console.error('Error loading audio:', error);
+            playPauseBtn.textContent = '▶';
+        }
+    };
+
+    // Load and play track function
+    async function loadAndPlayTrack(track) {
+        player.stop();
+        player.currentTrack = track;
+        player.state = new TrackState();
+        
+        try {
+            await updateAudioSource();
+            updatePlaylistView();
+            renderTrackContent();
+            
+            if (player.mode === PlaybackMode.PLAYING) {
+                audioElement.play();
+            }
+        } catch (error) {
+            console.error('Error loading track:', error);
+        }
     }
 
-    // Add audio event listeners for debugging
-    audioElement.addEventListener('loadstart', () => console.log('Audio loading started'));
-    audioElement.addEventListener('loadeddata', () => console.log('Audio data loaded'));
-    audioElement.addEventListener('canplay', () => console.log('Audio can play'));
-    audioElement.addEventListener('error', (e) => console.error('Audio error:', e));
-    audioElement.addEventListener('playing', () => console.log('Audio playing'));
-    audioElement.addEventListener('pause', () => console.log('Audio paused'));
+    // Add playlist controls to UI
+    const controlsContainer = document.querySelector('.track-controls');
+    const playlistControls = document.createElement('div');
+    playlistControls.className = 'playlist-controls';
+    playlistControls.innerHTML = `
+        <button id="prevTrackBtn" class="untitled-button" aria-label="Previous track">⏮</button>
+        <button id="nextTrackBtn" class="untitled-button" aria-label="Next track">⏭</button>
+        <button id="playlistModeBtn" class="untitled-button" aria-label="Playlist mode">🔁</button>
+    `;
+    controlsContainer.appendChild(playlistControls);
+
+    // Add playlist view (simplified)
+    const container = document.querySelector('.container');
+    const playlistView = document.createElement('div');
+    playlistView.className = 'playlist-view';
+    playlistView.innerHTML = '<div class="playlist-items"></div>';
+    container.appendChild(playlistView);
+
+    // Function to update playlist view (simplified)
+    function updatePlaylistView() {
+        const playlistItems = document.querySelector('.playlist-items');
+        playlistItems.innerHTML = '';
+        
+        playlist.tracks.forEach((track, index) => {
+            const item = document.createElement('div');
+            item.className = 'playlist-item';
+            if (index === playlist.currentIndex) {
+                item.classList.add('current');
+            }
+            
+            // Extract track number from audioUrl
+            const trackNumber = track.audioUrl.match(/\/(\d+)\./)?.[1] || '?';
+            
+            // Simplified structure - single div with hover info
+            item.innerHTML = `${trackNumber}`;
+            item.title = `${track.description?.en || track.id} [${formatDuration(track.totalDuration())}]`;
+            
+            item.addEventListener('click', () => {
+                playlist.jumpTo(index);
+                updatePlaylistView();
+                loadAndPlayTrack(playlist.getCurrentTrack());
+            });
+            
+            playlistItems.appendChild(item);
+        });
+
+        // Update mode button text
+        const modeBtn = document.getElementById('playlistModeBtn');
+        const modeIcons = {
+            [PlaylistMode.SEQUENTIAL]: '➡',
+            [PlaylistMode.REPEAT_ONE]: '🔂',
+            [PlaylistMode.REPEAT_ALL]: '🔁',
+            [PlaylistMode.SHUFFLE]: '🔀'
+        };
+        modeBtn.textContent = modeIcons[playlist.mode];
+    }
+
+    // Format duration helper
+    function formatDuration(seconds) {
+        const minutes = Math.floor(seconds / 60);
+        const secs = Math.floor(seconds % 60);
+        return `${minutes}:${secs.toString().padStart(2, '0')}`;
+    }
+
+    // Add event listeners for playlist controls
+    document.getElementById('prevTrackBtn').addEventListener('click', () => {
+        const prevTrack = playlist.previous();
+        if (prevTrack) {
+            loadAndPlayTrack(prevTrack);
+        }
+    });
+
+    document.getElementById('nextTrackBtn').addEventListener('click', () => {
+        const nextTrack = playlist.next();
+        if (nextTrack) {
+            loadAndPlayTrack(nextTrack);
+        }
+    });
+
+    document.getElementById('playlistModeBtn').addEventListener('click', () => {
+        const modes = Object.values(PlaylistMode);
+        const currentIndex = modes.indexOf(playlist.mode);
+        const nextMode = modes[(currentIndex + 1) % modes.length];
+        playlist.setMode(nextMode);
+        updatePlaylistView();
+    });
+
+    // Add ended event listener for playlist progression
+    audioElement.addEventListener('ended', () => {
+        const nextTrack = playlist.next();
+        if (nextTrack) {
+            loadAndPlayTrack(nextTrack);
+        } else {
+            player.stop();
+            playPauseBtn.textContent = '▶';
+        }
+    });
+
+    // Save playlist state before unloading
+    window.addEventListener('beforeunload', () => {
+        playlist.save();
+    });
+
+    // Initial UI update
+    updatePlaylistView();
+    
+    // Initialize with first track
+    const initialTrack = playlist.getCurrentTrack();
+    if (initialTrack) {
+        loadAndPlayTrack(initialTrack);
+    }
 
     // Create single dispatcher instance
     const dispatcher = player.createEventDispatcher();
     console.log('Dispatcher created');
 
     // Create screen with the same dispatcher
-    const container = document.querySelector('.container');
     const screen = new TrackPlayerScreen(3000, 3000, player, dispatcher);  // Pass dispatcher to screen
     
     // Initial mount
@@ -163,30 +316,6 @@ document.addEventListener('DOMContentLoaded', async () => {
         });
         renderTrackContent();
     });
-
-    // Initialize UI elements
-    const playPauseBtn = document.getElementById('playPauseBtn');
-    const stopBtn = document.getElementById('stopBtn');
-    const speedBtn = document.getElementById('speedBtn');
-    const trackTitle = document.getElementById('track-title');
-    const loopBtn = document.getElementById('loopBtn');
-    if (loopBtn) {
-        loopBtn.remove(); // Remove the loop button from DOM if it exists
-    }
-    const timeDisplay = document.getElementById('currentTime');
-    const speedDisplay = document.getElementById('track-speed');
-    const sectionsContent = document.getElementById('sections-content');
-
-    // Initialize state info with leading zeros
-    const currentSection = document.getElementById('current-section');
-    const currentBox = document.getElementById('current-box');
-    const currentPosition = document.getElementById('current-position');
-
-    if (currentSection && currentBox && currentPosition) {
-        currentSection.textContent = '00';
-        currentBox.textContent = '00';
-        currentPosition.textContent = '00';
-    }
 
     // Set track title
     trackTitle.textContent = player.currentTrack.id;
@@ -414,19 +543,6 @@ document.addEventListener('DOMContentLoaded', async () => {
         audioElement.src = '';
     });
 
-    // Update the updateAudioSource function
-    const updateAudioSource = async () => {
-        try {
-            playPauseBtn.textContent = '⌛'; // Show loading state
-            await preloadAudio(player.currentTrack.audioUrl);
-            playPauseBtn.textContent = '▶';
-            console.log('New audio source loaded successfully');
-        } catch (error) {
-            console.error('Error loading audio:', error);
-            playPauseBtn.textContent = '▶';
-        }
-    };
-
     // Modify the selectTrack function to update audio source
     player.selectTrack = async function(index) {
         if (index >= 0 && index < this.playlist.length) {
@@ -466,31 +582,4 @@ document.addEventListener('DOMContentLoaded', async () => {
             currentLanguage: current_lang_code
         });
     }
-
-    // Add ended event listener to handle track completion
-    audioElement.addEventListener('ended', () => {
-        // Reset everything to initial state
-        player.stop();  // This ensures proper mode reset
-        player.state = new TrackState();
-        player.time = 0;
-        accumulatedTime = 0;
-        playStartTime = null;
-        
-        // Start playing again if looping is enabled
-        if (player.looping) {
-            audioElement.currentTime = 0;
-            // Set mode to PLAYING before starting audio
-            player.mode = PlaybackMode.PLAYING;
-            audioElement.play().then(() => {
-                playStartTime = performance.now();
-                // Ensure state is reset
-                player.state = new TrackState();
-                // Force immediate visual update
-                updateVisuals(0);
-            }).catch(error => {
-                console.error('Error restarting playback:', error);
-                player.stop();
-            });
-        }
-    });
 });

@@ -10,8 +10,8 @@ export const track1 =
   "tau": 0.5,
   "delta": 0,
   "n": 4,
-  "tau_omega": "2024-03-19 15:30:00.00",
-  "dedication": "før søfia.",
+  "tau_omega": "1977-03-10 06:00:00.00",
+  "dedication": "før søfia",
   "audioUrl": "https://untitled-document.net/knowledge/agents/viktor-r/projects/vikktør/tracks/1. there is no wisdom without kindness/1. there is no wisdom without kindness.wav",
   "sections": [
     {

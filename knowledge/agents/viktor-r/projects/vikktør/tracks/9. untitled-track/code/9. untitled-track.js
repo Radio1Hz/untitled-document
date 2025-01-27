@@ -2,16 +2,16 @@ export const track9 =
 {
   "id": "\\vikktør\\tracks\\9. untitled-track",
   "description": {
-    "en": "untitled track før aurøra",
-    "zh": "无题曲目 - 致 aurøra",
-    "ru": "трек без названия для aurøra",
-    "ar": "مقطوعة بدون عنوان لأورورا"
+    "en": "untitled track",
+    "zh": "无题曲目",
+    "ru": "трек без названия", 
+    "ar": "مسار بدون عنوان"
   },
   "tau": 0.5,
-  "delta": 0.05,
+  "delta": 0,
   "n": 8,
   "tau_omega": "2024-03-19 15:30:00.00",
-  "dedication": "To aurøra",
+  "dedication": "før aurøra",
   "audioUrl": "https://untitled-document.net/knowledge/agents/viktor-r/projects/vikktør/tracks/9. untitled-track/9. untitled-track.wav",
   "sections": [
     {
@@ -20,48 +20,58 @@ export const track9 =
         "zh": "1. 时间单位 (τ)",
         "ru": "1. Единица времени (τ)",
         "ar": "1. وحدة الزمن (τ)"
-    },
+      },
       "imageUrl": "images/9-untitled-track-image-section-1.jpg",
       "timeboxes": [
         {
           "tStart": 0,
           "description": {
-            "en": "G",
-            "zh": "G",
-            "ru": "G",
-            "ar": "G"
+            "en": "A",
+            "zh": "A",
+            "ru": "A",
+            "ar": "A"
           },
-          "duration": 4
-        },
-        {
-          "tStart": 4,
-          "description": {
-            "en": "G",
-            "zh": "G",
-            "ru": "G",
-            "ar": "G"
-          },
-          "duration": 4
+          "nT": 8
         },
         {
           "tStart": 8,
           "description": {
-            "en": "G",
-            "zh": "G",
-            "ru": "G",
-            "ar": "G"
+            "en": "A",
+            "zh": "A",
+            "ru": "A",
+            "ar": "A"
           },
-          "duration": 4
+          "nT": 8
         },
         {
-          "tStart": 12,
+          "tStart": 16,
           "description": {
-            "en": "Bb-C",
-            "zh": "Bb-C",
-            "ru": "Bb-C",
-            "ar": "Bb-C"
+            "en": "A",
+            "zh": "A",
+            "ru": "A",
+            "ar": "A"
           },
-          "duration": 4
+          "nT": 8
+        },
+        {
+          "tStart": 24,
+          "description": {
+            "en": "C",
+            "zh": "C",
+            "ru": "C",
+            "ar": "C"
+          },
+          "nT": 4
+        },
+        {
+          "tStart": 28,
+          "description": {
+            "en": "D",
+            "zh": "D",
+            "ru": "D",
+            "ar": "D"
+          },
+          "nT": 4
         }
       ]
     },
@@ -75,44 +85,54 @@ export const track9 =
       "imageUrl": "images/9-untitled-track-image-section-2.jpg",
       "timeboxes": [
         {
-          "tStart": 16,
+          "tStart": 32,
           "description": {
-            "en": "G",
-            "zh": "G",
-            "ru": "G",
-            "ar": "G"
+            "en": "A",
+            "zh": "A",
+            "ru": "A",
+            "ar": "A"
           },
-          "duration": 4
+          "nT": 8
         },
         {
-          "tStart": 20,
+          "tStart": 40,
           "description": {
-            "en": "G",
-            "zh": "G",
-            "ru": "G",
-            "ar": "G"
+            "en": "A",
+            "zh": "A",
+            "ru": "A",
+            "ar": "A"
           },
-          "duration": 4
+          "nT": 8
         },
         {
-          "tStart": 24,
+          "tStart": 48,
           "description": {
-            "en": "G",
-            "zh": "G",
-            "ru": "G",
-            "ar": "G"
+            "en": "A",
+            "zh": "A",
+            "ru": "A",
+            "ar": "A"
           },
-          "duration": 4
+          "nT": 8
         },
         {
-          "tStart": 28,
+          "tStart": 56,
           "description": {
-            "en": "Bb-C",
-            "zh": "Bb-C",
-            "ru": "Bb-C",
-            "ar": "Bb-C"
+            "en": "C",
+            "zh": "C",
+            "ru": "C",
+            "ar": "C"
           },
-          "duration": 4
+          "nT": 4
+        },
+        {
+          "tStart": 60,
+          "description": {
+            "en": "D",
+            "zh": "D",
+            "ru": "D",
+            "ar": "D"
+          },
+          "nT": 4
         }
       ]
     },
@@ -126,44 +146,44 @@ export const track9 =
       "imageUrl": "images/9-untitled-track-image-section-3.jpg",
       "timeboxes": [
         {
-          "tStart": 32,
+          "tStart": 64,
           "description": {
-            "en": "D#-F",
-            "zh": "D#-F",
-            "ru": "D#-F",
-            "ar": "D#-F"
+            "en": "F",
+            "zh": "F",
+            "ru": "F",
+            "ar": "F"
           },
-          "duration": 4
+          "nT": 8
         },
         {
-          "tStart": 34,
+          "tStart": 72,
           "description": {
             "en": "G",
             "zh": "G",
             "ru": "G",
             "ar": "G"
           },
-          "duration": 4
+          "nT": 8
         },
         {
-          "tStart": 38,
+          "tStart": 80,
           "description": {
-            "en": "D#-F",
-            "zh": "D#-F",
-            "ru": "D#-F",
-            "ar": "D#-F"
+            "en": "A",
+            "zh": "A",
+            "ru": "A",
+            "ar": "A"
           },
-          "duration": 4
+          "nT": 8
         },
         {
-          "tStart": 42,
+          "tStart": 88,
           "description": {
-            "en": "G",
-            "zh": "G",
-            "ru": "G",
-            "ar": "G"
+            "en": "A",
+            "zh": "A",
+            "ru": "A",
+            "ar": "A"
           },
-          "duration": 4
+          "nT": 8
         }
       ]
     },
@@ -177,44 +197,44 @@ export const track9 =
       "imageUrl": "images/9-untitled-track-image-section-3.jpg",
       "timeboxes": [
         {
-          "tStart": 48,
+          "tStart": 96,
           "description": {
-            "en": "D#-F",
-            "zh": "D#-F",
-            "ru": "D#-F",
-            "ar": "D#-F"
+            "en": "F",
+            "zh": "F",
+            "ru": "F",
+            "ar": "F"
           },
-          "duration": 4
+          "nT": 8
         },
         {
-          "tStart": 52,
+          "tStart": 104,
           "description": {
             "en": "G",
             "zh": "G",
             "ru": "G",
             "ar": "G"
           },
-          "duration": 4
+          "nT": 8
         },
         {
-          "tStart": 56,
+          "tStart": 112,
           "description": {
-            "en": "D#-F",
-            "zh": "D#-F",
-            "ru": "D#-F",
-            "ar": "D#-F"
+            "en": "A",
+            "zh": "A",
+            "ru": "A",
+            "ar": "A"
           },
-          "duration": 4
+          "nT": 8
         },
         {
-          "tStart": 60,
+          "tStart": 120,
           "description": {
-            "en": "G",
-            "zh": "G",
-            "ru": "G",
-            "ar": "G"
+            "en": "A",
+            "zh": "A",
+            "ru": "A",
+            "ar": "A"
           },
-          "duration": 4
+          "nT": 8
         }
       ]
     }

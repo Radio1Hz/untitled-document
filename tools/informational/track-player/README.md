@@ -440,4 +440,59 @@ $$
 \end{cases}
 $$
 
+#### **9. Playlist ($\mathcal{P}$)**
+A playlist represents an ordered collection of tracks with additional playback behaviors:
+$$
+\mathcal{P} = (\Theta_\text{set}, \text{order}, \text{mode}, \text{history})
+$$
+**where**:
+- $\Theta_\text{set} = \{\Theta_1, \Theta_2, ..., \Theta_n\}$: Set of tracks
+- $\text{order}: \mathbb{N} \to \Theta_\text{set}$: Current playback order
+- $\text{mode} \in \{\text{SEQUENTIAL}, \text{SHUFFLE}, \text{REPEAT_ONE}, \text{REPEAT_ALL}\}$: Playlist mode
+- $\text{history}: \text{Stack}(\Theta)$: Track playback history
+
+**Operations**:
+
+1. **Track Management**:
+   $$
+   \begin{aligned}
+   \text{add}: \Theta &\to \mathcal{P} \\
+   \text{remove}: \Theta &\to \mathcal{P} \\
+   \text{reorder}: \mathbb{N} \times \mathbb{N} &\to \text{order}
+   \end{aligned}
+   $$
+
+2. **Navigation**:
+   $$
+   \begin{aligned}
+   \text{next}: \mathcal{P} &\to \Theta \\
+   \text{previous}: \mathcal{P} &\to \Theta \\
+   \text{jump}: \mathbb{N} &\to \Theta
+   \end{aligned}
+   $$
+
+3. **Shuffle Operation**:
+   $$
+   \text{shuffle}: \text{order} \to \text{order}'
+   $$
+   where $\text{order}'$ is a random permutation of $\text{order}$
+
+4. **History Management**:
+   $$
+   \begin{aligned}
+   \text{pushHistory}: \Theta &\to \text{history} \\
+   \text{popHistory}: \text{history} &\to \Theta
+   \end{aligned}
+   $$
+
+**State Transitions**:
+$$
+\text{nextTrack}(\mathcal{P}) = \begin{cases}
+\Theta_\text{current} & \text{if mode} = \text{REPEAT_ONE} \\
+\text{order}[i + 1] & \text{if mode} = \text{SEQUENTIAL} \\
+\text{order}[0] & \text{if mode} = \text{REPEAT_ALL and } i = |\Theta_\text{set}| - 1 \\
+\text{random}(\Theta_\text{set}) & \text{if mode} = \text{SHUFFLE}
+\end{cases}
+$$
+
 
