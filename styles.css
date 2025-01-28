@@ -1,7 +1,17 @@
+:root {
+    --primary-color: #ff5000;
+    --text-color: #b1b1b1;
+    --background-color: #000000;
+    --secondary-background: #121212;
+    --hover-color: #282828;
+    --word-active-color: #ff520d62;
+}
+
 .main-text {
     font-size: 2vw;
     text-align: center;
-    padding: 2rem;
+    color: var(--text-color);
+    padding: 2rem 2rem 0 2rem;
     line-height: 1.4;
     max-width: 80%;
     margin-bottom: 1rem;  /* Add space between main text and bottom text */
@@ -33,3 +43,11 @@ body {
     background-color: #000;
     color: #fff;
 }
+
+.github-link {
+    color: var(--primary-color);
+    text-decoration: none;
+    font-size: 6px;
+    display: block;
+}
+

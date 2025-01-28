@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>algorithm-simulator-v1.0</title>
+    <link href="https://db.onlinewebfonts.com/c/84cb021d5f9af287ffff84b61beef6dc?family=clockicons" rel="stylesheet">
+    <!-- Include track-player styles -->
+    <link rel="stylesheet" href="../track-player/styles.css">
+    <link rel="stylesheet" href="styles.css">
+    <!-- Include track-player scripts -->
+    <script type="module" src="../track-player/app.js"></script>
+    <script type="module" src="app.js"></script>
+</head>
+<body>
+    <div class="background-container">
+        <div class="background-image fade"></div>
+        <div class="background-image fade"></div>
+    </div>
+    <div class="layout">
+        <div class="main-content">
+            <div class="container">
+                <div class="algorithm-section">
+                    <div class="input-document">
+                        <h3>Input Document</h3>
+                        <div id="input-content" class="document-content" contenteditable="true"></div>
+                    </div>
+                    <div class="track-section">
+                        <div class="track-header">
+                            <div id="track-title">untitled-algorithm</div>
+                        </div>
+                        <div class="timeline"></div>
+                        <div class="track-controls" role="group" aria-label="Playback controls">
+                            <button id="playPauseBtn" class="untitled-button" aria-label="Play or pause">▶</button>
+                            <button id="stopBtn" class="untitled-button" aria-label="Stop">⏹</button>
+                            <div id="currentTime" class="time-display" aria-label="Current time">
+                                <span class="time-main digits">0000-00-00 00:00:00</span>
+                                <span class="time-cents digits">.00</span>
+                            </div>
+                            <div class="track-state" role="status" aria-label="Track position">
+                                <div class="state-info">
+                                    <div class="state-group">
+                                        <div id="current-section" class="state-value">-</div>
+                                    </div>
+                                    <div class="state-group">
+                                        <div id="current-box" class="state-value">-</div>
+                                    </div>
+                                    <div class="state-group">
+                                        <div id="current-position" class="state-value">-</div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="secondary-controls">
+                                <button id="speedBtn" class="untitled-button" aria-label="Playback speed">1x</button>
+                                <button id="loopBtn" class="untitled-button" title="Toggle loop" aria-label="Toggle loop"></button>
+                            </div>
+                            <div class="language-selector">
+                                <select id="langSelect" aria-label="Select language">
+                                    <option value="en">English</option>
+                                    <option value="zh">中文</option>
+                                    <option value="ru">Русский</option>
+                                    <option value="ar">العربية</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div id="sections-content" role="main" aria-label="Track sections"></div>
+                    </div>
+                    <div class="output-document">
+                        <h3>Output Document</h3>
+                        <div id="output-content" class="document-content" readonly></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="bottom-text">viktor-r@untitled-document.net #vikktør #untitled-document</div>
+</body>
+</html>

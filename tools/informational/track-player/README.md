@@ -495,4 +495,37 @@ $$
 \end{cases}
 $$
 
+#### **10. Document ($\Delta$)**
+A document $\Delta$ is a finite sequence of symbols from a given alphabet:
+$$
+\Delta = \left(A,\ S,\ \text{encoding} \right)
+$$
+**where**:
+- $A$: Finite alphabet of symbols
+- $S = \langle s_1, s_2, ..., s_n \rangle$: Sequence of symbols where $s_i \in A$
+- $\text{encoding} \in \{\text{UTF-8}, \text{UTF-16}, \text{ASCII}, ...\}$: Character encoding
+
+#### **11. Algorithm ($\Alpha$)**
+An algorithm $\Alpha$ is a specialized track that processes input to produce output:
+$$
+\Alpha = \left(\Theta,\ \Delta_\text{in},\ \Delta_\text{out} \right)
+$$
+**where**:
+- $\Theta$: Base track (see §4)
+- $\Delta_\text{in}$: Input document
+- $\Delta_\text{out}$: Output document
+
+**Properties**:
+1. $\tau_\omega$ is automatically set to algorithm start time
+2. Input document must be fully specified before algorithm start
+3. Output document is progressively generated during track playback
+
+**Constraints**:
+$$
+\begin{aligned}
+& \forall \Alpha: \Alpha.\Theta.\tau_\omega = \text{startTime}(\Alpha) \\
+& \forall \Alpha: \text{isDefined}(\Delta_\text{in}) \text{ before } \text{start}(\Alpha)
+\end{aligned}
+$$
+
 
