@@ -2,7 +2,7 @@ name: deploy to untitled-document.net
 on: push
 jobs:
   deploy:
-    name: Deploy
+    name: deploy
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v4
@@ -34,5 +34,5 @@ jobs:
         user: ${{ secrets.FTP_USERNAME }}
         password: ${{ secrets.FTP_PASSWORD }}
         localDir: "dist"
-        remoteDir: "system.tvojstav.com/public_html"
+        remoteDir: "untitled-document.net/public_html"
     
