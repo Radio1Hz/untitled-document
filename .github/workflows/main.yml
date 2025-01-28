@@ -1,18 +1,29 @@
 name: deploy to untitled-document.net
-on: push
+on: 
+  push:
+    branches:
+      - main  # or your default branch name
+  # Enable manual triggers from VS Code
+  workflow_dispatch:
+
 jobs:
   deploy:
     name: deploy
     runs-on: ubuntu-latest
+    
+    # Add environment variables at job level
+    env:
+      DEPLOY_PATH: untitled-document.net/public_html
+
     steps:
-    - uses: actions/checkout@v4
+    - name: Checkout repository
+      uses: actions/checkout@v4
       with:
-        fetch-depth: 0  # OR "2" -> To retrieve the preceding commit.
+        fetch-depth: 0
 
     - name: Get changed files
       id: changed-files
       uses: tj-actions/changed-files@v43
-    # NOTE: `since_last_remote_commit: true` is implied by default and falls back to the previous local commit.
 
     - name: List all changed files
       env:
@@ -22,11 +33,12 @@ jobs:
         for file in ${ALL_CHANGED_FILES}; do
           VAR=$file
           DIR="$(dirname "${VAR}")" ; FILE="$(basename "${VAR}")"
-          echo "[${DIR}] [${FILE}]"  
+          echo "Processing: [${DIR}] [${FILE}]"  
           mkdir -p dist/${DIR}
           cp $file dist/${DIR}
         done
         touch dist/commit_time.txt
+
     - name: Upload to untitled-document.net ftp
       uses: sebastianpopp/ftp-action@v2.0.0
       with:
@@ -34,5 +46,5 @@ jobs:
         user: ${{ secrets.FTP_USERNAME }}
         password: ${{ secrets.FTP_PASSWORD }}
         localDir: "dist"
-        remoteDir: "untitled-document.net/public_html"
+        remoteDir: ${{ env.DEPLOY_PATH }}
     
