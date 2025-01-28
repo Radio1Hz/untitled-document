@@ -7,10 +7,12 @@ document.addEventListener('DOMContentLoaded', async () => {
     // Load track data
     const track9Data = await import('https://untitled-document.net/knowledge/agents/viktor-r/projects/vikktør/tracks/9. untitled-track/code/9. untitled-track.js');
     const track1Data = await import('https://untitled-document.net/knowledge/agents/viktor-r/projects/vikktør/tracks/1. there is no wisdom without kindness/code/1. there is no wisdom without kindness.js');
+    const track11Data = await import('https://untitled-document.net/knowledge/agents/viktor-r/projects/vikktør/tracks/11. balkan folk song - karanfil se na put sprema/code/11. balkan folk song - karanfil se na put sprema.js');
 
     // Log raw track data
     console.log('Raw track9 data:', track9Data.track9);
     console.log('Raw track1 data:', track1Data.track1);
+    console.log('Raw track11 data:', track11Data.track11);
 
     // Create tracks from JSON data
     const track9Obj = new Track({
@@ -51,8 +53,29 @@ document.addEventListener('DOMContentLoaded', async () => {
     track1Data.track1.sections.forEach(sectionData => {
         const section = track1Obj.addSection(sectionData.description, sectionData.imageUrl);
         sectionData.timeboxes.forEach(boxData => {
-            // Use addTimeboxToSection instead of section.addTimebox
+            // Use nT directly from the timebox data
             track1Obj.addTimeboxToSection(section, boxData.tStart, boxData.description, boxData.nT);
+        });
+    });
+
+    // Create track11 object
+    const track11Obj = new Track({
+        id: track11Data.track11.id,
+        description: track11Data.track11.description,
+        tau: track11Data.track11.tau,
+        delta: track11Data.track11.delta,
+        n: track11Data.track11.n,
+        tau_omega: track11Data.track11.tau_omega,
+        dedication: track11Data.track11.dedication,
+        audioUrl: track11Data.track11.audioUrl
+    });
+
+    // Add sections and timeboxes from JSON
+    track11Data.track11.sections.forEach(sectionData => {
+        const section = track11Obj.addSection(sectionData.description, sectionData.imageUrl);
+        sectionData.timeboxes.forEach(boxData => {
+            // Add tStart as 0 or calculate it based on previous timeboxes
+            track11Obj.addTimeboxToSection(section, 0, boxData.description, boxData.nT);
         });
     });
 
@@ -60,16 +83,18 @@ document.addEventListener('DOMContentLoaded', async () => {
     const playlist = new Playlist();
     playlist.addTrack(track1Obj);
     playlist.addTrack(track9Obj);
+    playlist.addTrack(track11Obj);
 
     // Create a map of track IDs to track objects for persistence
     const trackMap = new Map();
-    [track1Obj, track9Obj].forEach(track => trackMap.set(track.id, track));
+    [track1Obj, track9Obj, track11Obj].forEach(track => trackMap.set(track.id, track));
 
     // Try to load saved playlist state
     playlist.load(trackMap);
 
-    // Create player with custom screen_to_dot_ratio
-    const player = new TrackPlayer(null, 1.0, 0, true, 50);
+    // Create player with custom screen_to_dot_ratio and playlist
+    const player = new TrackPlayer(playlist.getCurrentTrack(), 1.0, 0, true, 50);
+    player.playlist = playlist;
 
     // Initialize UI elements first
     const playPauseBtn = document.getElementById('playPauseBtn');
@@ -107,7 +132,23 @@ document.addEventListener('DOMContentLoaded', async () => {
     audioElement.addEventListener('playing', () => console.log('Audio playing'));
     audioElement.addEventListener('pause', () => console.log('Audio paused'));
 
-    // Audio URL encoding helper
+    // Update cache control configuration to be resource-type specific
+    const CacheControl = {
+        enabled: false, // Default to no caching
+        getHeaders(resourceType) {
+            // Allow caching for audio, disable for everything else
+            if (resourceType === 'audio') {
+                return {};
+            }
+            return {
+                'Cache-Control': 'no-store, no-cache, must-revalidate, proxy-revalidate, max-age=0',
+                'Pragma': 'no-cache',
+                'Expires': '0'
+            };
+        }
+    };
+
+    // Audio URL no longer needs cache busting
     const getEncodedAudioUrl = (url) => {
         const [domain, ...path] = url.split('/knowledge/');
         const encodedPath = path.join('/knowledge/').split('/').map(segment => 
@@ -116,28 +157,42 @@ document.addEventListener('DOMContentLoaded', async () => {
         return `${domain}/knowledge/${encodedPath}`;
     };
 
-    // Preload audio function
+    // Update preloadAudio to use direct URLs instead of blobs when possible
     const preloadAudio = async (url) => {
         const encodedUrl = getEncodedAudioUrl(url);
-        audioElement.src = encodedUrl;
         
-        return new Promise((resolve, reject) => {
-            const loadHandler = () => {
-                audioElement.removeEventListener('canplaythrough', loadHandler);
-                audioElement.removeEventListener('error', errorHandler);
-                resolve();
-            };
+        try {
+            // Set audio source directly if it's an audio file
+            audioElement.src = encodedUrl;
             
-            const errorHandler = (error) => {
-                audioElement.removeEventListener('canplaythrough', loadHandler);
-                audioElement.removeEventListener('error', errorHandler);
-                reject(error);
-            };
-            
-            audioElement.addEventListener('canplaythrough', loadHandler);
-            audioElement.addEventListener('error', errorHandler);
-            audioElement.load();
-        });
+            return new Promise((resolve, reject) => {
+                const handleLoad = () => {
+                    resolve();
+                };
+                
+                const handleError = (error) => {
+                    reject(error);
+                };
+                
+                audioElement.addEventListener('canplaythrough', handleLoad, { once: true });
+                audioElement.addEventListener('error', handleError, { once: true });
+                audioElement.load();
+            });
+        } catch (error) {
+            console.error('Error loading audio:', error);
+            throw error;
+        }
+    };
+
+    // Update image loading to use direct URLs when possible
+    const loadSectionImage = async (imageUrl) => {
+        try {
+            // Return direct URL for images
+            return imageUrl;
+        } catch (error) {
+            console.error('Error loading image:', error);
+            return null;
+        }
     };
 
     // Update audio source function
@@ -155,6 +210,11 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     // Load and play track function
     async function loadAndPlayTrack(track) {
+        if (!track) return;
+        
+        // Make sure to set tau_omega from the track
+        player.tau_omega = track.tau_omega ? new Date(track.tau_omega) : null;
+        
         player.stop();
         player.currentTrack = track;
         player.state = new TrackState();
@@ -183,7 +243,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     `;
     controlsContainer.appendChild(playlistControls);
 
-    // Add playlist view (simplified)
+    // Create playlist view (simplified)
     const container = document.querySelector('.container');
     const playlistView = document.createElement('div');
     playlistView.className = 'playlist-view';
@@ -193,7 +253,12 @@ document.addEventListener('DOMContentLoaded', async () => {
     // Function to update playlist view (simplified)
     function updatePlaylistView() {
         const playlistItems = document.querySelector('.playlist-items');
+        if (!playlistItems) return;  // Add safety check
+        
         playlistItems.innerHTML = '';
+        
+        console.log("PlaylistItems element:", playlistItems);
+        console.log("Creating items for tracks:", playlist.tracks.map(t => t.id));
         
         playlist.tracks.forEach((track, index) => {
             const item = document.createElement('div');
@@ -205,7 +270,6 @@ document.addEventListener('DOMContentLoaded', async () => {
             // Extract track number from audioUrl
             const trackNumber = track.audioUrl.match(/\/(\d+)\./)?.[1] || '?';
             
-            // Simplified structure - single div with hover info
             item.innerHTML = `${trackNumber}`;
             item.title = `${track.description?.en || track.id} [${formatDuration(track.totalDuration())}]`;
             
@@ -217,17 +281,10 @@ document.addEventListener('DOMContentLoaded', async () => {
             
             playlistItems.appendChild(item);
         });
-
-        // Update mode button text
-        const modeBtn = document.getElementById('playlistModeBtn');
-        const modeIcons = {
-            [PlaylistMode.SEQUENTIAL]: '➡',
-            [PlaylistMode.REPEAT_ONE]: '🔂',
-            [PlaylistMode.REPEAT_ALL]: '🔁',
-            [PlaylistMode.SHUFFLE]: '🔀'
-        };
-        modeBtn.textContent = modeIcons[playlist.mode];
     }
+
+    // Make sure to call updatePlaylistView after adding all tracks
+    updatePlaylistView();
 
     // Format duration helper
     function formatDuration(seconds) {
@@ -412,20 +469,29 @@ document.addEventListener('DOMContentLoaded', async () => {
     function updateBackground(imageUrl) {
         if (!imageUrl) return;
         
-        // Get next background element
         const nextIndex = (currentBgIndex + 1) % 2;
         const currentBg = backgroundImages[currentBgIndex];
         const nextBg = backgroundImages[nextIndex];
         
-        // Prepare next image
-        nextBg.style.backgroundImage = `url(${imageUrl})`;
+        // Create a temporary image to handle loading
+        const tempImage = new Image();
+        tempImage.onload = () => {
+            nextBg.style.backgroundImage = `url(${imageUrl})`;
+            currentBg.classList.remove('active');
+            nextBg.classList.add('active');
+            currentBgIndex = nextIndex;
+        };
         
-        // Fade out current, fade in next
-        currentBg.classList.remove('active');
-        nextBg.classList.add('active');
+        tempImage.onerror = () => {
+            console.error('Error loading background image');
+        };
         
-        // Update current index
-        currentBgIndex = nextIndex;
+        // Set crossOrigin if needed
+        if (imageUrl.startsWith('http')) {
+            tempImage.crossOrigin = 'anonymous';
+        }
+        
+        tempImage.src = imageUrl;
     }
 
     // Instead of using setInterval, let's use requestAnimationFrame with time correction
@@ -582,4 +648,10 @@ document.addEventListener('DOMContentLoaded', async () => {
             currentLanguage: current_lang_code
         });
     }
+
+    // After adding tracks to playlist
+    console.log("Playlist tracks:", playlist.tracks.map(t => t.id));
+
+    // Before creating playlist view
+    console.log("Container element:", container);
 });

@@ -74,19 +74,22 @@ class TrackPlayer {
 
     /**
      * Select track from playlist
-     * @param {number} index - Index of track to select
+     * @param {Track} track - Track to select
      */
-    async selectTrack(index) {
-        if (index >= 0 && index < this.playlist.length) {
-            this.mode = PlaybackMode.LOADING;
-            this.currentTrackIndex = index;
-            this.currentTrack = this.playlist[index];
-            this.state = new TrackState();
-            this.time = 0;
-            this.accumulatedTime = 0;
-            this.calculateTransitionTimes();  // Recalculate transitions for new track
-            this.mode = PlaybackMode.STOPPED;
+    selectTrack(track) {
+        this.mode = PlaybackMode.LOADING;
+        this.currentTrack = track;
+        this.state = new TrackState();
+        this.time = 0;
+        this.accumulatedTime = 0;
+        
+        // Reset tau_omega to the track's value
+        if (track.tau_omega) {
+            this.worldTimeStart = new Date(track.tau_omega);
         }
+        
+        this.calculateTransitionTimes();
+        this.mode = PlaybackMode.STOPPED;
     }
 
     /**
@@ -355,6 +358,7 @@ class TrackPlayer {
         if (!this.currentTrack) return;
         
         this.transitionTimes = [];
+        let totalAccumulatedTime = 0;  // Track total time across all sections
         
         // Iterate through sections
         this.currentTrack.sections.forEach((section, i) => {
@@ -364,24 +368,44 @@ class TrackPlayer {
                 const nT = timebox.getEffectiveN(this.currentTrack);
                 for (let k = 0; k < nT; k++) {
                     this.transitionTimes.push({
-                        time: timebox.tStart * this.currentTrack.tau + (k * this.currentTrack.tau),
+                        time: totalAccumulatedTime + (k * this.currentTrack.tau),
                         state: new TrackState(i, j, k)
                     });
                 }
+                totalAccumulatedTime += nT * this.currentTrack.tau;
             });
         });
 
         // Sort transitions by time
         this.transitionTimes.sort((a, b) => a.time - b.time);
+        
+        // Debug log
+        console.log('State transition times:', this.transitionTimes.map(t => ({
+            time: t.time.toFixed(2),
+            state: `(${t.state.i},${t.state.j},${t.state.k})`
+        })));
+    }
 
-        // Log the transition times array
-        console.log('State transition times calculated:', 
-            this.transitionTimes.map(t => ({
-                time: t.time.toFixed(3),
-                state: `(${t.state.i},${t.state.j},${t.state.k})`,
-                realTime: `${Math.floor(t.time/60)}:${(t.time%60).toFixed(1)}`
-            }))
+    getCurrentTimebox() {
+        const section = this.getCurrentSection();
+        if (!section) return null;
+        
+        return section.getTimeboxAtTime(this.time, this.currentTrack.tau);
+    }
+
+    checkStateTransitions() {
+        if (!this.transitionTimes || !this.transitionTimes.length) return;
+        
+        // Find the appropriate transition for current time
+        const currentTransition = this.transitionTimes.find(t => 
+            t.time <= this.time && 
+            t.time + this.currentTrack.tau > this.time
         );
+        
+        if (currentTransition && !this.state.equals(currentTransition.state)) {
+            console.log(`Transitioning to state ${currentTransition.state.i},${currentTransition.state.j},${currentTransition.state.k} at time ${this.time.toFixed(2)}`);
+            this.state = currentTransition.state;
+        }
     }
 }
 

@@ -12,24 +12,22 @@ class TimeUnit {
 }
 
 /**
- * Represents a contiguous interval within a track: T = (t_start, desc)
+ * Represents a contiguous interval within a track: T = (desc, nT)
  */
 class TimeBox {
     /**
-     * @param {number} tStart - Start time relative to track's origin
      * @param {Object|string} desc - Description of timebox content in multiple languages
      * @param {number} [nT] - Number of time units for this timebox (optional)
      */
-    constructor(tStart, desc = "", nT = undefined) {
-        this.tStart = tStart;
-        this.nT = nT;  // This is correctly storing the nT value
+    constructor(desc = "", nT = undefined) {
+        this.nT = nT;  // Number of time units for this timebox
         // Ensure desc is an object with language keys
-        this.desc = (typeof desc === 'string') ? {
-            en: desc,
-            zh: desc,
-            ru: desc,
-            ar: desc
-        } : desc;
+        this.desc = (typeof desc === 'object' && desc !== null) ? desc : {
+            en: desc || "",
+            zh: desc || "",
+            ru: desc || "",
+            ar: desc || ""
+        };
     }
 
     /**
@@ -201,7 +199,8 @@ class Section {
      * @returns {Section} This section instance
      */
     addTimebox(tStart, desc) {
-        this.timeboxes.push(new TimeBox(tStart, desc));
+        const timebox = new TimeBox(desc);
+        this.timeboxes.push(timebox);
         return this;
     }
 
@@ -213,6 +212,27 @@ class Section {
      */
     duration(tau, n) {
         return this.timeboxes.reduce((sum, box) => sum + box.duration(tau, n), 0);
+    }
+
+    // Helper to get timebox at specific time
+    getTimeboxAtTime(time, tau) {
+        let accumulatedTime = 0;
+        for (let i = 0; i < this.timeboxes.length; i++) {
+            const timebox = this.timeboxes[i];
+            const start = accumulatedTime;
+            const end = start + (timebox.nT * tau);
+            
+            if (time >= start && time < end) {
+                return {
+                    timebox,
+                    index: i,
+                    startTime: start,
+                    endTime: end
+                };
+            }
+            accumulatedTime = end;
+        }
+        return null;
     }
 }
 
@@ -264,7 +284,7 @@ class Track {
      * @param {number} [nT] - Optional number of time units (defaults to track's n)
      */
     addTimeboxToSection(section, tStart, description, nT = undefined) {
-        const timebox = new TimeBox(tStart, description, nT);
+        const timebox = new TimeBox(description, nT);
         section.timeboxes.push(timebox);
         return timebox;
     }
@@ -292,10 +312,9 @@ class Track {
             for (let i = 0; i < section.timeboxes.length - 1; i++) {
                 const currentBox = section.timeboxes[i];
                 const nextBox = section.timeboxes[i + 1];
-                const expectedStart = currentBox.tStart + 
-                    currentBox.getEffectiveN(this) * this.tau;
+                const expectedStart = currentBox.duration(this.tau, this);
                 
-                if (Math.abs(nextBox.tStart - expectedStart) > 1e-6) {
+                if (Math.abs(nextBox.duration(this.tau, this) - expectedStart) > 1e-6) {
                     return false;
                 }
             }

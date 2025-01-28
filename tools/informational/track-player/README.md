@@ -14,11 +14,9 @@ Let $\tau \in \mathbb{T}$ denote the **time unit**, an indivisible temporal inte
 #### **2. Timebox ($T$)**  
 A timebox $T$ represents a contiguous interval within a track, defined by:  
 $$  
-T = (t_{\text{start}}, \text{description}, n_T)
+T = (\text{description}, n_T)
 $$  
 **where**:  
-- $t_{\text{start}} \in \mathbb{T}$: Start time of $T$, relative to the track's origin.
-  - *Default*: $t_{\text{start}} = 0$.
 - $\text{description} \in \mathbb{S}$: Description of the timebox content.
   - *Default*: $\text{description} = \text{""}$ (empty string).
 - $n_T \in \mathbb{N}$: Number of time units in this timebox.
@@ -201,9 +199,9 @@ These operations form a complete algebra for manipulating track state, enabling:
 
 3. **Time Unit Constraints**:  
    - All temporal operations (play, pause, etc.) align with $\tau$-granularity.  
-   - Timeboxes are contiguous and non-overlapping:  
+   - Timeboxes are contiguous and non-overlapping within sections
    $$  
-   \forall S \in \Theta,\ \forall T_j, T_{j+1} \in S: \quad t_{\text{start}}(T_{j+1}) = t_{\text{start}}(T_j) + n_j \cdot \tau  
+   \forall S \in \Theta: \text{Duration}(S) = \sum_{T \in S} n_{T,\text{eff}} \cdot \tau  
    $$  
 
 ---  
@@ -493,39 +491,6 @@ $$
 \text{order}[0] & \text{if mode} = \text{REPEAT_ALL and } i = |\Theta_\text{set}| - 1 \\
 \text{random}(\Theta_\text{set}) & \text{if mode} = \text{SHUFFLE}
 \end{cases}
-$$
-
-#### **10. Document ($\Delta$)**
-A document $\Delta$ is a finite sequence of symbols from a given alphabet:
-$$
-\Delta = \left(A,\ S,\ \text{encoding} \right)
-$$
-**where**:
-- $A$: Finite alphabet of symbols
-- $S = \langle s_1, s_2, ..., s_n \rangle$: Sequence of symbols where $s_i \in A$
-- $\text{encoding} \in \{\text{UTF-8}, \text{UTF-16}, \text{ASCII}, ...\}$: Character encoding
-
-#### **11. Algorithm ($\Alpha$)**
-An algorithm $\Alpha$ is a specialized track that processes input to produce output:
-$$
-\Alpha = \left(\Theta,\ \Delta_\text{in},\ \Delta_\text{out} \right)
-$$
-**where**:
-- $\Theta$: Base track (see §4)
-- $\Delta_\text{in}$: Input document
-- $\Delta_\text{out}$: Output document
-
-**Properties**:
-1. $\tau_\omega$ is automatically set to algorithm start time
-2. Input document must be fully specified before algorithm start
-3. Output document is progressively generated during track playback
-
-**Constraints**:
-$$
-\begin{aligned}
-& \forall \Alpha: \Alpha.\Theta.\tau_\omega = \text{startTime}(\Alpha) \\
-& \forall \Alpha: \text{isDefined}(\Delta_\text{in}) \text{ before } \text{start}(\Alpha)
-\end{aligned}
 $$
 
 

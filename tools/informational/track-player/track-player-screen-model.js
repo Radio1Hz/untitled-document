@@ -461,7 +461,11 @@ class SectionView extends Component {
                 // Add timebox content with current language
                 const timeboxContent = document.createElement('div');
                 timeboxContent.className = 'timebox-content';
-                timeboxContent.textContent = timebox.desc?.[this.state.currentLanguage] || timebox.desc?.en || `Box ${timeboxIndex + 1}`;
+                const description = timebox.desc?.[this.state.currentLanguage] || 
+                                   timebox.desc?.en || 
+                                   Object.values(timebox.desc || {})[0] ||
+                                   `Box ${timeboxIndex + 1}`;
+                timeboxContent.textContent = description;
                 
                 // Check if this is the current timebox and add appropriate class
                 if (currentState && 
@@ -508,21 +512,36 @@ class SectionView extends Component {
         return div;
     }
 
-    setState(newState) {
+    setState({ currentTrack, currentLanguage }) {
         // Handle language updates
-        if (newState.currentLanguage) {
-            this.state.currentLanguage = newState.currentLanguage;
+        if (currentLanguage) {
+            this.state.currentLanguage = currentLanguage;
             this.render(); // Force re-render when language changes
         }
         // Handle track updates
-        if (newState.currentTrack) {
-            this.state.currentTrack = newState.currentTrack;
+        if (currentTrack) {
+            this.state.currentTrack = currentTrack;
         }
-        super.setState(newState);
+        super.setState({ currentTrack, currentLanguage });
         
         // Update position dot highlighting if state changed
-        if (newState.currentSection !== undefined) {
+        if (this.state.currentSection !== undefined) {
             this.updatePositionHighlighting();
+        }
+
+        // Update section descriptions to include index
+        if (currentTrack && currentTrack.sections) {
+            this.sections = currentTrack.sections.map((section, index) => ({
+                description: section.description ? 
+                    `${index + 1}. ${section.description[currentLanguage] || section.description.en}` :
+                    `${index + 1}. Section ${index + 1}`,
+                timeboxes: section.timeboxes.map(box => ({
+                    description: box.description ? 
+                        (box.description[currentLanguage] || box.description.en) :
+                        '',
+                    nT: box.nT
+                }))
+            }));
         }
     }
 

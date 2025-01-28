@@ -10,7 +10,7 @@ export const track9 =
   "tau": 0.5,
   "delta": 0,
   "n": 8,
-  "tau_omega": "2024-03-19 15:30:00.00",
+  "tau_omega": "1977-03-10 06:00:00.00",
   "dedication": "før aurøra",
   "audioUrl": "https://untitled-document.net/knowledge/agents/viktor-r/projects/vikktør/tracks/9. untitled-track/9. untitled-track.wav",
   "sections": [
@@ -24,53 +24,23 @@ export const track9 =
       "imageUrl": "images/9-untitled-track-image-section-1.jpg",
       "timeboxes": [
         {
-          "tStart": 0,
-          "description": {
-            "en": "A",
-            "zh": "A",
-            "ru": "A",
-            "ar": "A"
-          },
+          "description": {"en": "A", "zh": "A", "ru": "A", "ar": "A"},
           "nT": 8
         },
         {
-          "tStart": 8,
-          "description": {
-            "en": "A",
-            "zh": "A",
-            "ru": "A",
-            "ar": "A"
-          },
+          "description": {"en": "A", "zh": "A", "ru": "A", "ar": "A"},
           "nT": 8
         },
         {
-          "tStart": 16,
-          "description": {
-            "en": "A",
-            "zh": "A",
-            "ru": "A",
-            "ar": "A"
-          },
+          "description": {"en": "A", "zh": "A", "ru": "A", "ar": "A"},
           "nT": 8
         },
         {
-          "tStart": 24,
-          "description": {
-            "en": "C",
-            "zh": "C",
-            "ru": "C",
-            "ar": "C"
-          },
+          "description": {"en": "C", "zh": "C", "ru": "C", "ar": "C"},
           "nT": 4
         },
         {
-          "tStart": 28,
-          "description": {
-            "en": "D",
-            "zh": "D",
-            "ru": "D",
-            "ar": "D"
-          },
+          "description": {"en": "D", "zh": "D", "ru": "D", "ar": "D"},
           "nT": 4
         }
       ]
@@ -85,53 +55,23 @@ export const track9 =
       "imageUrl": "images/9-untitled-track-image-section-2.jpg",
       "timeboxes": [
         {
-          "tStart": 32,
-          "description": {
-            "en": "A",
-            "zh": "A",
-            "ru": "A",
-            "ar": "A"
-          },
+          "description": {"en": "A", "zh": "A", "ru": "A", "ar": "A"},
           "nT": 8
         },
         {
-          "tStart": 40,
-          "description": {
-            "en": "A",
-            "zh": "A",
-            "ru": "A",
-            "ar": "A"
-          },
+          "description": {"en": "A", "zh": "A", "ru": "A", "ar": "A"},
           "nT": 8
         },
         {
-          "tStart": 48,
-          "description": {
-            "en": "A",
-            "zh": "A",
-            "ru": "A",
-            "ar": "A"
-          },
+          "description": {"en": "A", "zh": "A", "ru": "A", "ar": "A"},
           "nT": 8
         },
         {
-          "tStart": 56,
-          "description": {
-            "en": "C",
-            "zh": "C",
-            "ru": "C",
-            "ar": "C"
-          },
+          "description": {"en": "C", "zh": "C", "ru": "C", "ar": "C"},
           "nT": 4
         },
         {
-          "tStart": 60,
-          "description": {
-            "en": "D",
-            "zh": "D",
-            "ru": "D",
-            "ar": "D"
-          },
+          "description": {"en": "D", "zh": "D", "ru": "D", "ar": "D"},
           "nT": 4
         }
       ]
@@ -146,43 +86,27 @@ export const track9 =
       "imageUrl": "images/9-untitled-track-image-section-3.jpg",
       "timeboxes": [
         {
-          "tStart": 64,
-          "description": {
-            "en": "F",
-            "zh": "F",
-            "ru": "F",
-            "ar": "F"
-          },
+          "description": {"en": "F", "zh": "F", "ru": "F", "ar": "F"},
+          "nT": 4
+        },
+        {
+          "description": {"en": "G", "zh": "G", "ru": "G", "ar": "G"},
+          "nT": 4
+        },
+        {
+          "description": {"en": "A", "zh": "A", "ru": "A", "ar": "A"},
           "nT": 8
         },
         {
-          "tStart": 72,
-          "description": {
-            "en": "G",
-            "zh": "G",
-            "ru": "G",
-            "ar": "G"
-          },
-          "nT": 8
+          "description": {"en": "F", "zh": "F", "ru": "F", "ar": "F"},
+          "nT": 4
         },
         {
-          "tStart": 80,
-          "description": {
-            "en": "A",
-            "zh": "A",
-            "ru": "A",
-            "ar": "A"
-          },
-          "nT": 8
+          "description": {"en": "G", "zh": "G", "ru": "G", "ar": "G"},
+          "nT": 4
         },
         {
-          "tStart": 88,
-          "description": {
-            "en": "A",
-            "zh": "A",
-            "ru": "A",
-            "ar": "A"
-          },
+          "description": {"en": "A", "zh": "A", "ru": "A", "ar": "A"},
           "nT": 8
         }
       ]
@@ -197,46 +121,162 @@ export const track9 =
       "imageUrl": "images/9-untitled-track-image-section-3.jpg",
       "timeboxes": [
         {
-          "tStart": 96,
-          "description": {
-            "en": "F",
-            "zh": "F",
-            "ru": "F",
-            "ar": "F"
-          },
+          "description": {"en": "F", "zh": "F", "ru": "F", "ar": "F"},
+          "nT": 4
+        },
+        {
+          "description": {"en": "G", "zh": "G", "ru": "G", "ar": "G"},
+          "nT": 4
+        },
+        {
+          "description": {"en": "A", "zh": "A", "ru": "A", "ar": "A"},
           "nT": 8
         },
         {
-          "tStart": 104,
-          "description": {
-            "en": "G",
-            "zh": "G",
-            "ru": "G",
-            "ar": "G"
-          },
-          "nT": 8
+          "description": {"en": "F", "zh": "F", "ru": "F", "ar": "F"},
+          "nT": 4
         },
         {
-          "tStart": 112,
-          "description": {
-            "en": "A",
-            "zh": "A",
-            "ru": "A",
-            "ar": "A"
-          },
-          "nT": 8
+          "description": {"en": "G", "zh": "G", "ru": "G", "ar": "G"},
+          "nT": 4
         },
         {
-          "tStart": 120,
-          "description": {
-            "en": "A",
-            "zh": "A",
-            "ru": "A",
-            "ar": "A"
-          },
+          "description": {"en": "A", "zh": "A", "ru": "A", "ar": "A"},
           "nT": 8
         }
       ]
-    }
+    },
+    {
+      "description": {
+        "en": "X. Time Unit (τ)",
+        "zh": "5. 时间单位 (τ)",
+        "ru": "5. Единица времени (τ)",
+        "ar": "5. وحدة الزمن (τ)"
+      },
+      "imageUrl": "images/9-untitled-track-image-section-1.jpg",
+      "timeboxes": [
+        {
+          "description": {"en": "A", "zh": "A", "ru": "A", "ar": "A"},
+          "nT": 8
+        },
+        {
+          "description": {"en": "A", "zh": "A", "ru": "A", "ar": "A"},
+          "nT": 8
+        },
+        {
+          "description": {"en": "A", "zh": "A", "ru": "A", "ar": "A"},
+          "nT": 8
+        },
+        {
+          "description": {"en": "C", "zh": "C", "ru": "C", "ar": "C"},
+          "nT": 4
+        },
+        {
+          "description": {"en": "D", "zh": "D", "ru": "D", "ar": "D"},
+          "nT": 4
+        }
+      ]
+    },
+    {
+      "description": {
+        "en": "X. Timebox (T)",
+        "zh": "6. 时间盒 (T)",
+        "ru": "6. Таймбокс (T)", 
+        "ar": "6. صندوق الوقت (T)"
+      },
+      "imageUrl": "images/9-untitled-track-image-section-2.jpg",
+      "timeboxes": [
+        {
+          "description": {"en": "A", "zh": "A", "ru": "A", "ar": "A"},
+          "nT": 8
+        },
+        {
+          "description": {"en": "A", "zh": "A", "ru": "A", "ar": "A"},
+          "nT": 8
+        },
+        {
+          "description": {"en": "A", "zh": "A", "ru": "A", "ar": "A"},
+          "nT": 8
+        },
+        {
+          "description": {"en": "C", "zh": "C", "ru": "C", "ar": "C"},
+          "nT": 4
+        },
+        {
+          "description": {"en": "D", "zh": "D", "ru": "D", "ar": "D"},
+          "nT": 4
+        }
+      ]
+    },
+    {
+      "description": {
+        "en": "X. Section (S)",
+        "zh": "7. 部分 (S)",
+        "ru": "7. Секция (S)",
+        "ar": "7. القسم (S)"
+      },
+      "imageUrl": "images/9-untitled-track-image-section-3.jpg",
+      "timeboxes": [
+        {
+          "description": {"en": "F", "zh": "F", "ru": "F", "ar": "F"},
+          "nT": 4
+        },
+        {
+          "description": {"en": "G", "zh": "G", "ru": "G", "ar": "G"},
+          "nT": 4
+        },
+        {
+          "description": {"en": "A", "zh": "A", "ru": "A", "ar": "A"},
+          "nT": 8
+        },
+        {
+          "description": {"en": "F", "zh": "F", "ru": "F", "ar": "F"},
+          "nT": 4
+        },
+        {
+          "description": {"en": "G", "zh": "G", "ru": "G", "ar": "G"},
+          "nT": 4
+        },
+        {
+          "description": {"en": "A", "zh": "A", "ru": "A", "ar": "A"},
+          "nT": 8
+        }
+      ]
+    },
+    {
+      "description": {
+        "en": "X. Track (Θ)",
+        "zh": "8. 轨道 (Θ)",
+        "ru": "8. Трек (Θ)", 
+        "ar": "8. المسار (Θ)"
+      },
+      "imageUrl": "images/9-untitled-track-image-section-3.jpg",
+      "timeboxes": [
+        {
+          "description": {"en": "F", "zh": "F", "ru": "F", "ar": "F"},
+          "nT": 4
+        },
+        {
+          "description": {"en": "G", "zh": "G", "ru": "G", "ar": "G"},
+          "nT": 4
+        },
+        {
+          "description": {"en": "A", "zh": "A", "ru": "A", "ar": "A"},
+          "nT": 8
+        },
+        {
+          "description": {"en": "F", "zh": "F", "ru": "F", "ar": "F"},
+          "nT": 4
+        },
+        {
+          "description": {"en": "G", "zh": "G", "ru": "G", "ar": "G"},
+          "nT": 4
+        },
+        {
+          "description": {"en": "A", "zh": "A", "ru": "A", "ar": "A"},
+          "nT": 8
+        }
+      ]
+    },
   ]
 }
