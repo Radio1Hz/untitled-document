@@ -40,13 +40,11 @@ jobs:
         touch dist/commit_time.txt
 
     - name: Upload to untitled-document.net ftp
-      uses: SamKirkland/FTP-Deploy-Action@v4.3.4
+      uses: sebastianpopp/ftp-action@v2.0.0
       with:
-        server: ${{ secrets.FTP_SERVER }}
-        username: ${{ secrets.FTP_USERNAME }}
+        host: ${{ secrets.FTP_SERVER }}
+        user: ${{ secrets.FTP_USERNAME }}
         password: ${{ secrets.FTP_PASSWORD }}
-        local-dir: ./dist/
-        server-dir: untitled-document.net/public_html/
-        protocol: ftps  # Force FTP over TLS
-        security: strict  # Require explicit TLS
+        localDir: "dist"
+        remoteDir: ${{ env.DEPLOY_PATH }}
     
