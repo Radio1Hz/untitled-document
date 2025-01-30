@@ -1,5 +1,5 @@
 :root {
-    --primary-color: #ff5000;
+    --primary-color: #00daff;
     --text-color: #b1b1b1;
     --background-color: #000000;
     --secondary-background: #121212;
@@ -18,17 +18,13 @@
 }
 
 .bottom-text {
-    /* Remove fixed positioning */
-    position: static;
     width: 100%;
     text-align: center;
     color: var(--text-color);
     opacity: 0.5;
     font-family: monospace;
     font-size: 8px;
-    display: flex;
-    justify-content: center;
-    align-items: center;
+    overflow: auto;
 }
 
 body {

@@ -93,23 +93,11 @@ class Screen {
      * @param {HTMLElement} container - Container element
      */
     mount(container) {
-        // 1. Get current browser window dimensions
-        const clientWidth = document.documentElement.clientWidth;
-        const clientHeight = document.documentElement.clientHeight;
+        if (!container) return;
         
-        // 2. Update screen dimensions to match window size
-        this.dimension = {
-            width: clientWidth,
-            height: clientHeight
-        };
-        
-        // 3. Calculate width of each time unit (tau) in pixels
-        this.tau_width_px = clientWidth / this.screen_to_dot_ratio;
-        
-        // 4. Size the container to fill window
-        container.style.width = `${clientWidth}px`;
-        container.style.height = `${clientHeight}px`;
-        container.style.margin = '0';
+        // Remove fixed dimensions, let CSS handle layout
+        container.style.width = '100%';
+        // container.style.height = '100%';  // Let content determine height
         container.style.position = 'relative';
         
         // 5. Re-render components
@@ -358,7 +346,11 @@ class SectionView extends Component {
             currentTrack: null,
             currentLanguage: 'en'
         });
-        this.screen = null;  // Reference to parent screen
+        this.screen = null;
+        this.hasScrolledInSection = false;
+        this.currentSectionIndex = null;
+        this.lastBoxIndex = null;
+        this.lastState = null;  // Add tracking for last state
     }
 
     /**
@@ -421,6 +413,11 @@ class SectionView extends Component {
             
             sectionElement.appendChild(header);
             
+            // Calculate total duration of section
+            const sectionDuration = section.timeboxes.reduce((sum, box) => {
+                return sum + box.duration(this.state.currentTrack.tau, this.state.currentTrack.n);
+            }, 0);
+
             // Create timeboxes container
             const timeboxesContainer = document.createElement('div');
             timeboxesContainer.className = 'timeboxes-container';
@@ -432,17 +429,11 @@ class SectionView extends Component {
                 const timeboxElement = document.createElement('div');
                 timeboxElement.className = 'timebox';
                 
-                const nT = timebox.nT !== undefined ? timebox.nT : this.state.currentTrack.n;
-                const width_px = Math.round(nT * this.screen.tau_width_px);
+                // Calculate this timebox's width as percentage of section duration
+                const boxDuration = timebox.duration(this.state.currentTrack.tau, this.state.currentTrack.n);
+                const widthPercent = (boxDuration / sectionDuration) * 100;
+                timeboxElement.style.width = `${widthPercent}%`;
                 
-                Object.assign(timeboxElement.style, {
-                    width: `${width_px}px`,
-                    flexGrow: '0',
-                    flexShrink: '0',
-                    borderRadius: '4px',
-                    margin: '2px'
-                });
-
                 // Add timebox content with current language
                 const timeboxContent = document.createElement('div');
                 timeboxContent.className = 'timebox-content';
@@ -465,10 +456,10 @@ class SectionView extends Component {
                 const positionsContainer = document.createElement('div');
                 positionsContainer.className = 'positions-container';
                 
-                for (let i = 0; i < nT; i++) {
+                for (let i = 0; i < timebox.nT; i++) {
                     const positionDot = document.createElement('div');
                     positionDot.className = 'position-dot';
-                    positionDot.style.width = `${100/nT}%`;
+                    positionDot.style.width = `${100/timebox.nT}%`;
                     
                     if (currentState && 
                         currentState.i === sectionIndex && 
@@ -497,56 +488,58 @@ class SectionView extends Component {
         return div;
     }
 
-    setState({ currentTrack, currentLanguage }) {
-        // Handle language updates
-        if (currentLanguage) {
-            this.state.currentLanguage = currentLanguage;
-            this.render(); // Force re-render when language changes
-        }
-        // Handle track updates
-        if (currentTrack) {
-            this.state.currentTrack = currentTrack;
-        }
-        super.setState({ currentTrack, currentLanguage });
-        
-        // Update position dot highlighting if state changed
-        if (this.state.currentSection !== undefined) {
-            this.updatePositionHighlighting();
-        }
-
-        // Update section descriptions to include index
-        if (currentTrack && currentTrack.sections) {
-            this.sections = currentTrack.sections.map((section, index) => ({
-                description: section.description ? 
-                    `${index + 1}. ${section.description[currentLanguage] || section.description.en}` :
-                    `${index + 1}. Section ${index + 1}`,
-                timeboxes: section.timeboxes.map(box => ({
-                    description: box.description ? 
-                        (box.description[currentLanguage] || box.description.en) :
-                        '',
-                    nT: box.nT
-                }))
-            }));
-        }
-    }
-
     updatePositionHighlighting() {
+        const state = this.screen.player.state;
+        if (!state) return;
+
         // Remove all current highlights
         document.querySelectorAll('.position-dot.current').forEach(dot => {
             dot.classList.remove('current');
         });
-        
-        // Get current state from player
-        const state = this.screen.player.state;
-        if (!state) return;
 
         // Find the current section
         const currentSection = document.querySelector(`[data-index="${state.i}"]`);
         if (!currentSection) return;
 
-        // Find the current timebox
-        const currentBox = currentSection.querySelectorAll('.timebox')[state.j];
+        const timeboxesContainer = currentSection.querySelector('.timeboxes-container');
+        if (!timeboxesContainer) return;
+
+        const timeboxes = currentSection.querySelectorAll('.timebox');
+        const currentBox = timeboxes[state.j];
         if (!currentBox) return;
+
+        // Check if we've actually changed section or box
+        const hasChangedSection = !this.lastState || state.i !== this.lastState.i;
+        const hasChangedBox = !this.lastState || state.j !== this.lastState.j;
+
+        // Reset scroll state when changing sections
+        if (hasChangedSection) {
+            this.hasScrolledInSection = false;
+        }
+
+        // Only check visibility if we've changed boxes
+        if (hasChangedBox) {
+            const containerRect = timeboxesContainer.getBoundingClientRect();
+            const boxRect = currentBox.getBoundingClientRect();
+            
+            const isBoxFullyVisible = (
+                boxRect.left >= containerRect.left &&
+                boxRect.right <= containerRect.right
+            );
+
+            // Only scroll if box is not fully visible and we haven't scrolled in this section
+            if (!isBoxFullyVisible && !this.hasScrolledInSection) {
+                const scrollLeft = currentBox.offsetLeft - 20;
+                timeboxesContainer.scrollTo({
+                    left: Math.max(0, scrollLeft),
+                    behavior: 'smooth'
+                });
+                this.hasScrolledInSection = true;
+            }
+        }
+
+        // Update last state
+        this.lastState = { ...state };
 
         // Find and highlight the current position dot
         const currentDot = currentBox.querySelectorAll('.position-dot')[state.k];
@@ -554,12 +547,19 @@ class SectionView extends Component {
             currentDot.classList.add('current');
         }
     }
+
+    setState(newState) {
+        super.setState(newState);
+        // Reset all tracking when track changes
+        this.hasScrolledInSection = false;
+        this.lastState = null;
+    }
 }
 
 /**
  * Track player screen: ΣΠ = (R, CΠ, IΠ, HΠ, Π)
  */
-class TrackPlayerScreen extends Screen {
+export class TrackPlayerScreen extends Screen {
     /**
      * @param {number} width - Screen width
      * @param {number} height - Screen height
@@ -569,12 +569,11 @@ class TrackPlayerScreen extends Screen {
     constructor(width, height, player, dispatcher) {
         super(width, height, player.screen_to_dot_ratio);
         
-        // Initialize dimension to client screen size
-        const clientWidth = document.documentElement.clientWidth;
-        const clientHeight = document.documentElement.clientHeight;
-        this.dimension = { width: clientWidth, height: clientHeight };
-        
+        // Instead of fixed dimensions, use percentages or viewport units
+        this.width = '100%';  // or remove if using CSS
+        this.height = '100%'; // or remove if using CSS
         this.player = player;
+        this.dispatcher = dispatcher;
 
         // Initialize core components
         this.timeline = new Timeline('timeline');
@@ -611,7 +610,7 @@ class TrackPlayerScreen extends Screen {
         this.setupHandlers();
 
         // Use provided dispatcher
-        dispatcher.subscribe(event => this.handlePlayerUpdate(event));
+        this.dispatcher.subscribe(event => this.handlePlayerUpdate(event));
     }
 
     /**
@@ -735,6 +734,4 @@ class TrackPlayerScreen extends Screen {
             currentLanguage: langCode
         });
     }
-}
-
-export { Component, Screen, TrackPlayerScreen }; 
+} 

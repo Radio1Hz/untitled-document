@@ -16,10 +16,27 @@ window.addEventListener('error', (event) => {
 
 document.addEventListener('DOMContentLoaded', async () => {
     try {
+        // Get track number from URL hash (e.g., #9)
+        const hash = window.location.hash;
+        const requestedTrackNumber = hash ? parseInt(hash.substring(1)) : null;
+        console.log('Requested track number from URL:', requestedTrackNumber);
+
         // Load track data
         const track9Data = await import('https://untitled-document.net/knowledge/agents/viktor-r/projects/vikktør/tracks/9. untitled-track/code/9. untitled-track.js');
         const track1Data = await import('https://untitled-document.net/knowledge/agents/viktor-r/projects/vikktør/tracks/1. there is no wisdom without kindness/code/1. there is no wisdom without kindness.js');
         const track11Data = await import('https://untitled-document.net/knowledge/agents/viktor-r/projects/vikktør/tracks/11. balkan folk song - karanfil se na put sprema/code/11. balkan folk song - karanfil se na put sprema.js');
+
+        // Create a map of track numbers to their data
+        const trackNumberMap = {
+            9: track9Data,
+            1: track1Data,
+            11: track11Data
+        };
+
+        // Log if requested track exists
+        if (requestedTrackNumber) {
+            console.log('Track data for requested number:', trackNumberMap[requestedTrackNumber] ? 'Found' : 'Not found');
+        }
 
         // Log raw track data
         console.log('Raw track9 data:', track9Data.track9);
@@ -129,6 +146,22 @@ document.addEventListener('DOMContentLoaded', async () => {
                 console.error('No tracks available in playlist. Track count:', playlist.tracks.length);
                 console.log('Playlist state:', playlist);
                 return;
+            }
+        }
+
+        // After creating playlist and adding all tracks
+        if (requestedTrackNumber) {
+            // Find the index of the requested track in the playlist
+            const requestedIndex = playlist.tracks.findIndex(track => 
+                track.id.includes(`${requestedTrackNumber}.`)
+            );
+            
+            if (requestedIndex !== -1) {
+                console.log(`Setting initial track to requested track ${requestedTrackNumber}`);
+                playlist.currentIndex = requestedIndex;
+                initialTrack = playlist.tracks[requestedIndex];
+            } else {
+                console.log(`Requested track ${requestedTrackNumber} not found in playlist`);
             }
         }
 
@@ -261,8 +294,31 @@ document.addEventListener('DOMContentLoaded', async () => {
             
             try {
                 await updateAudioSource();
+                
+                // Update UI elements
                 updatePlaylistView();
                 renderTrackContent();
+                
+                // Update screen components with new track data
+                if (screen) {
+                    // Update section view
+                    if (screen.sectionView) {
+                        screen.sectionView.setState({
+                            currentTrack: player.currentTrack,
+                            currentLanguage: current_lang_code
+                        });
+                    }
+                    
+                    // Update timeline
+                    if (screen.timelineView) {
+                        screen.timelineView.setState({
+                            track: player.currentTrack
+                        });
+                    }
+                    
+                    // Re-render the screen
+                    screen.mount(container);
+                }
                 
                 if (player.mode === PlaybackMode.PLAYING) {
                     audioElement.play();
@@ -288,7 +344,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         const playlistView = document.createElement('div');
         playlistView.className = 'playlist-view';
         playlistView.innerHTML = '<div class="playlist-items"></div>';
-        container.appendChild(playlistView);
+        controlsContainer.appendChild(playlistView);
 
         // Function to update playlist view (simplified)
         function updatePlaylistView() {
@@ -301,8 +357,8 @@ document.addEventListener('DOMContentLoaded', async () => {
             console.log("Creating items for tracks:", playlist.tracks.map(t => t.id));
             
             playlist.tracks.forEach((track, index) => {
-                const item = document.createElement('div');
-                item.className = 'playlist-item';
+                const item = document.createElement('button');
+                item.className = 'playlist-item untitled-button';
                 if (index === playlist.currentIndex) {
                     item.classList.add('current');
                 }
