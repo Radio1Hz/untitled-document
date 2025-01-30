@@ -192,27 +192,10 @@ class Timeline extends Component {
         });
     }
 
-    // Update formatTime method to handle both formats with shorter datetime for markers
-    formatTime(timeInSeconds, useTauOmega = false, track = null) {
-        if (useTauOmega && track && track.tau_omega) {
-            // Calculate absolute datetime based on tau_omega
-            const startTime = new Date(track.tau_omega);
-            const currentDateTime = new Date(startTime.getTime() + (timeInSeconds * 1000));
-            
-            // Format the shorter datetime string for markers
-            const year = currentDateTime.getFullYear();
-            const month = String(currentDateTime.getMonth() + 1).padStart(2, '0');
-            const day = String(currentDateTime.getDate()).padStart(2, '0');
-            const hours = String(currentDateTime.getHours()).padStart(2, '0');
-            const minutes = String(currentDateTime.getMinutes()).padStart(2, '0');
-            
-            return `${year}-${month}-${day} ${hours}:${minutes}`;
-        } else {
-            // Use relative time format (mm:ss)
-            const minutes = Math.floor(timeInSeconds / 60);
-            const seconds = Math.floor(timeInSeconds % 60);
-            return `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
-        }
+    formatTime(timeInSeconds) {
+        const minutes = Math.floor(timeInSeconds / 60);
+        const seconds = Math.floor(timeInSeconds % 60);
+        return `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
     }
 
     render() {
@@ -229,9 +212,8 @@ class Timeline extends Component {
         const progressBar = document.createElement('div');
         progressBar.className = 'timeline-progress';
         
-        // Set progress width directly from progress state
+        // Set only the width, let CSS handle the color
         progressBar.style.width = `${this.state.progress}%`;
-        progressBar.style.backgroundColor = '#ff5000';
         
         // Create markers container and clear any existing markers
         const markersContainer = document.createElement('div');
@@ -242,17 +224,20 @@ class Timeline extends Component {
         if (this.props.track) {
             let totalDuration = this.props.track.totalDuration();
             
-            // Check if track has tau_omega defined
-            const useTauOmega = Boolean(this.props.track.tau_omega);
-            
             // Create all markers at once
             const markerElements = this.props.track.sections.map((section, index) => {
                 const marker = document.createElement('div');
                 marker.className = 'timeline-marker';
                 
-                // Get the start time from the first timebox in this section
-                const firstTimebox = section.timeboxes[0];
-                const sectionStartTime = firstTimebox.tStart * this.props.track.tau + this.props.track.delta;
+                // Calculate section start time by summing durations of all previous sections
+                let sectionStartTime = 0;
+                for (let i = 0; i < index; i++) {
+                    const prevSection = this.props.track.sections[i];
+                    for (const box of prevSection.timeboxes) {
+                        const nT = box.nT !== undefined ? box.nT : this.props.track.n;
+                        sectionStartTime += nT * this.props.track.tau;
+                    }
+                }
                 
                 // Calculate position on timeline
                 const position = (sectionStartTime / totalDuration) * 100;
@@ -262,8 +247,8 @@ class Timeline extends Component {
                 const label = document.createElement('div');
                 label.className = 'marker-label';
                 
-                // Use the timebox's tStart to calculate the marker time
-                label.textContent = `[${this.formatTime(sectionStartTime, useTauOmega, this.props.track)}] ${section.description?.en || ''}`;
+                // Use the calculated section start time for the marker
+                label.textContent = `[${this.formatTime(sectionStartTime)}]`;
                 marker.appendChild(label);
                 
                 // Highlight current section

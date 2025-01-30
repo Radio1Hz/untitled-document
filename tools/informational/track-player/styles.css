@@ -1,5 +1,5 @@
 :root {
-    --primary-color: #ff5000;
+    --primary-color: #007a10;
     --text-color: #b1b1b1;
     --background-color: #000000;
     --secondary-background: #121212;
@@ -307,7 +307,7 @@ body {
 }
 
 .timebox {
-    border: 1px solid transparent;
+    background: transparent;
     border-radius: 4px;
     min-height: 60px;
     flex: 0 0 auto;
@@ -469,13 +469,11 @@ h1, h2, h3, h4, h5, h6 {
 /* Make timeline responsive */
 .timeline {
     width: 100%;
-    height: 5pt;
-    background: #121212;
-    border-radius: 4px;
+    height: 10px;
+    background: var(--secondary-background);
     position: relative;
     margin: 1rem 0;
     cursor: pointer;
-    border: 1px solid #333;
 }
 
 .timeline-background {
@@ -483,7 +481,6 @@ h1, h2, h3, h4, h5, h6 {
     top: 0;
     left: 0;
     height: 100%;
-    border-radius: 4px;
 }
 
 .timeline-progress {
@@ -492,8 +489,8 @@ h1, h2, h3, h4, h5, h6 {
     left: 0;
     height: 100%;
     opacity: 0.8;
-    border-radius: 4px;
     transition: width 0.05s linear;
+    background-color: var(--primary-color);
 }
 
 .timeline-markers {
@@ -513,7 +510,7 @@ h1, h2, h3, h4, h5, h6 {
 
 .marker-label {
     position: absolute;
-    top: -20pt;
+    top: -20px;
     color: var(--text-color);
     font-size: 0.8rem;
     opacity: 0.7;
@@ -545,10 +542,6 @@ h1, h2, h3, h4, h5, h6 {
 @media (max-width: 600px) {
     .container {
         padding: 1rem;
-    }
-    
-    .track-header {
-        
     }
     
     .track-controls {
@@ -590,8 +583,8 @@ h1, h2, h3, h4, h5, h6 {
 
 /* Update position dots */
 .position-dot {
-    height: 3px;
-    border: 1px solid #444;
+    height: 10px;
+    background: var(--secondary-background);
 }
 
 .position-dot.current {
@@ -610,8 +603,7 @@ h1, h2, h3, h4, h5, h6 {
 .position-line {
     width: 8px;
     height: 2px;
-    background-color: transparent;
-    border: 1px solid #444;
+    background-color: var(--secondary-background);
 }
 
 .current-box .position-line {

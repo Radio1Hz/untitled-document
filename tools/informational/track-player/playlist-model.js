@@ -146,11 +146,22 @@ export class Playlist {
         const savedState = localStorage.getItem('playlistState');
         if (savedState) {
             const state = JSON.parse(savedState);
-            this.tracks = state.trackIds.map(id => trackMap.get(id)).filter(Boolean);
-            this.currentIndex = state.currentIndex;
-            this.mode = state.mode;
-            this.history = state.history;
-            this.shuffleOrder = state.shuffleOrder;
+            // Don't clear existing tracks if we can't restore them all
+            const restoredTracks = state.trackIds.map(id => trackMap.get(id)).filter(Boolean);
+            if (restoredTracks.length === state.trackIds.length) {
+                this.tracks = restoredTracks;
+            }
+            // Only restore these if we have valid tracks
+            if (this.tracks.length > 0) {
+                this.currentIndex = state.currentIndex;
+                this.mode = state.mode;
+                this.history = state.history;
+                this.shuffleOrder = state.shuffleOrder;
+            }
+        }
+        // If no saved state or restoration failed, keep the existing tracks
+        if (this.tracks.length === 0) {
+            console.log('No valid saved state, keeping current tracks');
         }
     }
 } 
