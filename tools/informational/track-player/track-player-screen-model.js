@@ -630,6 +630,20 @@ export class TrackPlayerScreen extends Screen {
             this.sectionView.updatePositionHighlighting();
         }
         
+        // Update state info display with leading zeros
+        const state = this.player.state;
+        if (state) {
+            const currentSection = document.getElementById('current-section');
+            const currentBox = document.getElementById('current-box');
+            const currentPosition = document.getElementById('current-position');
+            
+            if (currentSection && currentBox && currentPosition) {
+                currentSection.textContent = state.i.toString().padStart(2, '0');
+                currentBox.textContent = state.j.toString().padStart(2, '0');
+                currentPosition.textContent = state.k.toString().padStart(2, '0');
+            }
+        }
+        
         // Update timeline progress
         if (this.timeline && this.player.currentTrack) {
             const progress = (this.player.time / this.player.currentTrack.totalDuration()) * 100;
