@@ -4,6 +4,8 @@ import { TrackPlayer, PlaybackMode } from './track-player-model.js';
 import { TrackPlayerScreen } from './track-player-screen-model.js';
 import { Playlist, PlaylistMode } from './playlist-model.js';
 
+let current_lang_code = 'en';  // Default language
+
 window.addEventListener('error', (event) => {
     console.error('Global error:', {
         message: event.message,
@@ -451,23 +453,19 @@ document.addEventListener('DOMContentLoaded', async () => {
             screen.mount(container);
         });
 
-        // Add global language state
-        let current_lang_code = 'en';  // Changed: Set default to English
-        
-        // Add language selection handler
+        // Set up language selector
         const langSelect = document.getElementById('langSelect');
-        langSelect.value = current_lang_code;  // Set initial selection to English
-        
-        langSelect.addEventListener('change', (e) => {
-            current_lang_code = e.target.value;
-            document.body.dataset.lang = current_lang_code;
-            
-            // Update both the screen's language and re-render content
-            screen.sectionView.setState({
-                currentLanguage: current_lang_code
+        if (langSelect) {
+            langSelect.value = current_lang_code;
+            langSelect.addEventListener('change', (e) => {
+                current_lang_code = e.target.value;
+                if (screen) {
+                    screen.setLanguage(current_lang_code);
+                }
+                renderTrackContent();
             });
-            renderTrackContent();
-        });
+        }
+
         // Safely update track title
         if (trackTitle) {
             if (player.currentTrack && player.currentTrack.id) {
@@ -747,7 +745,6 @@ document.addEventListener('DOMContentLoaded', async () => {
                 return;
             }
 
-            // Check if player exists and has a current track
             if (!player) {
                 trackTitle.textContent = 'Player not initialized';
                 return;
@@ -759,10 +756,8 @@ document.addEventListener('DOMContentLoaded', async () => {
                 return;
             }
 
-            // Now we're sure we have everything we need
             trackTitle.textContent = player.currentTrack.id;
             
-            // Update section view if it exists
             if (screen && screen.sectionView) {
                 screen.sectionView.setState({
                     currentTrack: player.currentTrack,

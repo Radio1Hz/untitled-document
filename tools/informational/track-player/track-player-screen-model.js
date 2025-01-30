@@ -52,16 +52,14 @@ class Screen {
     /**
      * @param {number} width - Screen width
      * @param {number} height - Screen height
-     * @param {number} screen_to_dot_ratio - Ratio for screen width to dot width
+     * @param {number} tau_width_px - Fixed width for each time unit
      */
-    constructor(width, height, screen_to_dot_ratio = 25) {
+    constructor(width, height, tau_width_px = 40) {
         this.resolution = { width, height };
         this.components = new Map();  // C: Set of components
         this.handlers = new Map();    // I: Set of input handlers
         this.hierarchy = new Map();   // H: Component hierarchy
-        this.dimension = { width: 3000, height: 3000 }; // D: Default dimension
-        this.screen_to_dot_ratio = screen_to_dot_ratio;
-        this.tau_width_px = this.dimension.width / this.screen_to_dot_ratio; // Default time unit width in pixels
+        this.tau_width_px = tau_width_px; // Fixed width for each time unit
     }
 
     /**
@@ -95,71 +93,28 @@ class Screen {
     mount(container) {
         if (!container) return;
         
-        // Remove fixed dimensions, let CSS handle layout
         container.style.width = '100%';
-        // container.style.height = '100%';  // Let content determine height
         container.style.position = 'relative';
         
-        // 5. Re-render components
-        this.renderHierarchy(container);
-        
-        // 6. Re-render section view with current state
-        this.sectionView.render();
-        
-        // 7. Attach event handlers
-        this.attachHandlers(container);
-    }
-
-    /**
-     * Render component hierarchy
-     * @param {HTMLElement} container - Container element
-     */
-    renderHierarchy(container) {
-        // Find root components (no parent)
-        const roots = new Set(this.components.keys());
-        this.hierarchy.forEach((_, childId) => roots.delete(childId));
-
-        // Only clear dynamic components (timeline), preserve static structure
-        const timeline = document.querySelector('.timeline');
-        if (timeline) {
-            timeline.remove();
+        // Find or create timeline container
+        let timelineContainer = container.querySelector('.timeline');
+        if (!timelineContainer) {
+            timelineContainer = document.createElement('div');
+            timelineContainer.className = 'timeline';
+            container.querySelector('.track-section').appendChild(timelineContainer);
         }
-
-        // Render each tree
-        roots.forEach(rootId => {
-            this.renderComponent(rootId, container);
-        });
-    }
-
-    /**
-     * Recursively render component and its children
-     * @param {string} componentId - Component ID
-     * @param {HTMLElement} container - Container element
-     */
-    renderComponent(componentId, container) {
-        const component = this.components.get(componentId);
-        if (!component) return;
-
-        const element = component.render();
-        component.element = element;
-        container.appendChild(element);
-
-        // Render children
-        Array.from(this.components.keys())
-            .filter(id => this.hierarchy.get(id) === componentId)
-            .forEach(childId => this.renderComponent(childId, element));
-    }
-
-    /**
-     * Attach event handlers to container
-     * @param {HTMLElement} container - Container element
-     */
-    attachHandlers(container) {
-        this.handlers.forEach((handlers, event) => {
-            container.addEventListener(event, (e) => {
-                handlers.forEach(handler => handler(e, this));
-            });
-        });
+        
+        // Render timeline
+        const timelineElement = this.timeline.render();
+        timelineContainer.innerHTML = '';
+        timelineContainer.appendChild(timelineElement);
+        
+        // Get the sections content container
+        const sectionsContent = container.querySelector('#sections-content');
+        if (sectionsContent) {
+            sectionsContent.innerHTML = '';
+            sectionsContent.appendChild(this.sectionView.render());
+        }
     }
 }
 
@@ -175,8 +130,7 @@ class Timeline extends Component {
             width: 0,
             isDragging: false,
             currentState: null,
-            activeWidth: 0,
-            progress: 0  // Add progress to state
+            progress: 0
         });
     }
 
@@ -199,8 +153,6 @@ class Timeline extends Component {
         // Create active progress bar
         const progressBar = document.createElement('div');
         progressBar.className = 'timeline-progress';
-        
-        // Set only the width, let CSS handle the color
         progressBar.style.width = `${this.state.progress}%`;
         
         // Create markers container and clear any existing markers
@@ -217,7 +169,7 @@ class Timeline extends Component {
                 const marker = document.createElement('div');
                 marker.className = 'timeline-marker';
                 
-                // Calculate section start time by summing durations of all previous sections
+                // Calculate section start time
                 let sectionStartTime = 0;
                 for (let i = 0; i < index; i++) {
                     const prevSection = this.props.track.sections[i];
@@ -235,8 +187,15 @@ class Timeline extends Component {
                 const label = document.createElement('div');
                 label.className = 'marker-label';
                 
+                // Get section description with fallbacks
+                const description = section.description?.[this.props.language] || 
+                                  section.description?.en || 
+                                  section.desc?.[this.props.language] ||
+                                  section.desc?.en ||
+                                  `Section ${index + 1}`;
+                
                 // Use the calculated section start time for the marker
-                label.textContent = `[${this.formatTime(sectionStartTime)}]`;
+                label.textContent = `[${this.formatTime(sectionStartTime)}] ${description}`;
                 marker.appendChild(label);
                 
                 // Highlight current section
@@ -301,16 +260,16 @@ class Timeline extends Component {
                 // Use next state's time for progress bar
                 const absoluteTime = nextState.absoluteTime(this.props.track);
                 const totalDuration = this.props.track.totalDuration();
-                newState.activeWidth = (absoluteTime / totalDuration) * 100;
+                newState.progress = (absoluteTime / totalDuration) * 100;
             } else {
                 // If there is no next state (end of track), use current state
                 const absoluteTime = newState.currentState.absoluteTime(this.props.track);
                 const totalDuration = this.props.track.totalDuration();
-                newState.activeWidth = (absoluteTime / totalDuration) * 100;
+                newState.progress = (absoluteTime / totalDuration) * 100;
             }
         } else {
-            newState.activeWidth = 0;
-            console.log('Timeline width set to 0% due to missing state or track');
+            newState.progress = 0;
+            console.log('Timeline progress set to 0% due to missing state or track');
         }
         
         super.setState(newState);
@@ -362,34 +321,24 @@ class SectionView extends Component {
     }
 
     render() {
-        // Get the existing sections-content element
-        const div = document.getElementById('sections-content');
-        if (!div) {
-            console.error('sections-content element not found');
-            return document.createElement('div');
-        }
+        const div = document.createElement('div');
+        div.className = 'section-view';
         
-        // Clear existing content before adding new sections
-        div.innerHTML = '';
-        
-        if (!this.state.currentTrack) {
-            return div;
-        }
-
-        // Create sections container
         const sectionsContainer = document.createElement('div');
         sectionsContainer.className = 'sections-container';
         
-        // Get current state from screen's player
-        const currentState = this.screen.player.state;
-        
-        // Calculate cumulative section start times
         let cumulativeTime = 0;
-        
+        const currentState = this.screen.player.state;
+
         this.state.currentTrack.sections.forEach((section, sectionIndex) => {
             const sectionElement = document.createElement('div');
             sectionElement.className = 'section';
             sectionElement.dataset.index = sectionIndex;
+            
+            // Add current-section class to current section
+            if (currentState && currentState.i === sectionIndex) {
+                sectionElement.classList.add('current-section');
+            }
             
             // Add section header with description
             const header = document.createElement('div');
@@ -429,11 +378,17 @@ class SectionView extends Component {
                 const timeboxElement = document.createElement('div');
                 timeboxElement.className = 'timebox';
                 
-                // Calculate this timebox's width as percentage of section duration
-                const boxDuration = timebox.duration(this.state.currentTrack.tau, this.state.currentTrack.n);
-                const widthPercent = (boxDuration / sectionDuration) * 100;
-                timeboxElement.style.width = `${widthPercent}%`;
+                // Calculate width based on number of time units (nT) and tau_width_px
+                const nT = timebox.nT !== undefined ? timebox.nT : this.state.currentTrack.n;
+                const width_px = Math.round(nT * this.screen.tau_width_px);
                 
+                Object.assign(timeboxElement.style, {
+                    width: `${width_px}px`,
+                    flexGrow: '0',
+                    flexShrink: '0',
+                    margin: '2px'
+                });
+
                 // Add timebox content with current language
                 const timeboxContent = document.createElement('div');
                 timeboxContent.className = 'timebox-content';
@@ -496,17 +451,35 @@ class SectionView extends Component {
         document.querySelectorAll('.position-dot.current').forEach(dot => {
             dot.classList.remove('current');
         });
+        document.querySelectorAll('.timebox-content.current').forEach(content => {
+            content.classList.remove('current');
+        });
+        document.querySelectorAll('.section').forEach(section => {
+            section.classList.remove('current-section');
+        });
+
+        // Find and mark current section
+        const currentSection = document.querySelector(`[data-index="${state.i}"]`);
+        if (currentSection) {
+            currentSection.classList.add('current-section');
+        }
 
         // Find the current section
-        const currentSection = document.querySelector(`[data-index="${state.i}"]`);
-        if (!currentSection) return;
+        const currentSectionElement = document.querySelector(`[data-index="${state.i}"]`);
+        if (!currentSectionElement) return;
 
-        const timeboxesContainer = currentSection.querySelector('.timeboxes-container');
+        const timeboxesContainer = currentSectionElement.querySelector('.timeboxes-container');
         if (!timeboxesContainer) return;
 
-        const timeboxes = currentSection.querySelectorAll('.timebox');
+        const timeboxes = currentSectionElement.querySelectorAll('.timebox');
         const currentBox = timeboxes[state.j];
         if (!currentBox) return;
+
+        // Highlight current timebox content
+        const currentBoxContent = currentBox.querySelector('.timebox-content');
+        if (currentBoxContent) {
+            currentBoxContent.classList.add('current');
+        }
 
         // Check if we've actually changed section or box
         const hasChangedSection = !this.lastState || state.i !== this.lastState.i;
@@ -567,13 +540,13 @@ export class TrackPlayerScreen extends Screen {
      * @param {Object} dispatcher - Event dispatcher
      */
     constructor(width, height, player, dispatcher) {
-        super(width, height, player.screen_to_dot_ratio);
+        super(width, height, 40);
         
-        // Instead of fixed dimensions, use percentages or viewport units
-        this.width = '100%';  // or remove if using CSS
-        this.height = '100%'; // or remove if using CSS
+        this.width = '100%';
+        this.height = '100%';
         this.player = player;
         this.dispatcher = dispatcher;
+        this.language = 'en';  // Add default language
 
         // Initialize core components
         this.timeline = new Timeline('timeline');
@@ -581,9 +554,10 @@ export class TrackPlayerScreen extends Screen {
         this.sectionView = new SectionView('section-view');
         this.sectionView.setScreen(this);
 
-        // Initialize timeline with track and seek handler
+        // Initialize timeline with track and language
         this.timeline.props = {
             track: player.currentTrack,
+            language: this.language,
             onSeek: (time) => {
                 player.seekTo(time);
                 if (player.mode === PlaybackMode.PLAYING) {
@@ -610,7 +584,9 @@ export class TrackPlayerScreen extends Screen {
         this.setupHandlers();
 
         // Use provided dispatcher
-        this.dispatcher.subscribe(event => this.handlePlayerUpdate(event));
+        this.dispatcher.subscribe(event => {
+            this.handlePlayerUpdate(event);
+        });
     }
 
     /**
@@ -649,44 +625,27 @@ export class TrackPlayerScreen extends Screen {
      * @param {Object} event - Player state event
      */
     handlePlayerUpdate(event) {
-        const { currentTime, totalDuration, mode, speed, state } = event;
-        
-        // Update state info display with leading zeros
-        if (state) {
-            const currentSection = document.getElementById('current-section');
-            const currentBox = document.getElementById('current-box');
-            const currentPosition = document.getElementById('current-position');
-            
-            if (currentSection && currentBox && currentPosition) {
-                currentSection.textContent = state.i.toString().padStart(2, '0');
-                currentBox.textContent = state.j.toString().padStart(2, '0');
-                currentPosition.textContent = state.k.toString().padStart(2, '0');
-            }
-
-            // Check if section changed
-            const previousState = this.sectionView.state.currentSection;
-            const newSection = this.player.currentTrack.sections[state.i];
-            
-            if (!previousState || previousState !== newSection) {
-                // Update section view state and scroll only on section change
-                this.sectionView.setState({
-                    currentSection: newSection,
-                    currentTrack: this.player.currentTrack
-                });
-                this.scrollToCurrentSection(state.i);
-            } else {
-                // Just update position highlighting without re-rendering section view
-                this.sectionView.updatePositionHighlighting();
-            }
+        // Update section view
+        if (this.sectionView) {
+            this.sectionView.updatePositionHighlighting();
         }
         
-        // Update timeline and controls as before
-        const progress = ((currentTime + this.player.currentTrack.tau) / totalDuration) * 100;
-        this.timeline.setState({
-            currentState: state,
-            progress: progress
-        });
-        this.controls.setState({ mode, speed });
+        // Update timeline progress
+        if (this.timeline && this.player.currentTrack) {
+            const progress = (this.player.time / this.player.currentTrack.totalDuration()) * 100;
+            this.timeline.setState({
+                progress: progress,
+                currentState: this.player.state
+            });
+            
+            // Force re-render of timeline
+            const timelineContainer = document.querySelector('.timeline');
+            if (timelineContainer) {
+                const timelineElement = this.timeline.render();
+                timelineContainer.innerHTML = '';
+                timelineContainer.appendChild(timelineElement);
+            }
+        }
     }
 
     /**
@@ -728,10 +687,20 @@ export class TrackPlayerScreen extends Screen {
         return element ? parseInt(element.dataset.index) : null;
     }
 
-    // Add method to handle language changes
+    // Update setLanguage method to update timeline
     setLanguage(langCode) {
-        this.sectionView.setState({
-            currentLanguage: langCode
-        });
+        this.language = langCode;
+        if (this.timeline) {
+            this.timeline.props = {
+                ...this.timeline.props,
+                language: langCode
+            };
+        }
+        if (this.sectionView) {
+            this.sectionView.setState({
+                currentLanguage: langCode
+            });
+        }
+        this.mount(document.querySelector('.container'));
     }
 } 

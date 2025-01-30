@@ -19,9 +19,8 @@ class TrackPlayer {
      * @param {number} speed - Playback speed multiplier
      * @param {number} predelay_ms - Milliseconds to delay time counting after play (default 500ms)
      * @param {boolean} looping - Whether track should loop by default (default true)
-     * @param {number} screen_to_dot_ratio - Ratio for screen width to dot width (default 25)
      */
-    constructor(initialTrack, speed = 1.0, predelay_ms = 0, looping = true, screen_to_dot_ratio = 25) {
+    constructor(initialTrack, speed = 1.0, predelay_ms = 0, looping = true) {
         this.playlist = [];  // Initialize empty playlist
         this.currentTrackIndex = -1;
         this.currentTrack = null;
@@ -32,7 +31,6 @@ class TrackPlayer {
         this.accumulatedTime = 0;
         this.predelay_ms = predelay_ms;
         this.looping = looping;  // Add looping property
-        this.screen_to_dot_ratio = screen_to_dot_ratio;
         this.transitionTimes = [];  // Array to store transition times
         
         if (initialTrack) {

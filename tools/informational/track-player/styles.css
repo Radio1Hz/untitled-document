@@ -1,5 +1,5 @@
 :root {
-    --primary-color: #00daff;
+    --primary-color: #33ff00;  /* Classic terminal green */
     --text-color: #b1b1b1;
     --background-color: #000000;
     --secondary-background: #121212;
@@ -25,12 +25,13 @@ body {
 .container {
     width: 100%;
     margin: 0 auto;
-    padding: 2rem;
+    padding: 1rem 1rem 2rem;
     display: flex;
     flex-direction: column;
     align-items: center;
     justify-content: flex-start;
-    min-height: 100vh;
+    height: 100vh;
+    overflow: hidden;
 }
 
 .track-section {
@@ -44,6 +45,7 @@ body {
     background: transparent;
     width: 100%;
     height: auto;
+    order: 1;  /* First */
 }
 
 #track-title {
@@ -74,6 +76,7 @@ body {
 .main-content {
     flex: 1;
     width: 100%;
+    overflow: auto;
 }
 
 .playlist-menu {
@@ -97,14 +100,34 @@ body {
 .playlist-item.active {
     background-color: var(--primary-color);
 }
+/* Container for sections */
+.sections-container {
+    display: flex;
+    flex-direction: column;
+    overflow: hidden; /* Hide overflow content */
+}
 
+/* Show only current and next section */
 #sections-content {
+    order: 5;  /* Last, after bottom text */
     width: 100%;
-    height: 25vh;  /* Changed from calc(100vh - 200px) */
+    height: auto;
+    max-height: calc(100vh - 200px);
     display: flex;
     flex-direction: column;
     overflow-y: auto;
     position: relative;
+    margin-top: auto; /* Push to bottom */
+}
+
+/* Hide all sections except current and next */
+#sections-content .section {
+    display: none;
+}
+
+#sections-content .section.current-section,
+#sections-content .section.current-section + .section {
+    display: block;
 }
 
 .sentence-line {
@@ -199,6 +222,7 @@ body {
     gap: 1rem;
     align-items: center;
     flex-wrap: wrap;
+    order: 3;  /* Third */
 }
 
 .time-display {
@@ -263,8 +287,7 @@ body {
     display: flex;
     flex-direction: column;
     background: transparent;
-    border: 1px solid transparent;
-    transition: border-color 0.2s;
+    transition: background-color 0.2s;
 }
 
 .section-header {
@@ -274,7 +297,14 @@ body {
     margin-bottom: 10px;
 }
 
-/* Add new active state styling */
+/* Change from border to background color */
+.section.current-section {
+    background-color: rgba(18, 18, 18, 0.7); 
+    border: none;  /* Remove any border */
+    color: var(--primary-color);
+}
+
+/* Update section header active state */
 .section-header.active {
     color: var(--primary-color);
 }
@@ -297,8 +327,8 @@ body {
     display: flex;
     width: 100%;
     overflow-x: auto;
-    scroll-behavior: smooth; /* Enable smooth scrolling */
-    -webkit-overflow-scrolling: touch; /* Smooth scrolling on iOS */
+    scroll-behavior: smooth;
+    -webkit-overflow-scrolling: touch;
 }
 
 .timebox {
@@ -350,11 +380,6 @@ h1, h2, h3, h4, h5, h6 {
     font-family: "clockicons";
     font-size: 1.5rem;
     color: var(--text-color);
-}
-
-.section.current-section {
-    border-color: #444;
-    background-color: transparent;
 }
 
 .loop-active {
@@ -424,7 +449,9 @@ h1, h2, h3, h4, h5, h6 {
 }
 
 .bottom-text {
-    bottom: 1rem;
+    order: 4;  /* Fourth, before sections */
+    position: relative; /* Change from fixed */
+    margin: 1rem 0;
     left: 0;
     width: 100%;
     text-align: center;
@@ -432,6 +459,7 @@ h1, h2, h3, h4, h5, h6 {
     opacity: 0.5;
     font-family: monospace;
     font-size: 8px;
+    z-index: 1;
 }
 
 /* Default LTR direction */
@@ -454,9 +482,9 @@ h1, h2, h3, h4, h5, h6 {
 
 /* Make timeline responsive */
 .timeline {
+    order: 2;  /* Second */
     width: 100%;
     height: 10px;
-    background: var(--secondary-background);
     position: relative;
     margin: 1rem 0;
     cursor: pointer;
@@ -491,18 +519,20 @@ h1, h2, h3, h4, h5, h6 {
     position: absolute;
     width: 2px;
     height: 100%;
-    background: #444;
+    background: #666666;
 }
 
 .marker-label {
     position: absolute;
     top: -20px;
     color: var(--text-color);
-    font-size: 0.8rem;
+    font-size: 0.6rem;
     opacity: 0.7;
     white-space: nowrap; /* Prevent wrapping */
     background-color: rgba(0, 0, 0, 0.8); /* Add semi-transparent background */
     transition: opacity 0.2s;
+    overflow: hidden;
+    text-overflow: ellipsis;
 }
 
 .timeline:hover .timeline-progress {
