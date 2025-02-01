@@ -31,11 +31,11 @@ jobs:
       run: |
         mkdir dist
         for file in ${ALL_CHANGED_FILES}; do
-          VAR=$file
+          VAR=$(echo $file | iconv -f utf-8 -t ascii//TRANSLIT)
           DIR="$(dirname "${VAR}")" ; FILE="$(basename "${VAR}")"
           echo "Processing: [${DIR}] [${FILE}]"  
           mkdir -p dist/${DIR}
-          cp $file dist/${DIR}
+          cp "$file" "dist/${DIR}/${FILE}"
         done
         touch dist/commit_time.txt
 
