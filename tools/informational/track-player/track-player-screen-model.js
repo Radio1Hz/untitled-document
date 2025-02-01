@@ -1,49 +1,6 @@
-import { PlaybackMode } from './track-player-model.js';
-
-/**
- * Represents a visual component: c = (id, type, props, state, φ)
- */
-class Component {
-    /**
-     * @param {string} id - Component identifier
-     * @param {string} type - Component type
-     * @param {Object} props - Static properties
-     * @param {Object} state - Dynamic properties
-     */
-    constructor(id, type, props = {}, state = {}) {
-        this.id = id;
-        this.type = type;
-        this.props = props;
-        this.state = state;
-        this.element = null;  // DOM element reference
-    }
-
-    /**
-     * Render function φ: state → visual
-     * @returns {HTMLElement} Rendered DOM element
-     */
-    render() {
-        throw new Error('Render method must be implemented by subclass');
-    }
-
-    /**
-     * Update component state
-     * @param {Object} newState - New state properties
-     */
-    setState(newState) {
-        this.state = { ...this.state, ...newState };
-        if (this.element) this.update();
-    }
-
-    /**
-     * Update existing DOM element
-     */
-    update() {
-        const newElement = this.render();
-        this.element.replaceWith(newElement);
-        this.element = newElement;
-    }
-}
+import { Component } from './component.js';
+import { PlayerScreenCanvas } from './player-screen-canvas.js';
+import { PlaybackMode, TrackPlayer } from './track-player-model.js';
 
 /**
  * Represents a screen: Σ = (R, C, I, H, D)
@@ -183,19 +140,18 @@ class Timeline extends Component {
                 const position = (sectionStartTime / totalDuration) * 100;
                 marker.style.left = `${position}%`;
                 
-                // Add marker label with appropriate time format
+                // Add marker label with simplified format
                 const label = document.createElement('div');
                 label.className = 'marker-label';
                 
-                // Get section description with fallbacks
-                const description = section.description?.[this.props.language] || 
-                                  section.description?.en || 
-                                  section.desc?.[this.props.language] ||
-                                  section.desc?.en ||
-                                  `Section ${index + 1}`;
+                // Format time as [mm:ss]
+                const minutes = Math.floor(sectionStartTime / 60);
+                const seconds = Math.floor(sectionStartTime % 60);
+                const timeStr = `[${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}]`;
                 
-                // Use the calculated section start time for the marker
-                label.textContent = `[${this.formatTime(sectionStartTime)}] ${description}`;
+                // Add sequence number (1-based index)
+                label.textContent = `${timeStr} ${index + 1}.`;
+                
                 marker.appendChild(label);
                 
                 // Highlight current section
@@ -256,20 +212,35 @@ class Timeline extends Component {
             // Get the next state
             const nextState = newState.currentState.advance(this.props.track);
             
+            // Calculate absolute time for current state
+            const currentAbsoluteTime = newState.currentState.absoluteTime(this.props.track);
+            const totalDuration = this.props.track.totalDuration();
+            
             if (nextState) {
                 // Use next state's time for progress bar
-                const absoluteTime = nextState.absoluteTime(this.props.track);
-                const totalDuration = this.props.track.totalDuration();
-                newState.progress = (absoluteTime / totalDuration) * 100;
+                const nextAbsoluteTime = nextState.absoluteTime(this.props.track);
+                newState.progress = (nextAbsoluteTime / totalDuration) * 100;
             } else {
-                // If there is no next state (end of track), use current state
-                const absoluteTime = newState.currentState.absoluteTime(this.props.track);
-                const totalDuration = this.props.track.totalDuration();
-                newState.progress = (absoluteTime / totalDuration) * 100;
+                // If at end of track, ensure we show 100% progress
+                const lastSection = this.props.track.sections[this.props.track.sections.length - 1];
+                const lastBox = lastSection.timeboxes[lastSection.timeboxes.length - 1];
+                const nT = lastBox.nT !== undefined ? lastBox.nT : this.props.track.n;
+                
+                // Check if we're in the final timebox
+                const isLastBox = newState.currentState.i === this.props.track.sections.length - 1 &&
+                                newState.currentState.j === lastSection.timeboxes.length - 1;
+                
+                if (isLastBox && newState.currentState.k === nT - 1) {
+                    // At very end of track
+                    newState.progress = 100;
+                } else {
+                    // Still playing final section
+                    newState.progress = (currentAbsoluteTime / totalDuration) * 100;
+                }
             }
         } else {
             newState.progress = 0;
-            console.log('Timeline progress set to 0% due to missing state or track');
+            //console.log('Timeline progress set to 0% due to missing state or track');
         }
         
         super.setState(newState);
@@ -299,17 +270,17 @@ class ControlPanel extends Component {
  * Section view component for track player
  */
 class SectionView extends Component {
-    constructor(id) {
-        super(id, 'section-view', {}, {
-            currentSection: null,
-            currentTrack: null,
-            currentLanguage: 'en'
-        });
-        this.screen = null;
+    constructor(id, props = {}) {
+        super(id, 'div', props);
+        this.state = {
+            currentTrack: props.currentTrack || null,
+            currentLanguage: props.currentLanguage || 'en'
+        };
+        this.screen = props.screen || null;  // Get screen from props
         this.hasScrolledInSection = false;
         this.currentSectionIndex = null;
         this.lastBoxIndex = null;
-        this.lastState = null;  // Add tracking for last state
+        this.lastState = null;
     }
 
     /**
@@ -321,14 +292,19 @@ class SectionView extends Component {
     }
 
     render() {
-        const div = document.createElement('div');
-        div.className = 'section-view';
-        
-        const sectionsContainer = document.createElement('div');
-        sectionsContainer.className = 'sections-container';
+        if (!this.state.currentTrack) {
+            const div = document.createElement('div');
+            div.id = this.id;
+            return div;
+        }
+
+        const container = document.createElement('div');
+        container.id = this.id;
+        container.className = 'sections-container';
         
         let cumulativeTime = 0;
-        const currentState = this.screen.player.state;
+        // Get current state safely
+        const currentState = this.screen?.player?.state || null;
 
         this.state.currentTrack.sections.forEach((section, sectionIndex) => {
             const sectionElement = document.createElement('div');
@@ -431,7 +407,7 @@ class SectionView extends Component {
             });
             
             sectionElement.appendChild(timeboxesContainer);
-            sectionsContainer.appendChild(sectionElement);
+            container.appendChild(sectionElement);
             
             // Update cumulative time for next section
             cumulativeTime += section.timeboxes.reduce((sum, timebox) => {
@@ -439,8 +415,7 @@ class SectionView extends Component {
             }, 0);
         });
         
-        div.appendChild(sectionsContainer);
-        return div;
+        return container;
     }
 
     updatePositionHighlighting() {
@@ -534,59 +509,74 @@ class SectionView extends Component {
  */
 export class TrackPlayerScreen extends Screen {
     /**
-     * @param {number} width - Screen width
-     * @param {number} height - Screen height
      * @param {TrackPlayer} player - Track player instance
-     * @param {Object} dispatcher - Event dispatcher
      */
-    constructor(width, height, player, dispatcher) {
-        super(width, height, 40);
-        
-        this.width = '100%';
-        this.height = '100%';
+    constructor(player) {
+        if (!player || !(player instanceof TrackPlayer)) {
+            throw new Error('Valid TrackPlayer instance is required');
+        }
+
+        super(window.innerWidth, window.innerHeight);
         this.player = player;
-        this.dispatcher = dispatcher;
-        this.language = 'en';  // Add default language
+        this.language = 'en';
 
-        // Initialize core components
-        this.timeline = new Timeline('timeline');
-        this.controls = new ControlPanel('controls');
-        this.sectionView = new SectionView('section-view');
-        this.sectionView.setScreen(this);
-
-        // Initialize timeline with track and language
-        this.timeline.props = {
-            track: player.currentTrack,
-            language: this.language,
-            onSeek: (time) => {
-                player.seekTo(time);
-                if (player.mode === PlaybackMode.PLAYING) {
-                    const audioElement = document.querySelector('audio');
-                    if (audioElement) {
-                        audioElement.currentTime = time;
-                    }
-                }
-            }
-        };
-
-        // Add components to screen
-        this.addComponent(this.timeline);
-        this.addComponent(this.controls);
-        this.addComponent(this.sectionView);
-
-        // Initialize section view with current track and language
-        this.sectionView.setState({
-            currentTrack: player.currentTrack,
-            currentLanguage: 'en'
-        });
+        // Initialize components
+        this.initializeComponents();
 
         // Setup input handlers
         this.setupHandlers();
 
-        // Use provided dispatcher
-        this.dispatcher.subscribe(event => {
+        // Add player update listener
+        this.player.addEventListener('stateChange', (event) => {
             this.handlePlayerUpdate(event);
         });
+    }
+
+    initializeComponents() {
+        // Create components with proper initialization order
+        this.createComponents();
+        this.initializeComponentStates();
+        this.addComponentsToScreen();
+    }
+
+    createComponents() {
+        this.canvas = new PlayerScreenCanvas('player-screen');
+        this.timeline = new Timeline('timeline');
+        this.sectionView = new SectionView('sections', {
+            screen: this  // Pass screen reference during creation
+        });
+        this.controls = new ControlPanel('controls');
+    }
+
+    initializeComponentStates() {
+        // Initialize timeline
+        if (this.timeline) {
+            this.timeline.props = {
+                language: this.language,
+                track: this.player.currentTrack
+            };
+        }
+
+        // Initialize section view
+        if (this.sectionView) {
+            this.sectionView.setState({
+                currentTrack: this.player.currentTrack,
+                currentLanguage: this.language,
+                screen: this  // Ensure screen reference is set
+            });
+        }
+
+        // Initialize canvas
+        if (this.canvas && this.player.currentTrack) {
+            this.canvas.loadInitialState(this.player.currentTrack);
+        }
+    }
+
+    addComponentsToScreen() {
+        if (this.canvas) this.addComponent(this.canvas);
+        if (this.timeline) this.addComponent(this.timeline);
+        if (this.sectionView) this.addComponent(this.sectionView);
+        if (this.controls) this.addComponent(this.controls);
     }
 
     /**
@@ -625,13 +615,15 @@ export class TrackPlayerScreen extends Screen {
      * @param {Object} event - Player state event
      */
     handlePlayerUpdate(event) {
+        //console.log('Handling player update:', event);  // Debug log
+        
         // Update section view
         if (this.sectionView) {
             this.sectionView.updatePositionHighlighting();
         }
         
         // Update state info display with leading zeros
-        const state = this.player.state;
+        const state = event.state || this.player.state;  // Get state from event or player
         if (state) {
             const currentSection = document.getElementById('current-section');
             const currentBox = document.getElementById('current-box');
@@ -642,6 +634,23 @@ export class TrackPlayerScreen extends Screen {
                 currentBox.textContent = state.j.toString().padStart(2, '0');
                 currentPosition.textContent = state.k.toString().padStart(2, '0');
             }
+
+            // Update sections view
+            if (this.sectionView) {
+                this.sectionView.setState({
+                    currentTrack: this.player.currentTrack,
+                    currentLanguage: this.language
+                });
+                // Force re-render of sections
+                const sectionsContent = document.querySelector('#sections-content');
+                if (sectionsContent) {
+                    const sectionElement = this.sectionView.render();
+                    if (sectionElement) {
+                        sectionsContent.innerHTML = '';
+                        sectionsContent.appendChild(sectionElement);
+                    }
+                }
+            }
         }
         
         // Update timeline progress
@@ -649,7 +658,7 @@ export class TrackPlayerScreen extends Screen {
             const progress = (this.player.time / this.player.currentTrack.totalDuration()) * 100;
             this.timeline.setState({
                 progress: progress,
-                currentState: this.player.state
+                currentState: state
             });
             
             // Force re-render of timeline
@@ -658,6 +667,20 @@ export class TrackPlayerScreen extends Screen {
                 const timelineElement = this.timeline.render();
                 timelineContainer.innerHTML = '';
                 timelineContainer.appendChild(timelineElement);
+            }
+        }
+
+        // Handle image loading through the new mechanism
+        if (this.canvas) {
+            //console.log('Player update:', {
+            //    mode: this.player.mode,
+            //    state: event.state
+            //});
+            
+            if (this.player.mode === 'STOPPED') {
+                this.canvas.handleStateTransition(null, this.player.currentTrack, 'STOPPED');
+            } else {
+                this.canvas.handleStateTransition(state, this.player.currentTrack, this.player.mode);
             }
         }
     }
@@ -716,5 +739,70 @@ export class TrackPlayerScreen extends Screen {
             });
         }
         this.mount(document.querySelector('.container'));
+    }
+
+    mount(container) {
+        if (!container) return;
+        
+        container.style.width = '100%';
+        container.style.position = 'relative';
+        
+        // Create canvas container if it doesn't exist
+        let canvasContainer = container.querySelector('.canvas-container');
+        if (!canvasContainer) {
+            canvasContainer = document.createElement('div');
+            canvasContainer.className = 'canvas-container';
+            const trackSection = container.querySelector('.track-section');
+            if (trackSection) {
+                trackSection.insertBefore(
+                    canvasContainer,
+                    container.querySelector('.timeline')
+                );
+            }
+        }
+        
+        // Render components with null checks
+        if (this.canvas) {
+            const canvasElement = this.canvas.render();
+            if (canvasContainer) {
+                canvasContainer.innerHTML = '';
+                canvasContainer.appendChild(canvasElement);
+            }
+        }
+        
+        // Find or create timeline container
+        let timelineContainer = container.querySelector('.timeline');
+        if (!timelineContainer) {
+            timelineContainer = document.createElement('div');
+            timelineContainer.className = 'timeline';
+            const trackSection = container.querySelector('.track-section');
+            if (trackSection) {
+                trackSection.appendChild(timelineContainer);
+            }
+        }
+        
+        // Render timeline with null checks
+        if (this.timeline) {
+            const timelineElement = this.timeline.render();
+            if (timelineContainer) {
+                timelineContainer.innerHTML = '';
+                timelineContainer.appendChild(timelineElement);
+            }
+        }
+        
+        // Get the sections content container
+        const sectionsContent = container.querySelector('#sections-content');
+        if (sectionsContent && this.sectionView) {
+            sectionsContent.innerHTML = '';
+            const sectionElement = this.sectionView.render();
+            if (sectionElement) {
+                sectionsContent.appendChild(sectionElement);
+            }
+        }
+
+        // Initialize canvas with initial state if we have a track
+        if (this.canvas && this.player.currentTrack) {
+            this.canvas.loadInitialState(this.player.currentTrack);
+        }
     }
 } 

@@ -5,6 +5,7 @@ import { TrackPlayerScreen } from './track-player-screen-model.js';
 import { Playlist, PlaylistMode } from './playlist-model.js';
 
 let current_lang_code = 'en';  // Default language
+let screen; // Declare screen variable at module scope
 
 window.addEventListener('error', (event) => {
     console.error('Global error:', {
@@ -21,7 +22,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         // Get track number from URL hash (e.g., #9)
         const hash = window.location.hash;
         const requestedTrackNumber = hash ? parseInt(hash.substring(1)) : null;
-        console.log('Requested track number from URL:', requestedTrackNumber);
+        //console.log('Requested track number from URL:', requestedTrackNumber);
 
         // Load track data
         const track9Data = await import('https://untitled-document.net/knowledge/agents/viktor-r/projects/vikktør/tracks/9. untitled-track/code/9. untitled-track.js');
@@ -37,13 +38,13 @@ document.addEventListener('DOMContentLoaded', async () => {
 
         // Log if requested track exists
         if (requestedTrackNumber) {
-            console.log('Track data for requested number:', trackNumberMap[requestedTrackNumber] ? 'Found' : 'Not found');
+            //console.log('Track data for requested number:', trackNumberMap[requestedTrackNumber] ? 'Found' : 'Not found');
         }
 
         // Log raw track data
-        console.log('Raw track9 data:', track9Data.track9);
-        console.log('Raw track1 data:', track1Data.track1);
-        console.log('Raw track11 data:', track11Data.track11);
+        //console.log('Raw track9 data:', track9Data.track9);
+        //console.log('Raw track1 data:', track1Data.track1);
+        //console.log('Raw track11 data:', track11Data.track11);
 
         // Create tracks from JSON data
         const track9Obj = new Track({
@@ -67,7 +68,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         });
 
         // Log initialized track object
-        console.log('Initialized track9:', track9Obj);
+        //console.log('Initialized track9:', track9Obj);
 
         const track1Obj = new Track({
             id: track1Data.track1.id,
@@ -114,22 +115,22 @@ document.addEventListener('DOMContentLoaded', async () => {
         const playlist = new Playlist();
 
         // Add tracks to playlist and log each addition
-        console.log('Adding tracks to playlist...');
+        //console.log('Adding tracks to playlist...');
         playlist.addTrack(track1Obj);
-        console.log('Added track1:', track1Obj.id);
+        //console.log('Added track1:', track1Obj.id);
         playlist.addTrack(track9Obj);
-        console.log('Added track9:', track9Obj.id);
+        //console.log('Added track9:', track9Obj.id);
         playlist.addTrack(track11Obj);
-        console.log('Added track11:', track11Obj.id);
+        //console.log('Added track11:', track11Obj.id);
 
         // Log the playlist state after adding tracks
-        console.log('Playlist tracks after adding:', playlist.tracks.map(t => t.id));
+        //console.log('Playlist tracks after adding:', playlist.tracks.map(t => t.id));
 
         // Create track map for persistence
         const trackMap = new Map();
         [track1Obj, track9Obj, track11Obj].forEach(track => {
             trackMap.set(track.id, track);
-            console.log('Added to trackMap:', track.id);
+            //console.log('Added to trackMap:', track.id);
         });
 
         // Try to load saved state AFTER adding tracks
@@ -138,15 +139,15 @@ document.addEventListener('DOMContentLoaded', async () => {
         // Now check for initial track and ensure we have a valid current index
         let initialTrack = playlist.getCurrentTrack();
         if (!initialTrack) {
-            console.log('No saved track state, attempting to set first track');
+            //console.log('No saved track state, attempting to set first track');
             // Make sure we have tracks before setting index
             if (playlist.tracks.length > 0) {
                 playlist.currentIndex = 0;
                 initialTrack = playlist.tracks[0];
-                console.log('Successfully set first track:', initialTrack.id);
+                //console.log('Successfully set first track:', initialTrack.id);
             } else {
-                console.error('No tracks available in playlist. Track count:', playlist.tracks.length);
-                console.log('Playlist state:', playlist);
+                //console.error('No tracks available in playlist. Track count:', playlist.tracks.length);
+                //console.log('Playlist state:', playlist);
                 return;
             }
         }
@@ -159,16 +160,16 @@ document.addEventListener('DOMContentLoaded', async () => {
             );
             
             if (requestedIndex !== -1) {
-                console.log(`Setting initial track to requested track ${requestedTrackNumber}`);
+                //console.log(`Setting initial track to requested track ${requestedTrackNumber}`);
                 playlist.currentIndex = requestedIndex;
                 initialTrack = playlist.tracks[requestedIndex];
             } else {
-                console.log(`Requested track ${requestedTrackNumber} not found in playlist`);
+                //console.log(`Requested track ${requestedTrackNumber} not found in playlist`);
             }
         }
 
         // Create player with the confirmed track
-        const player = new TrackPlayer(initialTrack, 1.0, 0, true, 50);
+        const player = new TrackPlayer(initialTrack, 1.0, 500, true);
         player.playlist = playlist;
 
         // Initialize UI elements first
@@ -276,7 +277,7 @@ document.addEventListener('DOMContentLoaded', async () => {
                 playPauseBtn.textContent = '⌛';
                 await preloadAudio(player.currentTrack.audioUrl);
                 playPauseBtn.textContent = '▶';
-                console.log('New audio source loaded successfully');
+                //console.log('New audio source loaded successfully');
             } catch (error) {
                 console.error('Error loading audio:', error);
                 playPauseBtn.textContent = '▶';
@@ -355,8 +356,8 @@ document.addEventListener('DOMContentLoaded', async () => {
             
             playlistItems.innerHTML = '';
             
-            console.log("PlaylistItems element:", playlistItems);
-            console.log("Creating items for tracks:", playlist.tracks.map(t => t.id));
+            //console.log("PlaylistItems element:", playlistItems);
+            //console.log("Creating items for tracks:", playlist.tracks.map(t => t.id));
             
             playlist.tracks.forEach((track, index) => {
                 const item = document.createElement('button');
@@ -440,10 +441,10 @@ document.addEventListener('DOMContentLoaded', async () => {
 
         // Create single dispatcher instance
         const dispatcher = player.createEventDispatcher();
-        console.log('Dispatcher created');
+        //console.log('Dispatcher created');
 
         // Create screen with the same dispatcher
-        const screen = new TrackPlayerScreen(3000, 3000, player, dispatcher);  // Pass dispatcher to screen
+        screen = new TrackPlayerScreen(player);
         
         // Initial mount
         screen.mount(container);
@@ -479,64 +480,35 @@ document.addEventListener('DOMContentLoaded', async () => {
         renderTrackContent();
 
         // Modify the player controls to handle audio
-        playPauseBtn.addEventListener('click', async () => {
+        playPauseBtn.addEventListener('click', () => {
+            //console.log('Play/Pause clicked, current mode:', player.mode);
+            
             if (player.mode === PlaybackMode.PLAYING) {
-                console.log('Pausing playback');
                 player.pause();
-                audioElement.pause();
                 playPauseBtn.textContent = '▶';
-                dispatcher.dispatch();  // Final dispatch when pausing
+                audioElement.pause();
             } else {
-                console.log('Starting playback');
-                try {
-                    // Reset time tracking
-                    accumulatedTime = 0;
-                    lastTickTime = null;
-                    
-                    // Initialize player state if needed
-                    if (!player.state) {
-                        player.state = new TrackState();
-                    }
-                    
-                    // Start playback immediately if audio is loaded
-                    if (audioElement.readyState >= 3) {
-                        await audioElement.play();
-                        player.play();
-                        playPauseBtn.textContent = '⏸';
-                        dispatcher.dispatch();  // Initial dispatch
-                    } else {
-                        // If audio isn't loaded, show loading state and wait
-                        playPauseBtn.textContent = '⌛';
-                        await preloadAudio(player.currentTrack.audioUrl);
-                        await audioElement.play();
-                        player.play();
-                        playPauseBtn.textContent = '⏸';
-                        // Initial dispatch when starting playback after loading
-                        dispatcher.dispatch();
-                    }
-                } catch (error) {
-                    console.error('Playback failed:', error);
-                    player.pause();
-                    playPauseBtn.textContent = '▶';
-                }
+                //console.log('Starting playback...');
+                player.play();  // Make sure this is called
+                playPauseBtn.textContent = '⏸';
+                audioElement.play();
+                
+                //console.log('After play:', {
+                //    playerMode: player.mode,
+                //    audioPlaying: !audioElement.paused,
+                //    currentState: player.state ? 
+                //        `(${player.state.i},${player.state.j},${player.state.k})` : 
+                //        'null'
+                //});
             }
         });
 
         stopBtn.addEventListener('click', () => {
-            // Stop playback
+            //console.log('Stop clicked');
             player.stop();
+            playPauseBtn.textContent = '▶';
             audioElement.pause();
             audioElement.currentTime = 0;
-            playPauseBtn.textContent = '▶';
-            
-            // Reset player state to initial
-            player.state = new TrackState(0, 0, 0);
-            player.time = 0;
-            accumulatedTime = 0;
-            playStartTime = null;
-            
-            // Dispatch event to update UI
-            dispatcher.dispatch();
         });
 
         // Update speed control to affect audio playback
@@ -654,11 +626,11 @@ document.addEventListener('DOMContentLoaded', async () => {
                         player.state.i !== newState.i || 
                         player.state.j !== newState.j || 
                         player.state.k !== newState.k) {
-                        console.log('State transition:', {
-                            time: formatTime(0), // Initial state always at time 0
-                            from: player.state ? `(${player.state.i},${player.state.j},${player.state.k})` : 'null',
-                            to: '(0,0,0)'
-                        });
+                        //console.log('State transition:', {
+                        //    time: formatTime(0), // Initial state always at time 0
+                        //    from: player.state ? `(${player.state.i},${player.state.j},${player.state.k})` : 'null',
+                        //    to: '(0,0,0)'
+                        //});
                         // Update player state after logging
                         player.state = newState;
                         dispatcher.dispatch();
@@ -683,11 +655,11 @@ document.addEventListener('DOMContentLoaded', async () => {
                             player.state.i !== newState.i || 
                             player.state.j !== newState.j || 
                             player.state.k !== newState.k) {
-                            console.log('State transition:', {
-                                time: formatTime(currentTransition.time),
-                                from: player.state ? `(${player.state.i},${player.state.j},${player.state.k})` : 'null',
-                                to: `(${newState.i},${newState.j},${newState.k})`
-                            });
+                            //console.log('State transition:', {
+                            //    time: formatTime(currentTransition.time),
+                            //    from: player.state ? `(${player.state.i},${player.state.j},${player.state.k})` : 'null',
+                            //    to: `(${newState.i},${newState.j},${newState.k})`
+                            //});
                             // Update player state after logging
                             player.state = newState;
                             dispatcher.dispatch();
@@ -767,10 +739,30 @@ document.addEventListener('DOMContentLoaded', async () => {
         }
 
         // After adding tracks to playlist
-        console.log("Playlist tracks:", playlist.tracks.map(t => t.id));
+        //console.log("Playlist tracks:", playlist.tracks.map(t => t.id));
 
         // Before creating playlist view
-        console.log("Container element:", container);
+        //console.log("Container element:", container);
+
+        // Add update loop for player
+        let lastTime = performance.now();
+
+        function updateLoop() {
+            const currentTime = performance.now();
+            const deltaTime = (currentTime - lastTime) / 1000; // Convert to seconds
+            lastTime = currentTime;
+
+            // Update player if it exists
+            if (player) {
+                player.update(deltaTime);
+            }
+
+            // Request next frame
+            requestAnimationFrame(updateLoop);
+        }
+
+        // Start update loop
+        requestAnimationFrame(updateLoop);
     } catch (error) {
         console.error('Initialization error:', error);
     }

@@ -766,3 +766,49 @@ option {
     font-size: 6px;
     display: block;
 }
+
+.canvas-container {
+    width: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin: 1rem 0;
+    background-color: var(--secondary-background);
+    border-radius: 4px;
+    overflow: hidden;
+    padding: 1rem;
+}
+
+.player-screen-canvas {
+    display: block;
+    background-color: var(--background-color);
+    border: 1px solid var(--hover-color);
+    max-width: 100%;
+    max-height: 100%;
+}
+
+.canvas-loader {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 24px;
+    height: 24px;
+    border: 2px solid var(--primary-color);
+    border-radius: 50%;
+    border-top-color: transparent;
+    animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+    to { transform: translate(-50%, -50%) rotate(360deg); }
+}
+
+.canvas-error {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    color: #ff0000;
+    font-size: 0.8rem;
+}

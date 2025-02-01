@@ -161,7 +161,7 @@ export class Playlist {
         }
         // If no saved state or restoration failed, keep the existing tracks
         if (this.tracks.length === 0) {
-            console.log('No valid saved state, keeping current tracks');
+            //console.log('No valid saved state, keeping current tracks');
         }
     }
 } 
