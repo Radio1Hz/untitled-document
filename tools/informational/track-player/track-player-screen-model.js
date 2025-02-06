@@ -11,7 +11,7 @@ class Screen {
      * @param {number} height - Screen height
      * @param {number} tau_width_px - Fixed width for each time unit
      */
-    constructor(width, height, tau_width_px = 40) {
+    constructor(width, height, tau_width_px = 20) {
         this.resolution = { width, height };
         this.components = new Map();  // C: Set of components
         this.handlers = new Map();    // I: Set of input handlers
@@ -302,53 +302,39 @@ class SectionView extends Component {
         container.id = this.id;
         container.className = 'sections-container';
         
-        let cumulativeTime = 0;
         // Get current state safely
         const currentState = this.screen?.player?.state || null;
+        const currentSectionIndex = currentState ? currentState.i : 0;
+        const isLastSection = currentSectionIndex === this.state.currentTrack.sections.length - 1;
+        
+        // Determine which sections to show
+        let sectionsToShow = [];
+        if (isLastSection) {
+            // Show next-to-last and last section
+            sectionsToShow = [currentSectionIndex - 1, currentSectionIndex];
+        } else {
+            // Show current and next section
+            sectionsToShow = [currentSectionIndex, currentSectionIndex + 1];
+        }
 
         this.state.currentTrack.sections.forEach((section, sectionIndex) => {
             const sectionElement = document.createElement('div');
             sectionElement.className = 'section';
             sectionElement.dataset.index = sectionIndex;
             
-            // Add current-section class to current section
+            // Only show sections in sectionsToShow array
+            if (sectionsToShow.includes(sectionIndex)) {
+                sectionElement.classList.add('visible');
+            }
+            
+            // Add current-section class if this is the current section
             if (currentState && currentState.i === sectionIndex) {
                 sectionElement.classList.add('current-section');
             }
-            
-            // Add section header with description
-            const header = document.createElement('div');
-            header.className = 'section-header';
-            
-            // Check if this section is currently active
-            if (currentState && currentState.i === sectionIndex) {
-                header.classList.add('active');
-            }
-            
-            // Format time as MM:SS
-            const minutes = Math.floor(cumulativeTime / 60);
-            const seconds = Math.floor(cumulativeTime % 60);
-            const timeStr = `[${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}]`;
-            const sectionText = section.desc?.[this.state.currentLanguage] || section.desc?.en || `Section ${sectionIndex + 1}`;
-            
-            // Order time and text based on language direction
-            header.textContent = this.state.currentLanguage === 'ar' 
-                ? `${sectionText} ${timeStr}`
-                : `${timeStr} ${sectionText}`;
-            
-            sectionElement.appendChild(header);
-            
-            // Calculate total duration of section
-            const sectionDuration = section.timeboxes.reduce((sum, box) => {
-                return sum + box.duration(this.state.currentTrack.tau, this.state.currentTrack.n);
-            }, 0);
 
             // Create timeboxes container
             const timeboxesContainer = document.createElement('div');
             timeboxesContainer.className = 'timeboxes-container';
-            timeboxesContainer.style.display = 'flex';
-            timeboxesContainer.style.gap = '2px';
-            timeboxesContainer.style.overflowX = 'auto';
 
             section.timeboxes.forEach((timebox, timeboxIndex) => {
                 const timeboxElement = document.createElement('div');
@@ -357,40 +343,32 @@ class SectionView extends Component {
                 // Calculate width based on number of time units (nT) and tau_width_px
                 const nT = timebox.nT !== undefined ? timebox.nT : this.state.currentTrack.n;
                 const width_px = Math.round(nT * this.screen.tau_width_px);
+                timeboxElement.style.width = `${width_px}px`;
+                timeboxElement.style.flexShrink = '0'; // Prevent shrinking
                 
-                Object.assign(timeboxElement.style, {
-                    width: `${width_px}px`,
-                    flexGrow: '0',
-                    flexShrink: '0',
-                    margin: '2px'
-                });
-
-                // Add timebox content with current language
-                const timeboxContent = document.createElement('div');
-                timeboxContent.className = 'timebox-content';
-                const description = timebox.desc?.[this.state.currentLanguage] || 
-                                   timebox.desc?.en || 
-                                   Object.values(timebox.desc || {})[0] ||
-                                   `Box ${timeboxIndex + 1}`;
-                timeboxContent.textContent = description;
-                
-                // Check if this is the current timebox and add appropriate class
+                // Add current-box class if this is the current timebox
                 if (currentState && 
                     currentState.i === sectionIndex && 
                     currentState.j === timeboxIndex) {
-                    timeboxContent.classList.add('current');
+                    timeboxElement.classList.add('current-box');
                 }
-                
-                timeboxElement.appendChild(timeboxContent);
-                
-                // Add position indicators
+
+                // Add timebox content
+                const content = document.createElement('div');
+                content.className = 'timebox-content';
+                content.textContent = timebox.desc?.[this.state.currentLanguage] || 
+                                    timebox.desc?.en || 
+                                    Object.values(timebox.desc || {})[0] ||
+                                    `Box ${timeboxIndex + 1}`;
+                timeboxElement.appendChild(content);
+
+                // Add position dots (reuse nT from above)
                 const positionsContainer = document.createElement('div');
                 positionsContainer.className = 'positions-container';
-                
-                for (let i = 0; i < timebox.nT; i++) {
+
+                for (let i = 0; i < nT; i++) {
                     const positionDot = document.createElement('div');
                     positionDot.className = 'position-dot';
-                    positionDot.style.width = `${100/timebox.nT}%`;
                     
                     if (currentState && 
                         currentState.i === sectionIndex && 
@@ -401,20 +379,15 @@ class SectionView extends Component {
                     
                     positionsContainer.appendChild(positionDot);
                 }
-                
+
                 timeboxElement.appendChild(positionsContainer);
                 timeboxesContainer.appendChild(timeboxElement);
             });
-            
+
             sectionElement.appendChild(timeboxesContainer);
             container.appendChild(sectionElement);
-            
-            // Update cumulative time for next section
-            cumulativeTime += section.timeboxes.reduce((sum, timebox) => {
-                return sum + timebox.duration(this.state.currentTrack.tau, this.state.currentTrack.n);
-            }, 0);
         });
-        
+
         return container;
     }
 
@@ -423,17 +396,28 @@ class SectionView extends Component {
         if (!state) return;
 
         // Remove all current highlights
-        document.querySelectorAll('.position-dot.current').forEach(dot => {
-            dot.classList.remove('current');
-        });
-        document.querySelectorAll('.timebox-content.current').forEach(content => {
-            content.classList.remove('current');
-        });
-        document.querySelectorAll('.section').forEach(section => {
-            section.classList.remove('current-section');
+        document.querySelectorAll('.position-dot.current, .timebox-content.current, .section.current-section')
+            .forEach(el => el.classList.remove('current', 'current-section'));
+
+        // Remove visible class from all sections
+        document.querySelectorAll('.section.visible')
+            .forEach(el => el.classList.remove('visible'));
+
+        // Determine which sections should be visible
+        const isLastSection = state.i === this.state.currentTrack.sections.length - 1;
+        const sectionsToShow = isLastSection 
+            ? [state.i - 1, state.i]
+            : [state.i, state.i + 1];
+
+        // Add visible class to appropriate sections
+        sectionsToShow.forEach(index => {
+            const section = document.querySelector(`[data-index="${index}"]`);
+            if (section) {
+                section.classList.add('visible');
+            }
         });
 
-        // Find and mark current section
+        // Add current-section class to current section
         const currentSection = document.querySelector(`[data-index="${state.i}"]`);
         if (currentSection) {
             currentSection.classList.add('current-section');
@@ -530,6 +514,9 @@ export class TrackPlayerScreen extends Screen {
         this.player.addEventListener('stateChange', (event) => {
             this.handlePlayerUpdate(event);
         });
+
+        // Add resize handler
+        window.addEventListener('resize', this.handleResize.bind(this));
     }
 
     initializeComponents() {
@@ -741,11 +728,73 @@ export class TrackPlayerScreen extends Screen {
         this.mount(document.querySelector('.container'));
     }
 
+    /**
+     * Calculate max number of time units and tau_width_px
+     */
+    calculateTauWidth() {
+        if (!this.player?.currentTrack) return;
+
+        // Find the longest sequence in terms of time units
+        let max_number_timeunits = 0;
+        
+        this.player.currentTrack.sections.forEach(section => {
+            let section_timeunits = 0;
+            section.timeboxes.forEach(timebox => {
+                const nT = timebox.nT !== undefined ? timebox.nT : this.player.currentTrack.n;
+                section_timeunits += nT;
+            });
+            max_number_timeunits = Math.max(max_number_timeunits, section_timeunits);
+        });
+
+        // Get the parent container width
+        const container = document.querySelector('.sections-container');
+        if (!container) return;
+
+        // Calculate new tau_width_px based on container width
+        const containerWidth = container.clientWidth;
+        this.tau_width_px = Math.floor((containerWidth * 0.9) / max_number_timeunits);
+
+        // Update section view with new tau_width_px
+        if (this.sectionView) {
+            this.sectionView.setState({
+                currentTrack: this.player.currentTrack,
+                currentLanguage: this.language
+            });
+            
+            // Re-render section view
+            const sectionsContent = document.querySelector('#sections-content');
+            if (sectionsContent) {
+                const sectionElement = this.sectionView.render();
+                if (sectionElement) {
+                    sectionsContent.innerHTML = '';
+                    sectionsContent.appendChild(sectionElement);
+                }
+            }
+        }
+    }
+
+    /**
+     * Handle window resize event
+     */
+    handleResize() {
+        // Update screen resolution
+        this.resolution = {
+            width: window.innerWidth,
+            height: window.innerHeight
+        };
+
+        // Recalculate tau_width_px and update section view
+        this.calculateTauWidth();
+    }
+
     mount(container) {
         if (!container) return;
         
         container.style.width = '100%';
         container.style.position = 'relative';
+        
+        // Calculate initial tau_width_px
+        this.calculateTauWidth();
         
         // Create canvas container if it doesn't exist
         let canvasContainer = container.querySelector('.canvas-container');
@@ -804,5 +853,9 @@ export class TrackPlayerScreen extends Screen {
         if (this.canvas && this.player.currentTrack) {
             this.canvas.loadInitialState(this.player.currentTrack);
         }
+    }
+
+    cleanup() {
+        window.removeEventListener('resize', this.handleResize.bind(this));
     }
 } 

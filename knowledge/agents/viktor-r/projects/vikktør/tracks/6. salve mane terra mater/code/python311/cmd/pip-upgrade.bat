@@ -1,0 +1,1 @@
+.\env311\Scripts\python.exe -m pip install --upgrade pip

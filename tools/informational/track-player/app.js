@@ -28,12 +28,14 @@ document.addEventListener('DOMContentLoaded', async () => {
         const track9Data = await import('https://untitled-document.net/knowledge/agents/viktor-r/projects/vikktør/tracks/9. untitled-track/code/9. untitled-track.js');
         const track1Data = await import('https://untitled-document.net/knowledge/agents/viktor-r/projects/vikktør/tracks/1. there is no wisdom without kindness/code/1. there is no wisdom without kindness.js');
         const track11Data = await import('https://untitled-document.net/knowledge/agents/viktor-r/projects/vikktør/tracks/11. balkan folk song - karanfil se na put sprema/code/11. balkan folk song - karanfil se na put sprema.js');
+        const track6Data = await import('https://untitled-document.net/knowledge/agents/viktor-r/projects/vikktør/tracks/6. salve mane terra mater/code/6. salve mane terra mater.js');
 
         // Create a map of track numbers to their data
         const trackNumberMap = {
             9: track9Data,
             1: track1Data,
-            11: track11Data
+            11: track11Data,
+            6: track6Data
         };
 
         // Log if requested track exists
@@ -46,7 +48,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         //console.log('Raw track1 data:', track1Data.track1);
         //console.log('Raw track11 data:', track11Data.track11);
 
-        // Create tracks from JSON data
+        // Create track objects from JSON data for track9, track1, track11, and track6...
         const track9Obj = new Track({
             id: track9Data.track9.id,
             description: track9Data.track9.description,
@@ -111,6 +113,26 @@ document.addEventListener('DOMContentLoaded', async () => {
             });
         });
 
+        // Create track6 object
+        const track6Obj = new Track({
+            id: track6Data.track6.id,
+            description: track6Data.track6.description,
+            tau: track6Data.track6.tau,
+            delta: track6Data.track6.delta,
+            n: track6Data.track6.n,
+            tau_omega: track6Data.track6.tau_omega,
+            dedication: track6Data.track6.dedication,
+            audioUrl: track6Data.track6.audioUrl
+        });
+
+        track6Data.track6.sections.forEach(sectionData => {
+            const section = track6Obj.addSection(sectionData.description, sectionData.imageUrl);
+            sectionData.timeboxes.forEach(boxData => {
+                // Assuming tStart is not defined in the JSON so we pass 0.
+                track6Obj.addTimeboxToSection(section, 0, boxData.description, boxData.nT);
+            });
+        });
+
         // First create playlist
         const playlist = new Playlist();
 
@@ -122,15 +144,17 @@ document.addEventListener('DOMContentLoaded', async () => {
         //console.log('Added track9:', track9Obj.id);
         playlist.addTrack(track11Obj);
         //console.log('Added track11:', track11Obj.id);
+        playlist.addTrack(track6Obj);
+        //console.log('Added track6:', track6Obj.id);
 
         // Log the playlist state after adding tracks
         //console.log('Playlist tracks after adding:', playlist.tracks.map(t => t.id));
 
         // Create track map for persistence
         const trackMap = new Map();
-        [track1Obj, track9Obj, track11Obj].forEach(track => {
+        [track1Obj, track9Obj, track11Obj, track6Obj].forEach(track => {
             trackMap.set(track.id, track);
-            //console.log('Added to trackMap:', track.id);
+            console.log('Added to trackMap:', track.id);
         });
 
         // Try to load saved state AFTER adding tracks

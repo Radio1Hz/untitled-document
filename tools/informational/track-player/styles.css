@@ -2,9 +2,10 @@
     --primary-color: #33ff00;  /* Classic terminal green */
     --text-color: #b1b1b1;
     --background-color: #000000;
-    --secondary-background: #121212;
+    --secondary-background: #343434;
     --hover-color: #282828;
-    --word-active-color: #ff520d62;
+    --dot-color: #444444;
+    --current-timebox-color: #34343450;
 }
 
 * {
@@ -107,27 +108,137 @@ body {
     overflow: hidden; /* Hide overflow content */
 }
 
-/* Show only current and next section */
+/* Update sections content container */
 #sections-content {
-    order: 5;  /* Last, after bottom text */
+    order: 5;
     width: 100%;
-    height: auto;
-    max-height: calc(100vh - 200px);
-    display: flex;
-    flex-direction: column;
+    height: 120px;
+    display: block;
     overflow-y: auto;
     position: relative;
-    margin-top: auto; /* Push to bottom */
+    margin-top: auto;
+    gap: 0.5rem;  /* Add gap between sections */
 }
 
-/* Hide all sections except current and next */
+/* Hide all sections by default */
 #sections-content .section {
     display: none;
 }
 
-#sections-content .section.current-section,
-#sections-content .section.current-section + .section {
+/* Show only current and next section (or previous and last for end case) */
+#sections-content .section.visible {
     display: block;
+    overflow-y: hidden;  /* Allow scrolling within section if needed */
+}
+
+/* Reduce font sizes and spacing in sections content */
+.section-header {
+    display: none;
+}
+
+.timebox-content {
+    font-size: 0.675rem;
+    margin-bottom: 2px;  /* Reduced margin */
+    line-height: 1.2;  /* Tighter line height */
+}
+
+.marker-label {
+    font-size: 0.45rem;  /* 75% of original size */
+}
+
+/* Adjust timeboxes container for more compact layout */
+.timeboxes-container {
+    display: flex !important;
+    flex-direction: row !important;
+    gap: 1px !important;
+    overflow-x: auto;
+    overflow-y: hidden;
+    width: 100%;
+}
+
+/* Style individual timeboxes */
+.timebox {
+    flex: 0 0 auto;
+    padding: 0px;
+    background-color: transparent;
+    transition: border-color 0.2s;
+    margin-right: 5px;
+}
+
+.timebox.current-box {
+    background-color: var(--current-timebox-color);
+}
+
+/* Style timebox content */
+.timebox-content {
+    font-size: 0.675rem;
+    margin-bottom: 2px;
+    line-height: 1.2;
+    color: var(--text-color);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.timebox-content.current {
+    color: var(--primary-color);
+}
+
+/* Make position dots more compact but visible */
+.positions-container {
+    display: flex;
+    margin-top: 4px;
+    gap: 1px;
+    min-height: 6px;
+    width: 100%;
+}
+
+.position-dot {
+    flex: 1;
+    height: 6px;
+    background: var(--dot-color);
+    transition: background-color 0.2s;
+}
+
+.position-dot.current {
+    background-color: var(--primary-color);
+}
+
+/* Ensure section content is visible */
+.section {
+    background: transparent;
+    padding: 4px;  /* Reduced padding */
+    border-radius: 4px;
+}
+
+.section.current-section {
+    background-color: rgba(18, 18, 18, 0.7);
+}
+
+/* Adjust section header */
+.section-header {
+    font-size: 0.75rem;
+    margin-bottom: 6px;
+    padding: 4px 0;
+    color: var(--text-color);
+}
+
+.section-header.active {
+    color: var(--primary-color);
+}
+
+/* Ensure proper section visibility */
+#sections-content .section.visible {
+    display: block;
+    height: auto;
+    /*max-height: calc((100vh - 200px) / 2.5);*/
+    overflow-y: auto;
+    margin-bottom: 0; 
+    border: 1px solid transparent;
+}
+
+#sections-content .section.visible.current-section {
+    border-color: var(--hover-color);
 }
 
 .sentence-line {
@@ -349,7 +460,7 @@ body {
 }
 
 .timebox.current-box {
-    border-color: #444;
+    background-color: var(--current-timebox-color);
 }
 
 h1, h2, h3, h4, h5, h6 {
@@ -451,7 +562,6 @@ h1, h2, h3, h4, h5, h6 {
 .bottom-text {
     order: 4;  /* Fourth, before sections */
     position: relative; /* Change from fixed */
-    margin: 1rem 0;
     left: 0;
     width: 100%;
     text-align: center;
@@ -594,13 +704,13 @@ h1, h2, h3, h4, h5, h6 {
 
 /* Ensure proper spacing between sections */
 #sections-content .section:not(:last-child) {
-    margin-bottom: 1rem;
+    margin: 0;
 }
 
 /* Update position dots */
 .position-dot {
-    height: 10px;
-    background: var(--secondary-background);
+    height: 3px;
+    background: var(--dot-color);
 }
 
 .position-dot.current {
@@ -611,7 +721,6 @@ h1, h2, h3, h4, h5, h6 {
 .positions-container {
     display: flex;
     gap: 2px;
-    margin-top: 8px;
     justify-content: space-between;
 }
 
@@ -622,10 +731,6 @@ h1, h2, h3, h4, h5, h6 {
     background-color: var(--secondary-background);
 }
 
-.current-box .position-line {
-
-}
-
 .sections-container {
     display: flex;
     flex-direction: column;
@@ -634,7 +739,7 @@ h1, h2, h3, h4, h5, h6 {
 /* Scrollbar styles for Firefox */
 * {
     scrollbar-width: thin;
-    scrollbar-color: #a0a0a057 transparent;
+    scrollbar-color: transparent;
 }
 
 /* Webkit scrollbar styles (Chrome, Safari, Edge) */
@@ -646,8 +751,6 @@ h1, h2, h3, h4, h5, h6 {
 
 *::-webkit-scrollbar-track {
     background-color: transparent;
-    border: 1px solid #333;  /* Light grey border for track */
-    margin: 2px;  /* Add some spacing */
 }
 
 *::-webkit-scrollbar-thumb {
