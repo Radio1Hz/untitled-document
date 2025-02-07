@@ -3,6 +3,7 @@ import { Track, TrackState } from './track-model.js';
 import { TrackPlayer, PlaybackMode } from './track-player-model.js';
 import { TrackPlayerScreen } from './track-player-screen-model.js';
 import { Playlist, PlaylistMode } from './playlist-model.js';
+import { Action, ActionManager } from './action-model.js';
 
 let current_lang_code = 'en';  // Default language
 let screen; // Declare screen variable at module scope
@@ -57,14 +58,14 @@ document.addEventListener('DOMContentLoaded', async () => {
             n: track9Data.track9.n,
             tau_omega: track9Data.track9.tau_omega,
             dedication: track9Data.track9.dedication,
-            audioUrl: track9Data.track9.audioUrl
+            audioUrl: track9Data.track9.audioUrl,
+            actions: track9Data.track9.actions  // Pass actions from JSON
         });
 
         // Add sections and timeboxes from JSON
-        track9Data.track9.sections.forEach(sectionData => {
+        track9Data.track9.sections.forEach((sectionData, index) => {
             const section = track9Obj.addSection(sectionData.description, sectionData.imageUrl);
             sectionData.timeboxes.forEach(boxData => {
-                // Use nT directly from the timebox data
                 track9Obj.addTimeboxToSection(section, boxData.tStart, boxData.description, boxData.nT);
             });
         });

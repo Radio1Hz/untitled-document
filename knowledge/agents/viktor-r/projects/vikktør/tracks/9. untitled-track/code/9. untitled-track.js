@@ -13,6 +13,44 @@ export const track9 =
   "tau_omega": "2019-08-19 20:00:00.00",
   "dedication": "før aurøra",
   "audioUrl": "https://untitled-document.net/knowledge/agents/viktor-r/projects/vikktør/tracks/9. untitled-track/9. untitled-track.wav",
+  "actions": [
+    {
+      "actionStartState": { "i": 0, "j": 0, "k": 0 },
+      "actionId": 1
+    },
+    {
+      "actionStartState": { "i": 1, "j": 0, "k": 0 },
+      "actionId": 2
+    },
+    {
+      "actionStartState": { "i": 2, "j": 0, "k": 0 },
+      "actionId": 3
+    },
+    {
+      "actionStartState": { "i": 3, "j": 0, "k": 0 },
+      "actionId": 4
+    },
+    {
+      "actionStartState": { "i": 4, "j": 0, "k": 0 },
+      "actionId": 5
+    },
+    {
+      "actionStartState": { "i": 5, "j": 0, "k": 0 },
+      "actionId": 6
+    },
+    {
+      "actionStartState": { "i": 6, "j": 0, "k": 0 },
+      "actionId": 7
+    },
+    {
+      "actionStartState": { "i": 7, "j": 0, "k": 0 },
+      "actionId": 8
+    },
+    {
+      "actionStartState": { "i": 8, "j": 0, "k": 0 },
+      "actionId": 9
+    }
+  ],
   "sections": [
     {
       "description": {

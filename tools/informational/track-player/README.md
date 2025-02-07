@@ -18,7 +18,7 @@ T = (\text{description}, n_T, \text{imageUrl})
 $$  
 **where**:  
 - $\text{description} \in \mathbb{S}$: Description of the timebox content.
-  - *Default*: $\text{description} = \text{""}$ (empty string).
+  - *Default*: $\text{description} = \text{""}$ (empty string).  
 - $n_T \in \mathbb{N}$: Number of time units in this timebox.
   - *Optional*: If undefined, inherits from track's $n$ attribute.
 - $\text{imageUrl} \in \mathbb{U} \cup \{\text{null}\}$: URL of visual asset for timebox.
@@ -38,10 +38,28 @@ $$
 
 ---  
 
-#### **4. Track ($\Theta$)**  
+#### **4. Action ($\alpha$)**
+An action $\alpha$ represents a trigger point within a track's timeline:
+$$
+\alpha = (\psi_{\text{start}}, \text{id})
+$$
+**where**:
+- $\psi_{\text{start}} = (i,j,k) \in \mathbb{N}^3$: State vector triggering action start
+  - $i$: Section index
+  - $j$: Timebox index within section
+  - $k$: Position index within timebox
+- $\text{id} \in \mathbb{N}^+$: Unique identifier for this action
+
+**Properties**:
+1. **Uniqueness**: $\forall \alpha_1, \alpha_2 \in \mathcal{A}: \alpha_1.\text{id} = \alpha_2.\text{id} \implies \alpha_1 = \alpha_2$
+2. **Validity**: $\psi_{\text{start}}$ must reference valid indices within track structure
+
+---  
+
+#### **5. Track ($\Theta$)**  
 A track $\Theta$ is a tuple:  
 $$  
-\Theta = \left( \text{id},\ \text{description},\ \tau,\ \delta,\ n,\ \tau_\omega,\ \text{dedication},\ \left\langle S_1, S_2, \ldots, S_m \right\rangle \right)  
+\Theta = \left( \text{id},\ \text{description},\ \tau,\ \delta,\ n,\ \tau_\omega,\ \text{dedication},\ \mathcal{A},\ \left\langle S_1, S_2, \ldots, S_m \right\rangle \right)  
 $$  
 **where**:  
 - $\text{id} \in \mathbb{S}$: Unique identifier for $\Theta$.  
@@ -65,12 +83,19 @@ $$
   - *Type*: Optional textual dedication
   - *Default*: empty string
   - *Example*: $\text{dedication} = \text{"To the concept of eternal return"}$
+- $\mathcal{A}$: Set of track actions where each $a \in \mathcal{A}$ is defined as:
+  $$
+  a = (\psi_{\text{start}}, \text{id})
+  $$
+  where:
+  - $\psi_{\text{start}} = (i,j,k)$: State triggering action start
+  - $\text{id} \in \mathbb{N}^+$: Unique action identifier
 - $\left\langle S_1, S_2, \ldots, S_m \right\rangle$: Ordered sequence of sections (see §3).  
   - *Default*: Empty sequence $\left\langle \right\rangle$.  
 
 ---  
 
-#### **5. Visual Component ($c$)**
+#### **6. Visual Component ($c$)**
 A visual component $c$ is defined as:
 $$
 c = (\text{id}, \text{type}, \text{props}, \text{state}, \phi)
@@ -82,9 +107,9 @@ $$
 - $\text{state}$: Dynamic properties
 - $\phi: \text{state} \to \text{visual}$: Render function
 
----
+---  
 
-#### **6. Canvas Component ($C$)**
+#### **7. Canvas Component ($C$)**
 A canvas component $C$ extends visual component for media display:
 $$
 C = (w, h, \text{ctx}, \text{content})
@@ -116,7 +141,7 @@ $$
 
 ---  
 
-#### **7. Screen ($\Sigma$)**
+#### **8. Screen ($\Sigma$)**
 A screen $\Sigma$ represents the complete visual interface:
 $$
 \Sigma = (R, \mathcal{C}, \mathcal{I}, \mathcal{H}, \mathcal{D})
@@ -153,7 +178,7 @@ $$
 
 ---  
 
-#### **8. Track Player Screen ($\Sigma_\Pi$)**
+#### **9. Track Player Screen ($\Sigma_\Pi$)**
 A specialized screen for track player interaction:
 $$
 \Sigma_\Pi = \left(R,\ \mathcal{C}_\Pi,\ \mathcal{I}_\Pi,\ \mathcal{H}_\Pi,\ \Pi \right)
@@ -259,7 +284,7 @@ $$
 \end{cases}
 $$
 
-#### **9. Playlist ($\mathcal{P}$)**
+#### **10. Playlist ($\mathcal{P}$)**
 A playlist represents an ordered collection of tracks with additional playback behaviors:
 $$
 \mathcal{P} = (\Theta_\text{set}, \text{order}, \text{mode}, \text{history})

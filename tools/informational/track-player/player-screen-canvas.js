@@ -96,7 +96,7 @@ export class PlayerScreenCanvas extends Component {
             newImageUrl = firstSection.imageUrl || null;
         }
         
-        console.log('Computed newImageUrl:', newImageUrl, ' vs current:', this.state.currentImageUrl);
+        //console.log('Computed newImageUrl:', newImageUrl, ' vs current:', this.state.currentImageUrl);
 
         // If the new image URL differs, load it; otherwise, update the state and force a redraw.
         if (newImageUrl && decodeURI(newImageUrl) !== decodeURI(this.state.currentImageUrl || "")) {

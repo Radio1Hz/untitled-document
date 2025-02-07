@@ -1,3 +1,5 @@
+import { Action, ActionManager } from './action-model.js';
+
 /**
  * Represents a time unit (τ) - an indivisible temporal interval
  */
@@ -272,8 +274,9 @@ class Track {
      * @param {string} [params.tau_omega] - World time anchor point (τω)
      * @param {string} [params.dedication] - Optional dedication text
      * @param {string} [params.audioUrl] - URL to the track's audio file
+     * @param {Array} [params.actions] - Array of action objects
      */
-    constructor({ id, description, tau, delta, n, tau_omega, dedication, audioUrl }) {
+    constructor({ id, description, tau, delta, n, tau_omega, dedication, audioUrl, actions = [] }) {
         this.id = id;
         this.description = description;
         this.tau = tau;
@@ -284,6 +287,13 @@ class Track {
         this.audioUrl = audioUrl;
         this.sections = [];
         this.state = new TrackState();
+        this.actions = new ActionManager();
+
+        // Load actions from JSON if provided
+        actions.forEach(actionData => {
+            const action = new Action(actionData.actionStartState, actionData.actionId);
+            this.actions.addAction(action);
+        });
     }
 
     /**

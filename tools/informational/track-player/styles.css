@@ -51,7 +51,7 @@ body {
 
 #track-title {
     font-size: 1rem;
-    padding: 15px 0 0 0;
+    padding: 0;
 }
 
 .track-meta {
@@ -594,9 +594,9 @@ h1, h2, h3, h4, h5, h6 {
 .timeline {
     order: 2;  /* Second */
     width: 100%;
-    height: 10px;
+    height: 3px;
     position: relative;
-    margin: 1rem 0;
+    margin: 0.5rem 0;
     cursor: pointer;
 }
 

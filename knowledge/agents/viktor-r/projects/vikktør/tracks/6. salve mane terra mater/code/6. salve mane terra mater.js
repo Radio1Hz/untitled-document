@@ -36,30 +36,64 @@ export const track6 = {
     },
     {
       "description": {
-        "en": "I EA-EA",
-        "zh": "I EA-EA",
-        "ru": "I EA-EA",
-        "ar": "I EA-EA"
+        "en": "I E-A",
+        "zh": "I E-A",
+        "ru": "I E-A",
+        "ar": "I E-A"
       },
+
       "imageUrl": "",
       "timeboxes": [
         {
-          "description": {"en": "I EA-EA 1/4", "zh": "I EA-EA 1/4", "ru": "I EA-EA 1/4", "ar": "I EA-EA 1/4"},
+          "description": {"en": "E (ionian)", "zh": "E (ionian)", "ru": "E (ionian)", "ar": "E (ionian)"},
           "nT": 16,
           "imageUrl": null
         },
         {
-          "description": {"en": "I EA-EA 2/4", "zh": "I EA-EA 2/4", "ru": "I EA-EA 2/4", "ar": "I EA-EA 2/4"},
+          "description": {"en": "A (lydian)", "zh": "A (lydian)", "ru": "A (lydian)", "ar": "A (lydian)"},
           "nT": 16,
           "imageUrl": null
         },
         {
-          "description": {"en": "I EA-EA 3/4", "zh": "I EA-EA 3/4", "ru": "I EA-EA 3/4", "ar": "I EA-EA 3/4"},
+          "description": {"en": "E", "zh": "E", "ru": "E", "ar": "E"},
           "nT": 16,
           "imageUrl": null
         },
         {
-          "description": {"en": "I EA-EA 4/4", "zh": "I EA-EA 4/4", "ru": "I EA-EA 4/4", "ar": "I EA-EA 4/4"},
+          "description": {"en": "A", "zh": "A", "ru": "A", "ar": "A"},
+          "nT": 16,
+          "imageUrl": null
+        }
+
+      ]
+    },
+    {
+      "description": {
+        "en": "II F#m-B",
+        "zh": "II F#m-B",
+        "ru": "II F#m-B",
+        "ar": "II F#m-B"
+      },
+
+      "imageUrl": "",
+      "timeboxes": [
+        {
+          "description": {"en": "F#m (dorian)", "zh": "F#m (dorian)", "ru": "F#m (dorian)", "ar": "F#m (dorian)"},
+          "nT": 16,
+          "imageUrl": null
+        },
+        {
+          "description": {"en": "B (m-lydian)", "zh": "B (m-lydian)", "ru": "B (m-lydian)", "ar": "B (m-lydian)"},
+          "nT": 16,
+          "imageUrl": null
+        },
+        {
+          "description": {"en": "F#m", "zh": "F#m", "ru": "F#m", "ar": "F#m"},
+          "nT": 16,
+          "imageUrl": null
+        },
+        {
+          "description": {"en": "B", "zh": "B", "ru": "B", "ar": "B"},
           "nT": 16,
           "imageUrl": null
         }
@@ -67,30 +101,32 @@ export const track6 = {
     },
     {
       "description": {
-        "en": "II F#mB-F#mB",
-        "zh": "II F#mB-F#mB",
-        "ru": "II F#mB-F#mB",
-        "ar": "II F#mB-F#mB"
+        "en": "III E-A",
+        "zh": "III E-A",
+        "ru": "III E-A",
+        "ar": "III E-A"
       },
       "imageUrl": "",
       "timeboxes": [
         {
-          "description": {"en": "II F#mB-F#mB 1/4", "zh": "II F#mB-F#mB 1/4", "ru": "II F#mB-F#mB 1/4", "ar": "II F#mB-F#mB 1/4"},
+          "description": {"en": "E", "zh": "E", "ru": "E", "ar": "E"},
+          "nT": 16,
+          "imageUrl": null
+
+        },
+        {
+          "description": {"en": "A", "zh": "A", "ru": "A", "ar": "A"},
           "nT": 16,
           "imageUrl": null
         },
         {
-          "description": {"en": "II F#mB-F#mB 2/4", "zh": "II F#mB-F#mB 2/4", "ru": "II F#mB-F#mB 2/4", "ar": "II F#mB-F#mB 2/4"},
+          "description": {"en": "E", "zh": "E", "ru": "E", "ar": "E"},
           "nT": 16,
           "imageUrl": null
         },
+
         {
-          "description": {"en": "II F#mB-F#mB 3/4", "zh": "II F#mB-F#mB 3/4", "ru": "II F#mB-F#mB 3/4", "ar": "II F#mB-F#mB 3/4"},
-          "nT": 16,
-          "imageUrl": null
-        },
-        {
-          "description": {"en": "II F#mB-F#mB 4/4", "zh": "II F#mB-F#mB 4/4", "ru": "II F#mB-F#mB 4/4", "ar": "II F#mB-F#mB 4/4"},
+          "description": {"en": "A", "zh": "A", "ru": "A", "ar": "A"},
           "nT": 16,
           "imageUrl": null
         }
@@ -98,30 +134,63 @@ export const track6 = {
     },
     {
       "description": {
-        "en": "III EA-EA",
-        "zh": "III EA-EA",
-        "ru": "III EA-EA",
-        "ar": "III EA-EA"
+        "en": "IV F#m-B",
+        "zh": "IV F#m-B",
+        "ru": "IV F#m-B",
+        "ar": "IV F#m-B"
       },
       "imageUrl": "",
       "timeboxes": [
         {
-          "description": {"en": "III EA-EA 1/4", "zh": "III EA-EA 1/4", "ru": "III EA-EA 1/4", "ar": "III EA-EA 1/4"},
+          "description": {"en": "F#m", "zh": "F#m", "ru": "F#m", "ar": "F#m"},
           "nT": 16,
           "imageUrl": null
         },
         {
-          "description": {"en": "III EA-EA 2/4", "zh": "III EA-EA 2/4", "ru": "III EA-EA 2/4", "ar": "III EA-EA 2/4"},
+          "description": {"en": "B", "zh": "B", "ru": "B", "ar": "B"},
           "nT": 16,
           "imageUrl": null
         },
         {
-          "description": {"en": "III EA-EA 3/4", "zh": "III EA-EA 3/4", "ru": "III EA-EA 3/4", "ar": "III EA-EA 3/4"},
+          "description": {"en": "F#m", "zh": "F#m", "ru": "F#m", "ar": "F#m"},
           "nT": 16,
           "imageUrl": null
         },
         {
-          "description": {"en": "III EA-EA 4/4", "zh": "III EA-EA 4/4", "ru": "III EA-EA 4/4", "ar": "III EA-EA 4/4"},
+          "description": {"en": "B", "zh": "B", "ru": "B", "ar": "B"},
+          "nT": 16,
+          "imageUrl": null
+        }
+
+      ]
+    },
+    {
+      "description": {
+        "en": "V E-A",
+        "zh": "V E-A",
+        "ru": "V E-A",
+        "ar": "V E-A"
+      },
+
+      "imageUrl": "",
+      "timeboxes": [
+        {
+          "description": {"en": "E", "zh": "E", "ru": "E", "ar": "E"},
+          "nT": 16,
+          "imageUrl": null
+        },
+        {
+          "description": {"en": "A", "zh": "A", "ru": "A", "ar": "A"},
+          "nT": 16,
+          "imageUrl": null
+        },
+        {
+          "description": {"en": "A", "zh": "A", "ru": "A", "ar": "A"},
+          "nT": 16,
+          "imageUrl": null
+        },
+        {
+          "description": {"en": "E", "zh": "E", "ru": "E", "ar": "E"},
           "nT": 16,
           "imageUrl": null
         }
@@ -129,92 +198,31 @@ export const track6 = {
     },
     {
       "description": {
-        "en": "IV F#mB-F#mB",
-        "zh": "IV F#mB-F#mB",
-        "ru": "IV F#mB-F#mB",
-        "ar": "IV F#mB-F#mB"
+        "en": "VI F#m-B",
+        "zh": "VI F#m-B",
+        "ru": "VI F#m-B",
+        "ar": "VI F#m-B"
       },
+
       "imageUrl": "",
       "timeboxes": [
         {
-          "description": {"en": "IV F#mB-F#mB 1/4", "zh": "IV F#mB-F#mB 1/4", "ru": "IV F#mB-F#mB 1/4", "ar": "IV F#mB-F#mB 1/4"},
+          "description": {"en": "F#m", "zh": "F#m", "ru": "F#m", "ar": "F#m"},
           "nT": 16,
           "imageUrl": null
         },
         {
-          "description": {"en": "IV F#mB-F#mB 2/4", "zh": "IV F#mB-F#mB 2/4", "ru": "IV F#mB-F#mB 2/4", "ar": "IV F#mB-F#mB 2/4"},
+          "description": {"en": "B", "zh": "B", "ru": "B", "ar": "B"},
           "nT": 16,
           "imageUrl": null
         },
         {
-          "description": {"en": "IV F#mB-F#mB 3/4", "zh": "IV F#mB-F#mB 3/4", "ru": "IV F#mB-F#mB 3/4", "ar": "IV F#mB-F#mB 3/4"},
+          "description": {"en": "F#m", "zh": "F#m", "ru": "F#m", "ar": "F#m"},
           "nT": 16,
           "imageUrl": null
         },
         {
-          "description": {"en": "IV F#mB-F#mB 4/4", "zh": "IV F#mB-F#mB 4/4", "ru": "IV F#mB-F#mB 4/4", "ar": "IV F#mB-F#mB 4/4"},
-          "nT": 16,
-          "imageUrl": null
-        }
-      ]
-    },
-    {
-      "description": {
-        "en": "V EA-EA",
-        "zh": "V EA-EA",
-        "ru": "V EA-EA",
-        "ar": "V EA-EA"
-      },
-      "imageUrl": "",
-      "timeboxes": [
-        {
-          "description": {"en": "V EA-EA 1/4", "zh": "V EA-EA 1/4", "ru": "V EA-EA 1/4", "ar": "V EA-EA 1/4"},
-          "nT": 16,
-          "imageUrl": null
-        },
-        {
-          "description": {"en": "V EA-EA 2/4", "zh": "V EA-EA 2/4", "ru": "V EA-EA 2/4", "ar": "V EA-EA 2/4"},
-          "nT": 16,
-          "imageUrl": null
-        },
-        {
-          "description": {"en": "V EA-EA 3/4", "zh": "V EA-EA 3/4", "ru": "V EA-EA 3/4", "ar": "V EA-EA 3/4"},
-          "nT": 16,
-          "imageUrl": null
-        },
-        {
-          "description": {"en": "V EA-EA 4/4", "zh": "V EA-EA 4/4", "ru": "V EA-EA 4/4", "ar": "V EA-EA 4/4"},
-          "nT": 16,
-          "imageUrl": null
-        }
-      ]
-    },
-    {
-      "description": {
-        "en": "VI F#mB-F#mB",
-        "zh": "VI F#mB-F#mB",
-        "ru": "VI F#mB-F#mB",
-        "ar": "VI F#mB-F#mB"
-      },
-      "imageUrl": "",
-      "timeboxes": [
-        {
-          "description": {"en": "VI F#mB-F#mB 1/4", "zh": "VI F#mB-F#mB 1/4", "ru": "VI F#mB-F#mB 1/4", "ar": "VI F#mB-F#mB 1/4"},
-          "nT": 16,
-          "imageUrl": null
-        },
-        {
-          "description": {"en": "VI F#mB-F#mB 2/4", "zh": "VI F#mB-F#mB 2/4", "ru": "VI F#mB-F#mB 2/4", "ar": "VI F#mB-F#mB 2/4"},
-          "nT": 16,
-          "imageUrl": null
-        },
-        {
-          "description": {"en": "VI F#mB-F#mB 3/4", "zh": "VI F#mB-F#mB 3/4", "ru": "VI F#mB-F#mB 3/4", "ar": "VI F#mB-F#mB 3/4"},
-          "nT": 16,
-          "imageUrl": null
-        },
-        {
-          "description": {"en": "VI F#mB-F#mB 4/4", "zh": "VI F#mB-F#mB 4/4", "ru": "VI F#mB-F#mB 4/4", "ar": "VI F#mB-F#mB 4/4"},
+          "description": {"en": "B", "zh": "B", "ru": "B", "ar": "B"},
           "nT": 16,
           "imageUrl": null
         }
@@ -236,7 +244,7 @@ export const track6 = {
             "ru": "outro",
             "ar": "outro"
           },
-          "nT": 8,
+          "nT": 16,
           "imageUrl": null
         }
       ]
