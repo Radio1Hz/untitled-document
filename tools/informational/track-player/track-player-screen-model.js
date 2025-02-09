@@ -140,17 +140,12 @@ class Timeline extends Component {
                 const position = (sectionStartTime / totalDuration) * 100;
                 marker.style.left = `${position}%`;
                 
-                // Add marker label with simplified format
+                // Add marker label
                 const label = document.createElement('div');
                 label.className = 'marker-label';
                 
-                // Format time as [mm:ss]
-                const minutes = Math.floor(sectionStartTime / 60);
-                const seconds = Math.floor(sectionStartTime % 60);
-                const timeStr = `[${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}]`;
-                
-                // Add sequence number (1-based index)
-                label.textContent = `${timeStr} ${index + 1}.`;
+                // Show only section index (0-based)
+                label.textContent = String(index).padStart(2, '0');
                 
                 marker.appendChild(label);
                 
@@ -322,6 +317,12 @@ class SectionView extends Component {
             sectionElement.className = 'section';
             sectionElement.dataset.index = sectionIndex;
             
+            // Add section index display
+            const sectionIndexDisplay = document.createElement('div');
+            sectionIndexDisplay.className = 'section-index state-value';
+            sectionIndexDisplay.textContent = sectionIndex.toString().padStart(2, '0');
+            
+            
             // Only show sections in sectionsToShow array
             if (sectionsToShow.includes(sectionIndex)) {
                 sectionElement.classList.add('visible');
@@ -335,7 +336,7 @@ class SectionView extends Component {
             // Create timeboxes container
             const timeboxesContainer = document.createElement('div');
             timeboxesContainer.className = 'timeboxes-container';
-
+            timeboxesContainer.appendChild(sectionIndexDisplay);
             section.timeboxes.forEach((timebox, timeboxIndex) => {
                 const timeboxElement = document.createElement('div');
                 timeboxElement.className = 'timebox';

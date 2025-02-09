@@ -185,12 +185,12 @@ export const track6 = {
           "imageUrl": null
         },
         {
-          "description": {"en": "A", "zh": "A", "ru": "A", "ar": "A"},
+          "description": {"en": "E", "zh": "E", "ru": "E", "ar": "E"},
           "nT": 16,
           "imageUrl": null
         },
         {
-          "description": {"en": "E", "zh": "E", "ru": "E", "ar": "E"},
+          "description": {"en": "A", "zh": "A", "ru": "A", "ar": "A"},
           "nT": 16,
           "imageUrl": null
         }
@@ -230,21 +230,23 @@ export const track6 = {
     },
     {
       "description": {
-        "en": "outro",
-        "zh": "outro",
-        "ru": "outro",
-        "ar": "outro"
+        "en": "E (outro)",
+        "zh": "E (outro)",
+        "ru": "E (outro)",
+        "ar": "E (outro)"
       },
+
       "imageUrl": "",
       "timeboxes": [
         {
           "description": {
-            "en": "outro",
-            "zh": "outro",
-            "ru": "outro",
-            "ar": "outro"
+            "en": "E (outro)",
+            "zh": "E (outro)",
+            "ru": "E (outro)",
+            "ar": "E (outro)"
           },
           "nT": 16,
+
           "imageUrl": null
         }
       ]

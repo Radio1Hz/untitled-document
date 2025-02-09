@@ -27,7 +27,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 
         // Load track data
         const track9Data = await import('https://untitled-document.net/knowledge/agents/viktor-r/projects/vikktør/tracks/9. untitled-track/code/9. untitled-track.js');
-        const track1Data = await import('https://untitled-document.net/knowledge/agents/viktor-r/projects/vikktør/tracks/1. there is no wisdom without kindness/code/1. there is no wisdom without kindness.js');
+        const track1Data = await import('https://untitled-document.net/knowledge/agents/viktor-r/projects/vikktør/tracks/1. there is no wisdom without kindness v1.1/code/1. there is no wisdom without kindness v1.1.js');
         const track11Data = await import('https://untitled-document.net/knowledge/agents/viktor-r/projects/vikktør/tracks/11. balkan folk song - karanfil se na put sprema/code/11. balkan folk song - karanfil se na put sprema.js');
         const track6Data = await import('https://untitled-document.net/knowledge/agents/viktor-r/projects/vikktør/tracks/6. salve mane terra mater/code/6. salve mane terra mater.js');
 

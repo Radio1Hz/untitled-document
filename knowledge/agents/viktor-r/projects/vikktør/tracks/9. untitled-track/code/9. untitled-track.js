@@ -87,16 +87,19 @@ export const track9 =
           "nT": 8,
           "imageUrl": null
         },
+
         {
-          "description": {"en": "Am (aeolian)", "zh": "Am (aeolian)", "ru": "Am (aeolian)", "ar": "Am (aeolian)"},
+          "description": {"en": "Am", "zh": "Am", "ru": "Am", "ar": "Am"},
           "nT": 8,
+
           "imageUrl": "https://untitled-document.net/knowledge/agents/viktor-r/projects/vikktør/tracks/9. untitled-track/images/9-untitled-track-image-section-10.jpg"
         },
         {
-          "description": {"en": "Am (aeolian)", "zh": "Am (aeolian)", "ru": "Am (aeolian)", "ar": "Am (aeolian)"},
+          "description": {"en": "Am", "zh": "Am", "ru": "Am", "ar": "Am"},
           "nT": 8,
           "imageUrl": null
         },
+
         {
           "description": {"en": "C (ionian)", "zh": "C (ionian)", "ru": "C (ionian)", "ar": "C (ionian)"},
           "nT": 4,
@@ -119,30 +122,35 @@ export const track9 =
       "imageUrl": "https://untitled-document.net/knowledge/agents/viktor-r/projects/vikktør/tracks/9. untitled-track/images/9-untitled-track-image-section-2.jpg",
       "timeboxes": [
         {
-          "description": {"en": "Am (aeolian)", "zh": "Am (aeolian)", "ru": "Am (aeolian)", "ar": "Am (aeolian)"},
+          "description": {"en": "Am", "zh": "Am", "ru": "Am", "ar": "Am"},
           "nT": 8,
           "imageUrl": null
         },
+
         {
-          "description": {"en": "Am (aeolian)", "zh": "Am (aeolian)", "ru": "Am (aeolian)", "ar": "Am (aeolian)"},
+          "description": {"en": "Am", "zh": "Am", "ru": "Am", "ar": "Am"},
           "nT": 8,
           "imageUrl": null
         },
+
         {
-          "description": {"en": "Am (aeolian)", "zh": "Am (aeolian)", "ru": "Am (aeolian)", "ar": "Am (aeolian)"},
+          "description": {"en": "Am", "zh": "Am", "ru": "Am", "ar": "Am"},
           "nT": 8,
           "imageUrl": null
         },
+
         {
-          "description": {"en": "C (ionian)", "zh": "C (ionian)", "ru": "C (ionian)", "ar": "C (ionian)"},
+          "description": {"en": "C", "zh": "C", "ru": "C", "ar": "C"},
           "nT": 4,
           "imageUrl": null
         },
+
         {
-          "description": {"en": "Dm (dorian)", "zh": "Dm (dorian)", "ru": "Dm (dorian)", "ar": "Dm (dorian)"},
+          "description": {"en": "Dm", "zh": "Dm", "ru": "Dm", "ar": "Dm"},
           "nT": 4,
           "imageUrl": null
         }
+
       ]
     },
     {
@@ -160,25 +168,29 @@ export const track9 =
           "imageUrl": null
         },
         {
-          "description": {"en": "G (m-lydian)", "zh": "G (m-lydian)", "ru": "G (m-lydian)", "ar": "G (m-lydian)"},
+          "description": {"en": "G (mixolydian)", "zh": "G (mixolydian)", "ru": "G (mixolydian)", "ar": "G (mixolydian)"},
           "nT": 4,
           "imageUrl": null
         },
+
         {
-          "description": {"en": "A (m-lydian)", "zh": "A (m-lydian)", "ru": "A (m-lydian)", "ar": "A (m-lydian)"},
+          "description": {"en": "A (mixolydian)", "zh": "A (mixolydian)", "ru": "A (mixolydian)", "ar": "A (mixolydian)"},
           "nT": 8,
           "imageUrl": null
         },
+
         {
-          "description": {"en": "F (lydian)", "zh": "F (lydian)", "ru": "F (lydian)", "ar": "F (lydian)"},
+          "description": {"en": "F", "zh": "F", "ru": "F", "ar": "F"},
           "nT": 4,
           "imageUrl": null
         },
+
         {
-          "description": {"en": "G (m-lydian)", "zh": "G (m-lydian)", "ru": "G (m-lydian)", "ar": "G (m-lydian)"},
+          "description": {"en": "G", "zh": "G", "ru": "G", "ar": "G"},
           "nT": 4,
           "imageUrl": null
         },
+
         {
           "description": {"en": "Em (phrygian)", "zh": "Em (phrygian)", "ru": "Em (phrygian)", "ar": "Em (phrygian)"},
           "nT": 8,
@@ -196,35 +208,41 @@ export const track9 =
       "imageUrl": "https://untitled-document.net/knowledge/agents/viktor-r/projects/vikktør/tracks/9. untitled-track/images/9-untitled-track-image-section-10.jpg",
       "timeboxes": [
         {
-          "description": {"en": "F (lydian)", "zh": "F (lydian)", "ru": "F (lydian)", "ar": "F (lydian)"},
+          "description": {"en": "F", "zh": "F", "ru": "F", "ar": "F"},
+          "nT": 4,
+          "imageUrl": null
+
+        },
+        {
+          "description": {"en": "G", "zh": "G", "ru": "G", "ar": "G"},
           "nT": 4,
           "imageUrl": null
         },
+
         {
-          "description": {"en": "G (m-lydian)", "zh": "G (m-lydian)", "ru": "G (m-lydian)", "ar": "G (m-lydian)"},
-          "nT": 4,
-          "imageUrl": null
-        },
-        {
-          "description": {"en": "A (m-lydian)", "zh": "A (m-lydian)", "ru": "A (m-lydian)", "ar": "A (m-lydian)"},
+          "description": {"en": "A", "zh": "A", "ru": "A", "ar": "A"},
           "nT": 8,
           "imageUrl": null
         },
+
         {
-          "description": {"en": "F (lydian)", "zh": "F (lydian)", "ru": "F (lydian)", "ar": "F (lydian)"},
+          "description": {"en": "F", "zh": "F", "ru": "F", "ar": "F"},
           "nT": 4,
           "imageUrl": null
         },
+
         {
-          "description": {"en": "G (m-lydian)", "zh": "G (m-lydian)", "ru": "G (m-lydian)", "ar": "G (m-lydian)"},
+          "description": {"en": "G", "zh": "G", "ru": "G", "ar": "G"},
           "nT": 4,
           "imageUrl": null
         },
+
         {
-          "description": {"en": "C (ionian)", "zh": "C (ionian)", "ru": "C (ionian)", "ar": "C (ionian)"},
+          "description": {"en": "C", "zh": "C", "ru": "C", "ar": "C"},
           "nT": 8,
           "imageUrl": null
         }
+
 
       ]
     },
@@ -238,30 +256,35 @@ export const track9 =
       "imageUrl": "https://untitled-document.net/knowledge/agents/viktor-r/projects/vikktør/tracks/9. untitled-track/images/9-untitled-track-image-section-2.jpg",
       "timeboxes": [
         {
-          "description": {"en": "Am (aeolian)", "zh": "Am (aeolian)", "ru": "Am (aeolian)", "ar": "Am (aeolian)"},
+          "description": {"en": "Am", "zh": "Am", "ru": "Am", "ar": "Am"},
+          "nT": 8,
+          "imageUrl": null
+
+        },
+        {
+          "description": {"en": "Am", "zh": "Am", "ru": "Am", "ar": "Am"},
           "nT": 8,
           "imageUrl": null
         },
+
         {
-          "description": {"en": "Am (aeolian)", "zh": "Am (aeolian)", "ru": "Am (aeolian)", "ar": "Am (aeolian)"},
+          "description": {"en": "Am", "zh": "Am", "ru": "Am", "ar": "Am"},
           "nT": 8,
           "imageUrl": null
         },
+
         {
-          "description": {"en": "Am (aeolian)", "zh": "Am (aeolian)", "ru": "Am (aeolian)", "ar": "Am (aeolian)"},
-          "nT": 8,
-          "imageUrl": null
-        },
-        {
-          "description": {"en": "C (ionian)", "zh": "C (ionian)", "ru": "C (ionian)", "ar": "C (ionian)"},
+          "description": {"en": "C", "zh": "C", "ru": "C", "ar": "C"},
           "nT": 4,
           "imageUrl": null
         },
+
         {
-          "description": {"en": "Dm (dorian)", "zh": "Dm (dorian)", "ru": "Dm (dorian)", "ar": "Dm (dorian)"},
+          "description": {"en": "Dm", "zh": "Dm", "ru": "Dm", "ar": "Dm"},
           "nT": 4,
           "imageUrl": null
         }
+
       ]
     },
     {
@@ -274,30 +297,35 @@ export const track9 =
       "imageUrl": "https://untitled-document.net/knowledge/agents/viktor-r/projects/vikktør/tracks/9. untitled-track/images/9-untitled-track-image-section-2.jpg",
       "timeboxes": [
         {
-          "description": {"en": "Am (aeolian)", "zh": "Am (aeolian)", "ru": "Am (aeolian)", "ar": "Am (aeolian)"},
+          "description": {"en": "Am", "zh": "Am", "ru": "Am", "ar": "Am"},
           "nT": 8,
           "imageUrl": null
         },
+
         {
-          "description": {"en": "Am (aeolian)", "zh": "Am (aeolian)", "ru": "Am (aeolian)", "ar": "Am (aeolian)"},
+          "description": {"en": "Am", "zh": "Am", "ru": "Am", "ar": "Am"},
           "nT": 8,
           "imageUrl": null
         },
+
         {
-          "description": {"en": "Am (aeolian)", "zh": "Am (aeolian)", "ru": "Am (aeolian)", "ar": "Am (aeolian)"},
+          "description": {"en": "Am", "zh": "Am", "ru": "Am", "ar": "Am"},
           "nT": 8,
           "imageUrl": null
         },
+
         {
-          "description": {"en": "C (ionian)", "zh": "C (ionian)", "ru": "C (ionian)", "ar": "C (ionian)"},
+          "description": {"en": "C", "zh": "C", "ru": "C", "ar": "C"},
           "nT": 4,
           "imageUrl": null
         },
+
         {
-          "description": {"en": "Dm (dorian)", "zh": "Dm (dorian)", "ru": "Dm (dorian)", "ar": "Dm (dorian)"},
+          "description": {"en": "Dm", "zh": "Dm", "ru": "Dm", "ar": "Dm"},
           "nT": 4,
           "imageUrl": null
         }
+
       ]
     },
     {
@@ -310,35 +338,41 @@ export const track9 =
       "imageUrl": "https://untitled-document.net/knowledge/agents/viktor-r/projects/vikktør/tracks/9. untitled-track/images/9-untitled-track-image-section-10.jpg",
       "timeboxes": [
         {
-          "description": {"en": "F (lydian)", "zh": "F (lydian)", "ru": "F (lydian)", "ar": "F (lydian)"},
+          "description": {"en": "F", "zh": "F", "ru": "F", "ar": "F"},
           "nT": 4,
           "imageUrl": null
         },
+
         {
-          "description": {"en": "G (m-lydian)", "zh": "G (m-lydian)", "ru": "G (m-lydian)", "ar": "G (m-lydian)"},
+          "description": {"en": "G", "zh": "G", "ru": "G", "ar": "G"},
           "nT": 4,
           "imageUrl": null
         },
+
         {
-          "description": {"en": "A (m-lydian)", "zh": "A (m-lydian)", "ru": "A (m-lydian)", "ar": "A (m-lydian)"},
+          "description": {"en": "A", "zh": "A", "ru": "A", "ar": "A"},
           "nT": 8,
           "imageUrl": null
         },
+
         {
-          "description": {"en": "F (lydian)", "zh": "F (lydian)", "ru": "F (lydian)", "ar": "F (lydian)"},
+          "description": {"en": "F", "zh": "F", "ru": "F", "ar": "F"},
           "nT": 4,
           "imageUrl": null
         },
+
         {
-          "description": {"en": "G (m-lydian)", "zh": "G (m-lydian)", "ru": "G (m-lydian)", "ar": "G (m-lydian)"},
+          "description": {"en": "G", "zh": "G", "ru": "G", "ar": "G"},
           "nT": 4,
           "imageUrl": null
         },
+
         {
-          "description": {"en": "Em (phrygian)", "zh": "Em (phrygian)", "ru": "Em (phrygian)", "ar": "Em (phrygian)"},
+          "description": {"en": "Em", "zh": "Em", "ru": "Em", "ar": "Em"},
           "nT": 8,
           "imageUrl": null
         }
+
       ]
     },
     {
@@ -351,36 +385,40 @@ export const track9 =
       "imageUrl": "https://untitled-document.net/knowledge/agents/viktor-r/projects/vikktør/tracks/9. untitled-track/images/9-untitled-track-image-section-10.jpg",
       "timeboxes": [
         {
-          "description": {"en": "F (lydian)", "zh": "F (lydian)", "ru": "F (lydian)", "ar": "F (lydian)"},
+          "description": {"en": "F", "zh": "F", "ru": "F", "ar": "F"},
           "nT": 4,
           "imageUrl": null
         },
+
         {
-          "description": {"en": "G (m-lydian)", "zh": "G (m-lydian)", "ru": "G (m-lydian)", "ar": "G (m-lydian)"},
+          "description": {"en": "G", "zh": "G", "ru": "G", "ar": "G"},
           "nT": 4,
           "imageUrl": null
         },
+
         {
-          "description": {"en": "A (m-lydian)", "zh": "A (m-lydian)", "ru": "A (m-lydian)", "ar": "A (m-lydian)"},
+          "description": {"en": "A", "zh": "A", "ru": "A", "ar": "A"},
           "nT": 8,
           "imageUrl": null
         },
+
         {
-          "description": {"en": "F (lydian)", "zh": "F (lydian)", "ru": "F (lydian)", "ar": "F (lydian)"},
+          "description": {"en": "F", "zh": "F", "ru": "F", "ar": "F"},
           "nT": 4,
           "imageUrl": null
         },
+
         {
-          "description": {"en": "G (m-lydian)", "zh": "G (m-lydian)", "ru": "G (m-lydian)", "ar": "G (m-lydian)"},
+          "description": {"en": "G", "zh": "G", "ru": "G", "ar": "G"},
           "nT": 4,
           "imageUrl": null
         },
+
         {
-          "description": {"en": "C (ionian)", "zh": "C (ionian)", "ru": "C (ionian)", "ar": "C (ionian)"},
+          "description": {"en": "C", "zh": "C", "ru": "C", "ar": "C"},
           "nT": 8,
           "imageUrl": null
         }
-
       ]
     },
     {
@@ -393,35 +431,41 @@ export const track9 =
       "imageUrl": "https://untitled-document.net/knowledge/agents/viktor-r/projects/vikktør/tracks/9. untitled-track/images/9-untitled-track-image-section-10.jpg",
       "timeboxes": [
         {
-          "description": {"en": "F (lydian)", "zh": "F (lydian)", "ru": "F (lydian)", "ar": "F (lydian)"},
+          "description": {"en": "F", "zh": "F", "ru": "F", "ar": "F"},
           "nT": 4,
           "imageUrl": null
         },
+
         {
-          "description": {"en": "G (m-lydian)", "zh": "G (m-lydian)", "ru": "G (m-lydian)", "ar": "G (m-lydian)"},
+          "description": {"en": "F", "zh": "F", "ru": "F", "ar": "F"},
           "nT": 4,
           "imageUrl": null
         },
+
         {
-          "description": {"en": "A (m-lydian)", "zh": "A (m-lydian)", "ru": "A (m-lydian)", "ar": "A (m-lydian)"},
+          "description": {"en": "F", "zh": "F", "ru": "F", "ar": "F"},
           "nT": 8,
           "imageUrl": null
         },
+
         {
-          "description": {"en": "F (lydian)", "zh": "F (lydian)", "ru": "F (lydian)", "ar": "F (lydian)"},
+          "description": {"en": "F", "zh": "F", "ru": "F", "ar": "F"},
           "nT": 4,
           "imageUrl": null
         },
+
         {
-          "description": {"en": "G (m-lydian)", "zh": "G (m-lydian)", "ru": "G (m-lydian)", "ar": "G (m-lydian)"},
+          "description": {"en": "F", "zh": "F", "ru": "F", "ar": "F"},
           "nT": 4,
           "imageUrl": null
         },
+
         {
-          "description": {"en": "Em (phrygian)", "zh": "Em (phrygian)", "ru": "Em (phrygian)", "ar": "Em (phrygian)"},
+          "description": {"en": "F", "zh": "F", "ru": "F", "ar": "F"},
           "nT": 8,
           "imageUrl": null
         }
+
       ]
     }
   ]
