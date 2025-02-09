@@ -88,8 +88,14 @@ document.addEventListener('DOMContentLoaded', async () => {
         track1Data.track1.sections.forEach(sectionData => {
             const section = track1Obj.addSection(sectionData.description, sectionData.imageUrl);
             sectionData.timeboxes.forEach(boxData => {
-                // Use nT directly from the timebox data
-                track1Obj.addTimeboxToSection(section, boxData.tStart, boxData.description, boxData.nT);
+                // Pass the imageUrl from the timebox data
+                track1Obj.addTimeboxToSection(
+                    section, 
+                    boxData.tStart, 
+                    boxData.description, 
+                    boxData.nT,
+                    boxData.imageUrl  // Add this parameter
+                );
             });
         });
 

@@ -16,10 +16,10 @@ export const track1 =
   "sections": [
     {
       "description": {
-        "en": "there is no wisdom without kindness",
-        "zh": "没有仁慈，就没有智慧",
-        "ru": "без доброты нет мудрости",
-        "ar": "لا حكمة بدون لطف"
+        "en": "intro",
+        "zh": "介绍",
+        "ru": "вступление", 
+        "ar": "مقدمة"
       },
       "imageUrl": "https://untitled-document.net/knowledge/agents/viktor-r/projects/vikktør/tracks/1. there is no wisdom without kindness v1.1/images/1-0-image-d2.jpg",
       "timeboxes": [
@@ -162,47 +162,51 @@ export const track1 =
         },
         {
           "description": { "en": "Am", "zh": "Am", "ru": "Am", "ar": "Am" },
-          "nT": 4
+          "nT": 4,
+          "imageUrl": "https://untitled-document.net/knowledge/agents/viktor-r/projects/vikktør/tracks/1. there is no wisdom without kindness v1.1/images/faten-hamama.png"
         },
         {
           "description": { "en": "C", "zh": "C", "ru": "C", "ar": "C" },
+          "imageUrl": "https://untitled-document.net/knowledge/agents/viktor-r/projects/vikktør/tracks/1. there is no wisdom without kindness v1.1/images/faten-hamama.png",
           "nT": 4
         },
+
         {
           "description": { "en": "Am", "zh": "Am", "ru": "Am", "ar": "Am" },
+          "imageUrl": "https://untitled-document.net/knowledge/agents/viktor-r/projects/vikktør/tracks/1. there is no wisdom without kindness v1.1/images/faten-hamama.png",
           "nT": 4
         },
         {
           "description": { "en": "Bm", "zh": "Bm", "ru": "Bm", "ar": "Bm" },
+          "imageUrl": "https://untitled-document.net/knowledge/agents/viktor-r/projects/vikktør/tracks/1. there is no wisdom without kindness v1.1/images/faten-hamama.png",
           "nT": 2
         },
         {
           "description": { "en": "G", "zh": "G", "ru": "G", "ar": "G" },
+          "imageUrl": "https://untitled-document.net/knowledge/agents/viktor-r/projects/vikktør/tracks/1. there is no wisdom without kindness v1.1/images/faten-hamama.png",
           "nT": 2
         }
       ]
     },
     {
       "description": {
-        "en": "E (outro)",
-        "zh": "E (结束)",
-        "ru": "E (выход)",
-        "ar": "E (خروج)"
+        "en": "Em (outro)",
+        "zh": "Em (结束)",
+        "ru": "Em (выход)",
+        "ar": "Em (خروج)"
       },
-
-      "imageUrl": "https://untitled-document.net/knowledge/agents/viktor-r/projects/vikktør/tracks/1. there is no wisdom without kindness v1.1/images/1-0-image-d2.jpg",
+      "imageUrl": "https://untitled-document.net/knowledge/agents/viktor-r/projects/vikktør/tracks/images/vikktor-key-knowledge-2025-1000x1000.png",
       "timeboxes": [
         {
           "description": {
-          "en": "E (outro)",
-          "zh": "E (结束)",
-          "ru": "E (выход)",
-          "ar": "E (خروج)"
+          "en": "Em (outro)",
+          "zh": "Em (结束)",
+          "ru": "Em (выход)",
+          "ar": "Em (خروج)"
         },
-        "nT": 4
+        "nT": 6
       }
     ]
-
     }
   ]
 } 

@@ -1,206 +1,316 @@
 import { Component } from './component.js';
 
 /**
- * Represents an image display component for the track player.
- * Instead of using a canvas, it uses an <img> to show slideshow images.
- * It updates its image once per state transition (each tau interval) as defined by the player.
+ * Represents a canvas display component for the track player.
+ * Uses HTML canvas to render state transitions.
+ * It updates its state text once per state transition (each tau interval) as defined by the player.
  */
 export class PlayerScreenCanvas extends Component {
     /**
-     * @param {string} id - Image component identifier.
+     * @param {string} id - Canvas component identifier.
      * @param {Object} props - Static properties.
      */
     constructor(id, props = {}) {
-        // Set type to 'img' for clarity.
-        super(id, 'img', props);
+        // Set type to 'canvas' instead of 'img'
+        super(id, 'canvas', props);
         this.state = {
-            currentImageUrl: null,    // The currently loaded image URL.
-            isLoading: false,
-            error: null,
             currentState: null,
             mode: null
         };
         this.lastTransitionKey = null;
+        this.imageCache = new Map(); // Add image cache
         
-        // Add a resize handler to adjust dimensions dynamically.
+        // Add a resize handler to adjust dimensions dynamically
         window.addEventListener('resize', () => this.handleResize());
     }
     
     /**
-     * Computes the ideal element size based on the window's dimensions.
-     * Returns the smaller value between the window's width and height.
+     * Computes the ideal element size based on the container dimensions.
+     * Returns the size that makes a perfect square within the container.
      */
     getElementSize() {
-        const screenWidth = window.innerWidth;
-        const screenHeight = window.innerHeight;
-        return Math.min(screenWidth, screenHeight);
+        const container = this.element?.parentElement;
+        if (!container) return 300; // fallback size
+        
+        const containerWidth = container.clientWidth;
+        const containerHeight = container.clientHeight;
+        
+        // Use the smaller dimension to create a square
+        return Math.min(containerWidth, containerHeight);
     }
     
     /**
-     * Handles window resize events by updating the <img> dimensions.
+     * Handles window resize events by updating the canvas dimensions and redrawing.
      */
     handleResize() {
         if (this.element) {
             const size = this.getElementSize();
+            // Set both style dimensions and canvas buffer dimensions
             this.element.style.width = size + 'px';
             this.element.style.height = size + 'px';
+            this.element.width = size;
+            this.element.height = size;
+            this.drawState(); // Redraw the current state
         }
     }
     
+    // Add method to collect all unique image URLs from the track
+    getAllImageUrls(track) {
+        const urls = new Set();
+        
+        if (track && track.sections) {
+            track.sections.forEach(section => {
+                if (section.imageUrl) {
+                    urls.add(section.imageUrl);
+                }
+                if (section.timeboxes) {
+                    section.timeboxes.forEach(timebox => {
+                        if (timebox.imageUrl) {
+                            urls.add(timebox.imageUrl);
+                        }
+                    });
+                }
+            });
+        }
+        
+        return Array.from(urls);
+    }
+
+    // Preload all images and store in cache
+    async preloadImages(track) {
+        const urls = this.getAllImageUrls(track);
+        const loadPromises = urls.map(url => this.loadImage(url));
+        
+        try {
+            await Promise.all(loadPromises);
+            console.log('All images preloaded successfully');
+        } catch (error) {
+            console.error('Error preloading images:', error);
+        }
+    }
+
     /**
-     * Loads the initial image from the track. For instance, if a track defines a first section image,
-     * it preloads and displays that image.
-     *
+     * Loads the initial state from the track.
      * @param {Track} track - The current track.
      */
-    loadInitialState(track) {
-        if (!track || !track.sections || track.sections.length === 0) return;
-        const firstSection = track.sections[0];
-        if (firstSection.imageUrl && firstSection.imageUrl !== this.state.currentImageUrl) {
-            this.loadImage(firstSection.imageUrl)
-                .catch(error => {
-                    console.error('Failed to load initial image:', error);
-                });
-        }
+    async loadInitialState(track) {
+        // Store track in props
+        this.props.track = track;
+        
+        // Preload all images first
+        await this.preloadImages(track);
+        
+        // Create initial state with first section and timebox
+        const initialState = track && track.sections.length > 0 ? { i: 0, j: 0, k: 0 } : null;
+        
+        // Handle the state transition which will draw the image
+        this.handleStateTransition(initialState, track, 'STOPPED');
     }
     
     /**
      * Handles state transitions.
-     * For each new state transition (i.e. each tau interval), determines whether a new image URL should be loaded.
-     * The selection is based first on the timebox image, then on the section image; for STOPPED mode,
-     * it uses the first section's image if available.
+     * For each new state transition (i.e. each tau interval), updates the canvas with new state text.
      *
      * @param {Object} newState - New track state (with properties i, j, k).
      * @param {Track} track - The current track.
      * @param {string} mode - Playback mode (e.g. 'PLAYING', 'STOPPED').
      */
     handleStateTransition(newState, track, mode) {
-        // Create a unique key based on newState; if newState is null (stopped), use 'stopped'.
+        // Create a unique key based on newState; if newState is null (stopped), use 'stopped'
         const stateKey = newState ? `${newState.i}-${newState.j}-${newState.k}` : 'stopped';
         if (this.lastTransitionKey === stateKey) return;
         this.lastTransitionKey = stateKey;
         
-        // Determine the new image URL.
-        let newImageUrl = null;
-        if (newState && track && track.sections && track.sections[newState.i]) {
-            const section = track.sections[newState.i];
-            // Prefer the timebox image if available.
-            if (section.timeboxes && section.timeboxes[newState.j] && section.timeboxes[newState.j].imageUrl) {
-                newImageUrl = section.timeboxes[newState.j].imageUrl;
-            } else if (section.imageUrl) {
-                newImageUrl = section.imageUrl;
+        // Store track in props for access to descriptions
+        this.props.track = track;
+        this.setState({ currentState: newState, mode });
+
+        // Update track title with section description
+        const trackTitleElement = document.getElementById('track-title');
+        if (trackTitleElement && track) {
+            // Get base track ID
+            let title = track.id || '';
+            
+            // Add section description if we have a valid state and section
+            if (newState && track.sections[newState.i]) {
+                const section = track.sections[newState.i];
+                const lang = document.documentElement.getAttribute('data-lang') || 'en';
+                const sectionDesc = section.desc?.[lang] || section.desc?.['en'] || '';
+                
+                if (sectionDesc) {
+                    // Format: trackId\sectionIndex. sectionDescription
+                    title = `${title}\\${newState.i}. ${sectionDesc}`;
+                }
             }
-        } else if (mode === 'STOPPED' && track && track.sections && track.sections.length > 0) {
-            // For STOPPED mode, use the first section's image.
-            const firstSection = track.sections[0];
-            newImageUrl = firstSection.imageUrl || null;
+            
+            // Update the title element's text content
+            trackTitleElement.textContent = title;
+            // Also update the title element's title attribute for tooltip
+            trackTitleElement.setAttribute('title', title);
+        }
+
+        this.drawState();
+    }
+    
+    /**
+     * Draws the current state text on the canvas
+     */
+    async drawState() {
+        // Now we can use cached images directly without loading
+        if (!this.element) return;
+        
+        const ctx = this.element.getContext('2d');
+        const canvas = this.element;
+        
+        // Clear canvas with black background
+        ctx.fillStyle = 'black';
+        ctx.fillRect(0, 0, canvas.width, canvas.height);
+        
+        // Set up text style
+        ctx.fillStyle = 'white';
+        ctx.textAlign = 'right';
+        ctx.textBaseline = 'bottom';
+        
+        // Calculate font size
+        const stateFontSize = Math.min(canvas.width, canvas.height) * 0.025;
+        
+        // Gather information
+        let stateText;
+        let currentImageUrl = '';
+        
+        if (this.state.currentState && this.props.track) {
+            const { i, j, k } = this.state.currentState;
+            stateText = `${String(i).padStart(2, '0')} ${String(j).padStart(2, '0')} ${String(k).padStart(2, '0')}`;
+            
+            const section = this.props.track.sections[i];
+            if (section) {
+                // Set section image only if no current image is set
+                if (!currentImageUrl && section.imageUrl) {
+                    currentImageUrl = section.imageUrl;
+                }
+                
+                // Check timebox image - only update if timebox has an image
+                const timebox = section.timeboxes[j];
+                if (timebox && timebox.imageUrl) {
+                    currentImageUrl = timebox.imageUrl;
+                }
+            }
+        } else {
+            stateText = '00 00 00';
+        }
+
+        const drawTextContent = () => {
+            ctx.font = `${stateFontSize}px clockicons`;
+            const padding = Math.min(canvas.width, canvas.height) * 0.02;
+            ctx.fillText(stateText, canvas.width - padding, canvas.height - padding);
+        };
+
+        if (currentImageUrl) {
+            // Use cached image directly
+            const img = this.imageCache.get(currentImageUrl);
+            if (img) {
+                const scale = Math.max(canvas.width / img.width, canvas.height / img.height);
+                const scaledWidth = img.width * scale;
+                const scaledHeight = img.height * scale;
+                const x = (canvas.width - scaledWidth) / 2;
+                const y = (canvas.height - scaledHeight) / 2;
+                
+                ctx.drawImage(img, x, y, scaledWidth, scaledHeight);
+            } else {
+                // Fallback if image not in cache
+                ctx.fillStyle = '#660000';
+                ctx.fillRect(0, 0, canvas.width, canvas.height);
+                ctx.fillStyle = 'white';
+            }
         }
         
-        //console.log('Computed newImageUrl:', newImageUrl, ' vs current:', this.state.currentImageUrl);
-
-        // If the new image URL differs, load it; otherwise, update the state and force a redraw.
-        if (newImageUrl && decodeURI(newImageUrl) !== decodeURI(this.state.currentImageUrl || "")) {
-            this.loadImage(newImageUrl)
-                .then(() => {
-                    this.setState({ currentState: newState, mode });
-                })
-                .catch(error => {
-                    console.error('Failed to load image:', error);
-                    this.setState({ currentState: newState, mode });
-                });
-        } else {
-            this.setState({ currentState: newState, mode });
-            // Force a DOM update.
-            requestAnimationFrame(() => {
-                if (this.element) {
-                    this.element.src = this.state.currentImageUrl || "";
-                }
-            });
-        }
+        drawTextContent();
     }
     
     /**
-     * Preloads an image from the provided URL.
-     * Once loaded, updates the state with the new URL and sets the <img> element's src.
-     *
-     * @param {string} url - The image URL.
-     * @returns {Promise<void>}
-     */
-    async loadImage(url) {
-        if (!url) return;
-        // Append a cache-busting parameter so that the URL is unique on every load.
-        const cacheBustedUrl = url + (url.includes('?') ? '&' : '?') + 't=' + Date.now();
-        const encodedUrl = encodeURI(cacheBustedUrl);
-        this.setState({ isLoading: true, error: null });
-        try {
-            const image = new Image();
-            image.crossOrigin = "anonymous";
-            await new Promise((resolve, reject) => {
-                image.onload = () => resolve();
-                image.onerror = (e) => {
-                    if (image.crossOrigin) {
-                        image.crossOrigin = null;
-                        image.src = encodedUrl;
-                    } else {
-                        reject(new Error(`Failed to load image: ${encodedUrl}`));
-                    }
-                };
-                image.src = encodedUrl;
-            });
-            this.setState({
-                currentImageUrl: encodedUrl,
-                isLoading: false,
-                error: null
-            });
-            // Update the displayed image.
-            requestAnimationFrame(() => {
-                if (this.element) {
-                    console.log('Updating image src to:', encodedUrl);
-                    this.element.src = encodedUrl;
-                }
-            });
-        } catch (error) {
-            this.setState({ isLoading: false, error: error.message });
-            throw error;
-        }
-    }
-    
-    /**
-     * Renders the <img> element.
-     * The element's dimensions are set according to the window size.
-     *
-     * @returns {HTMLElement} The rendered <img> element.
+     * Renders the canvas element.
+     * @returns {HTMLCanvasElement} The rendered canvas element.
      */
     render() {
-        const img = document.createElement('img');
+        const canvas = document.createElement('canvas');
         const size = this.getElementSize();
-        img.style.width = size + 'px';
-        img.style.height = size + 'px';
-        img.style.objectFit = 'cover';
-        // Optionally, add a fade-in transition.
-        img.style.transition = 'opacity 0.5s ease-in-out';
-        img.style.opacity = '1';
-        if (this.state.currentImageUrl) {
-            img.src = this.state.currentImageUrl;
-        }
-        return img;
+        
+        // Add styles to make canvas fill container as a square
+        canvas.style.width = '100%';
+        canvas.style.height = '100%';
+        canvas.style.display = 'block';
+        canvas.style.backgroundColor = 'black';
+        canvas.style.aspectRatio = '1 / 1'; // Force square aspect ratio
+        
+        // Set canvas dimensions
+        canvas.width = size;
+        canvas.height = size;
+        
+        // Draw initial state
+        this.element = canvas;
+        this.drawState();
+        
+        return canvas;
     }
     
     /**
-     * Updates the displayed <img> element.
-     * Instead of replacing the element, it updates its attributes directly.
+     * Updates the canvas element.
      */
     update() {
-        if (this.element) {
-            const size = this.getElementSize();
-            this.element.style.width = size + 'px';
-            this.element.style.height = size + 'px';
-            if (this.state.currentImageUrl) {
-                this.element.src = this.state.currentImageUrl;
-            }
-        } else {
-            const newElement = this.render();
-            this.element = newElement;
+        if (!this.element) {
+            this.element = this.render();
         }
+        const size = this.getElementSize();
+        this.element.style.width = size + 'px';
+        this.element.style.height = size + 'px';
+        this.element.width = size;
+        this.element.height = size;
+        this.drawState();
+    }
+
+    // Add method to preload and cache image
+    loadImage(url) {
+        return new Promise((resolve, reject) => {
+            if (this.imageCache.has(url)) {
+                resolve(this.imageCache.get(url));
+                return;
+            }
+
+            const img = new Image();
+            img.crossOrigin = 'anonymous';
+            
+            img.onload = () => {
+                this.imageCache.set(url, img);
+                resolve(img);
+            };
+            
+            img.onerror = () => {
+                reject(new Error(`Failed to load image: ${url}`));
+            };
+            
+            img.src = url;
+        });
+    }
+
+    // Move wrapText to be a method of the class and pass ctx as parameter
+    wrapText(ctx, text, maxWidth) {
+        const words = text.split('');
+        const lines = [];
+        let currentLine = '';
+        
+        for (let i = 0; i < words.length; i++) {
+            const char = words[i];
+            const testLine = currentLine + char;
+            const metrics = ctx.measureText(testLine);
+            
+            if (metrics.width > maxWidth && currentLine !== '') {
+                lines.push(currentLine);
+                currentLine = char;
+            } else {
+                currentLine = testLine;
+            }
+        }
+        lines.push(currentLine);
+        return lines;
     }
 } 

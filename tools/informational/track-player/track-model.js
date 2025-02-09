@@ -314,9 +314,10 @@ class Track {
      * @param {number} tStart - Start time
      * @param {Object|string} description - Description
      * @param {number} [nT] - Optional number of time units (defaults to track's n)
+     * @param {string} [imageUrl] - Optional image URL for the timebox
      */
-    addTimeboxToSection(section, tStart, description, nT = undefined) {
-        const timebox = new TimeBox(description, nT);
+    addTimeboxToSection(section, tStart, description, nT = undefined, imageUrl = null) {
+        const timebox = new TimeBox(description, nT, imageUrl);
         section.timeboxes.push(timebox);
         return timebox;
     }

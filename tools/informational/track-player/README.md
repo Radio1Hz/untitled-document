@@ -1,6 +1,8 @@
 ### Track-Player: Formal Mathematical Model  
 A visual tool for interacting with temporal structures ("tracks") through playback control (play, pause, rewind, etc.) and visualization. The system is defined hierarchically as follows:  
 
+https://untitled-document.net/tools/informational/track-player/#1
+
 ---  
 
 #### **1. Time Unit ($\tau$)**  
