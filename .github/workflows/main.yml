@@ -3,7 +3,6 @@ on:
   push:
     branches:
       - main  # or your default branch name
-  # Enable manual triggers from VS Code
   workflow_dispatch:
 
 jobs:
@@ -11,7 +10,6 @@ jobs:
     name: deploy
     runs-on: ubuntu-latest
     
-    # Add environment variables at job level
     env:
       DEPLOY_PATH: untitled-document.net/public_html
 
@@ -44,6 +42,10 @@ jobs:
         done
         touch dist/commit_time.txt
 
+    - name: List contents of dist directory
+      run: |
+        ls -R dist
+
     - name: Upload to untitled-document.net ftp
       uses: sebastianpopp/ftp-action@v2.0.0
       with:
@@ -52,4 +54,3 @@ jobs:
         password: ${{ secrets.FTP_PASSWORD }}
         localDir: "dist"
         remoteDir: ${{ env.DEPLOY_PATH }}
-    
