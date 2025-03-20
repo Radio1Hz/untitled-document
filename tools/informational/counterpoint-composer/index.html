@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Counterpoint Composer - Based on Fux's Gradus ad Parnassum</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <h1>Counterpoint Composer</h1>
+    <div class="tutorial">
+        <h2>Quick Tutorial</h2>
+        <ol>
+            <li>This tool helps you compose First Species Counterpoint (note against note)</li>
+            <li>Enter notes in both the Cantus Firmus (CF) and Counterpoint lines</li>
+            <li>Use standard notation (C4, D4, E4, etc. where the number represents the octave)</li>
+            <li>The tool will validate your counterpoint against basic rules</li>
+            <li>Start with C4 and end with C4 for a simple C major exercise</li>
+        </ol>
+        <h3>Basic Rules:</h3>
+        <ul>
+            <li>Use only consonant intervals (3rds, 5ths, 6ths, octaves)</li>
+            <li>Avoid parallel fifths and octaves</li>
+            <li>Move in contrary or oblique motion when possible</li>
+            <li>End with an octave or unison</li>
+        </ul>
+    </div>
+
+    <div class="controls">
+        <div class="generator-controls">
+            <select id="mode-select">
+                <option value="ionian">Ionian (Major)</option>
+                <option value="dorian">Dorian</option>
+                <option value="phrygian">Phrygian</option>
+                <option value="lydian">Lydian</option>
+                <option value="mixolydian">Mixolydian</option>
+                <option value="aeolian">Aeolian (Minor)</option>
+            </select>
+            <select id="length-select">
+                <option value="8">8 Notes</option>
+                <option value="10">10 Notes</option>
+                <option value="12">12 Notes</option>
+            </select>
+            <button onclick="generateCantusFirmus()">Generate Cantus Firmus</button>
+        </div>
+        <button onclick="validateCounterpoint()">Validate Counterpoint</button>
+        <button onclick="playComposition()">Play</button>
+        <button onclick="clearAll()">Clear All</button>
+    </div>
+
+    <div class="composition-area">
+        <h3>Counterpoint Line</h3>
+        <div class="composition-grid" id="counterpoint-line">
+            <!-- Will be filled by JavaScript -->
+        </div>
+
+        <h3>Cantus Firmus</h3>
+        <div class="composition-grid" id="cantus-firmus">
+            <!-- Will be filled by JavaScript -->
+        </div>
+    </div>
+
+    <div id="validation-messages" class="validation-message"></div>
+
+    <script src="app.js"></script>
+</body>
+</html>

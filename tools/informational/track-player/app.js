@@ -382,35 +382,64 @@ document.addEventListener('DOMContentLoaded', async () => {
 
         // Function to update playlist view (simplified)
         function updatePlaylistView() {
-            const playlistItems = document.querySelector('.playlist-items');
-            if (!playlistItems) return;  // Add safety check
-            
-            playlistItems.innerHTML = '';
-            
-            //console.log("PlaylistItems element:", playlistItems);
-            //console.log("Creating items for tracks:", playlist.tracks.map(t => t.id));
-            
-            playlist.tracks.forEach((track, index) => {
-                const item = document.createElement('button');
-                item.className = 'playlist-item untitled-button';
-                if (index === playlist.currentIndex) {
-                    item.classList.add('current');
-                }
-                
-                // Extract track number from audioUrl
-                const trackNumber = track.audioUrl.match(/\/(\d+)\./)?.[1] || '?';
-                
-                item.innerHTML = `${trackNumber}`;
-                item.title = `${track.description?.en || track.id} [${formatDuration(track.totalDuration())}]`;
-                
-                item.addEventListener('click', () => {
-                    playlist.jumpTo(index);
-                    updatePlaylistView();
-                    loadAndPlayTrack(playlist.getCurrentTrack());
-                });
-                
-                playlistItems.appendChild(item);
+            const trackTitle = document.getElementById('track-title');
+            if (!trackTitle) return;
+
+            // Create hover menu container
+            const hoverMenu = document.createElement('div');
+            hoverMenu.className = 'track-hover-menu';
+            hoverMenu.style.display = 'none';
+
+            // Get current track number
+            const currentTrackNumber = playlist.getCurrentTrack()?.audioUrl.match(/\/(\d+)\./)?.[1];
+
+            // Create track links
+            const trackNumbers = [1, 6, 9, 11]; // Available tracks
+            trackNumbers.forEach(num => {
+                const link = document.createElement('a');
+                link.href = `#${num}`;
+                link.className = 'track-hover-item' + (num === Number(currentTrackNumber) ? ' current' : '');
+                link.textContent = `track ${num}`;
+                hoverMenu.appendChild(link);
             });
+
+            // Extract track name from full path
+            const trackPath = playlist.getCurrentTrack()?.id || '';
+            const trackNameMatch = trackPath.match(/\\tracks\\([^\\]+)/);
+            const trackName = trackNameMatch ? trackNameMatch[1] : '';
+
+            // Create hoverable span for track name
+            const trackNameSpan = document.createElement('span');
+            trackNameSpan.className = 'track-name-hover';
+            trackNameSpan.textContent = trackName;
+
+            // Set up hover behavior
+            trackNameSpan.addEventListener('mouseover', () => {
+                hoverMenu.style.display = 'block';
+            });
+
+            trackNameSpan.addEventListener('mouseout', (e) => {
+                if (!e.relatedTarget?.closest('.track-hover-menu')) {
+                    hoverMenu.style.display = 'none';
+                }
+            });
+
+            hoverMenu.addEventListener('mouseleave', () => {
+                hoverMenu.style.display = 'none';
+            });
+
+            // Clear and rebuild track title
+            trackTitle.innerHTML = '';
+            const prefix = document.createTextNode('\\vikktør\\tracks\\');
+            trackTitle.appendChild(prefix);
+            trackTitle.appendChild(trackNameSpan);
+            trackTitle.appendChild(hoverMenu);
+
+            // If there's a section description, append it
+            if (playlist.getCurrentTrack()?.sections[0]?.desc) {
+                const sectionDesc = playlist.getCurrentTrack().sections[0].desc.en;
+                trackTitle.appendChild(document.createTextNode('\\' + sectionDesc));
+            }
         }
 
         // Make sure to call updatePlaylistView after adding all tracks
