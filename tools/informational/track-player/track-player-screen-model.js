@@ -1,6 +1,7 @@
 import { Component } from './component.js';
 import { PlayerScreenCanvas } from './player-screen-canvas.js';
 import { PlaybackMode, TrackPlayer } from './track-player-model.js';
+import { TrackState } from './track-model.js';
 
 /**
  * Represents a screen: Σ = (R, C, I, H, D)
@@ -149,6 +150,41 @@ class Timeline extends Component {
                 
                 marker.appendChild(label);
                 
+                // Add click handler to jump to section start
+                marker.addEventListener('click', (e) => {
+                    e.stopPropagation(); // Prevent timeline click handler from firing
+                    
+                    // Create state for the start of this section
+                    const targetState = new TrackState(index, 0, 0);
+                    
+                    // Store current mode
+                    const wasPlaying = this.props.player.mode === PlaybackMode.PLAYING;
+                    
+                    // Pause playback
+                    if (wasPlaying) {
+                        this.props.player.pause();
+                    }
+                    
+                    // Calculate absolute time for this state
+                    const targetTime = targetState.absoluteTime(this.props.track);
+                    
+                    // Use seek to properly synchronize state and time
+                    this.props.player.seek(targetTime);
+                    
+                    // Resume if it was playing
+                    if (wasPlaying) {
+                        // Wait for audio to be ready at new position before resuming
+                        const audioElement = document.getElementById('track-audio');
+                        if (audioElement) {
+                            audioElement.addEventListener('seeked', () => {
+                                this.props.player.play();
+                            }, { once: true });
+                        } else {
+                            this.props.player.play();
+                        }
+                    }
+                });
+                
                 // Highlight current section
                 if (this.state.currentState && this.state.currentState.i === index) {
                     marker.classList.add('current-marker');
@@ -204,38 +240,28 @@ class Timeline extends Component {
     setState(newState) {
         // Calculate new active width if state changed
         if (newState.currentState && this.props.track) {
-            // Get the next state
-            const nextState = newState.currentState.advance(this.props.track);
+            const track = this.props.track;
+            let totalTimeUnits = 0;
+            let currentTimeUnits = 0;
             
-            // Calculate absolute time for current state
-            const currentAbsoluteTime = newState.currentState.absoluteTime(this.props.track);
-            const totalDuration = this.props.track.totalDuration();
+            // Calculate total time units and current progress
+            track.sections.forEach((section, i) => {
+                section.timeboxes.forEach((timebox, j) => {
+                    const nT = timebox.nT !== undefined ? timebox.nT : track.n;
+                    totalTimeUnits += nT;
+                    
+                    // Count units up to current state
+                    if (i < newState.currentState.i || (i === newState.currentState.i && j < newState.currentState.j)) {
+                        currentTimeUnits += nT;
+                    } else if (i === newState.currentState.i && j === newState.currentState.j) {
+                        currentTimeUnits += newState.currentState.k;
+                    }
+                });
+            });
             
-            if (nextState) {
-                // Use next state's time for progress bar
-                const nextAbsoluteTime = nextState.absoluteTime(this.props.track);
-                newState.progress = (nextAbsoluteTime / totalDuration) * 100;
-            } else {
-                // If at end of track, ensure we show 100% progress
-                const lastSection = this.props.track.sections[this.props.track.sections.length - 1];
-                const lastBox = lastSection.timeboxes[lastSection.timeboxes.length - 1];
-                const nT = lastBox.nT !== undefined ? lastBox.nT : this.props.track.n;
-                
-                // Check if we're in the final timebox
-                const isLastBox = newState.currentState.i === this.props.track.sections.length - 1 &&
-                                newState.currentState.j === lastSection.timeboxes.length - 1;
-                
-                if (isLastBox && newState.currentState.k === nT - 1) {
-                    // At very end of track
-                    newState.progress = 100;
-                } else {
-                    // Still playing final section
-                    newState.progress = (currentAbsoluteTime / totalDuration) * 100;
-                }
-            }
+            newState.progress = (currentTimeUnits / totalTimeUnits) * 100;
         } else {
             newState.progress = 0;
-            //console.log('Timeline progress set to 0% due to missing state or track');
         }
         
         super.setState(newState);
@@ -319,9 +345,53 @@ class SectionView extends Component {
             
             // Add section index display
             const sectionIndexDisplay = document.createElement('div');
-            sectionIndexDisplay.className = 'section-index state-value';
+            sectionIndexDisplay.className = 'section-index state-value clickable';
             sectionIndexDisplay.textContent = sectionIndex.toString().padStart(2, '0');
             
+            // Add click handler to jump to section start
+            sectionIndexDisplay.addEventListener('click', (e) => {
+                e.stopPropagation(); // Prevent event bubbling
+                
+                const track = this.state.currentTrack;
+                
+                if (!track || !this.screen?.player) {
+                    console.warn('Track or player not available');
+                    return;
+                }
+                
+                // Create state for the start of this section
+                const targetState = new TrackState(sectionIndex, 0, 0);
+                
+                // Store current mode
+                const wasPlaying = this.screen.player.mode === PlaybackMode.PLAYING;
+                
+                // Pause playback
+                if (wasPlaying) {
+                    this.screen.player.pause();
+                }
+                
+                // Use seek to properly synchronize state and time
+                const targetTime = targetState.absoluteTime(track);
+                this.screen.player.seek(targetTime);
+                
+                // Update audio element's time to match
+                const audioElement = document.getElementById('track-audio');
+                if (audioElement) {
+                    audioElement.currentTime = targetTime;
+                }
+                
+                // Resume if it was playing
+                if (wasPlaying) {
+                    // Wait for audio to be ready at new position before resuming
+                    if (audioElement) {
+                        audioElement.addEventListener('seeked', () => {
+                            this.screen.player.play();
+                        }, { once: true });
+                    } else {
+                        this.screen.player.play();
+                    }
+                }
+            });
             
             // Only show sections in sectionsToShow array
             if (sectionsToShow.includes(sectionIndex)) {
@@ -338,6 +408,7 @@ class SectionView extends Component {
             timeboxesContainer.className = 'timeboxes-container';
             timeboxesContainer.appendChild(sectionIndexDisplay);
             section.timeboxes.forEach((timebox, timeboxIndex) => {
+
                 const timeboxElement = document.createElement('div');
                 timeboxElement.className = 'timebox';
                 
@@ -346,6 +417,53 @@ class SectionView extends Component {
                 const width_px = Math.round(nT * this.screen.tau_width_px);
                 timeboxElement.style.width = `${width_px}px`;
                 timeboxElement.style.flexShrink = '0'; // Prevent shrinking
+
+                // Add click handler to jump to timebox start
+                timeboxElement.addEventListener('click', (e) => {
+                    e.stopPropagation(); // Prevent event bubbling
+                    
+                    const track = this.state.currentTrack;
+                    
+                    if (!track || !this.screen?.player) {
+                        console.warn('Track or player not available');
+                        return;
+                    }
+                    
+                    // Create state for the clicked timebox
+                    const targetState = new TrackState(sectionIndex, timeboxIndex, 0);
+                    
+                    
+                    // Store current mode
+                    const wasPlaying = this.screen.player.mode === PlaybackMode.PLAYING;
+                    
+                    // Pause playback
+                    if (wasPlaying) {
+                        this.screen.player.pause();
+                    }
+                    
+                    // Use seek to properly synchronize state and time
+                    const targetTime = targetState.absoluteTime(track);
+                    this.screen.player.seek(targetTime);
+                    
+                    // Update audio element's time to match
+                    const audioElement = document.getElementById('track-audio');
+                    if (audioElement) {
+                        audioElement.currentTime = targetTime;
+                    }
+                    
+                    // Resume if it was playing
+                    if (wasPlaying) {
+                        // Wait for audio to be ready at new position before resuming
+                        const audioElement = document.getElementById('track-audio');
+                        if (audioElement) {
+                            audioElement.addEventListener('seeked', () => {
+                                this.screen.player.play();
+                            }, { once: true });
+                        } else {
+                            this.screen.player.play();
+                        }
+                    }
+                });
                 
                 // Add current-box class if this is the current timebox
                 if (currentState && 
@@ -541,7 +659,8 @@ export class TrackPlayerScreen extends Screen {
         if (this.timeline) {
             this.timeline.props = {
                 language: this.language,
-                track: this.player.currentTrack
+                track: this.player.currentTrack,
+                player: this.player  // Pass player instance to Timeline
             };
         }
 
@@ -603,67 +722,102 @@ export class TrackPlayerScreen extends Screen {
      * @param {Object} event - Player state event
      */
     handlePlayerUpdate(event) {
-        //console.log('Handling player update:', event);  // Debug log
         
-        // Update section view
+        const state = event.state || this.player.state;  // Get state from event or player
+        if (!state) return;
+
+        // Check if state has actually changed
+        const hasStateChanged = !this.lastState || 
+            this.lastState.i !== state.i || 
+            this.lastState.j !== state.j;
+
+        // Always update position highlighting for smooth dot transitions
         if (this.sectionView) {
             this.sectionView.updatePositionHighlighting();
         }
         
         // Update state info display with leading zeros
-        const state = event.state || this.player.state;  // Get state from event or player
-        if (state) {
-            const currentSection = document.getElementById('current-section');
-            const currentBox = document.getElementById('current-box');
-            const currentPosition = document.getElementById('current-position');
-            
-            if (currentSection && currentBox && currentPosition) {
-                currentSection.textContent = state.i.toString().padStart(2, '0');
-                currentBox.textContent = state.j.toString().padStart(2, '0');
-                currentPosition.textContent = state.k.toString().padStart(2, '0');
-            }
-
-            // Update sections view
-            if (this.sectionView) {
-                this.sectionView.setState({
-                    currentTrack: this.player.currentTrack,
-                    currentLanguage: this.language
-                });
-                // Force re-render of sections
-                const sectionsContent = document.querySelector('#sections-content');
-                if (sectionsContent) {
-                    const sectionElement = this.sectionView.render();
-                    if (sectionElement) {
-                        sectionsContent.innerHTML = '';
-                        sectionsContent.appendChild(sectionElement);
-                    }
-                }
-            }
-        }
+        const currentSection = document.getElementById('current-section');
+        const currentBox = document.getElementById('current-box');
+        const currentPosition = document.getElementById('current-position');
         
-        // Update timeline progress
-        if (this.timeline && this.player.currentTrack) {
-            const progress = (this.player.time / this.player.currentTrack.totalDuration()) * 100;
-            this.timeline.setState({
-                progress: progress,
-                currentState: state
+        if (currentSection && currentBox && currentPosition) {
+            currentSection.textContent = state.i.toString().padStart(2, '0');
+            currentBox.textContent = state.j.toString().padStart(2, '0');
+            currentPosition.textContent = state.k.toString().padStart(2, '0');
+        }
+
+        // Only re-render sections if state has meaningfully changed
+        if (hasStateChanged && this.sectionView) {
+            
+            this.sectionView.setState({
+                currentTrack: this.player.currentTrack,
+                currentLanguage: this.language
             });
             
-            // Force re-render of timeline
-            const timelineContainer = document.querySelector('.timeline');
-            if (timelineContainer) {
-                const timelineElement = this.timeline.render();
-                timelineContainer.innerHTML = '';
-                timelineContainer.appendChild(timelineElement);
+            // Force re-render of sections
+            const sectionsContent = document.querySelector('#sections-content');
+            if (sectionsContent) {
+                const sectionElement = this.sectionView.render();
+                if (sectionElement) {
+                    sectionsContent.innerHTML = '';
+                    sectionsContent.appendChild(sectionElement);
+                }
+            }
+            
+            // Update last state after re-render
+            this.lastState = { ...state };
+        }
+        
+        // Update timeline
+        if (this.timeline && this.player.currentTrack && state) {
+            // Calculate progress based on time units instead of absolute time
+            const track = this.player.currentTrack;
+            let totalTimeUnits = 0;
+            let currentTimeUnits = 0;
+            
+            // Calculate total time units
+            track.sections.forEach((section, i) => {
+                section.timeboxes.forEach((timebox, j) => {
+                    const nT = timebox.nT !== undefined ? timebox.nT : track.n;
+                    totalTimeUnits += nT;
+                    
+                    // Count units up to current state
+                    if (i < state.i || (i === state.i && j < state.j)) {
+                        currentTimeUnits += nT;
+                    } else if (i === state.i && j === state.j) {
+                        currentTimeUnits += state.k;
+                    }
+                });
+            });
+            
+            const progress = (currentTimeUnits / totalTimeUnits) * 100;
+            
+            // Only do full re-render if state changed
+            if (hasStateChanged) {
+                this.timeline.setState({
+                    progress: progress,
+                    currentState: state
+                });
+                
+                // Re-render timeline for state changes
+                const timelineContainer = document.querySelector('.timeline');
+                if (timelineContainer) {
+                    const timelineElement = this.timeline.render();
+                    timelineContainer.innerHTML = '';
+                    timelineContainer.appendChild(timelineElement);
+                }
+            } else {
+                // Only update progress if k (time unit) has changed
+                const progressBar = document.querySelector('.timeline-progress');
+                if (progressBar && (!this.lastState || state.k !== this.lastState.k)) {
+                    progressBar.style.width = `${progress}%`;
+                }
             }
         }
 
         // Handle image loading through the new mechanism
         if (this.canvas) {
-            //console.log('Player update:', {
-            //    mode: this.player.mode,
-            //    state: event.state
-            //});
             
             if (this.player.mode === 'STOPPED') {
                 this.canvas.handleStateTransition(null, this.player.currentTrack, 'STOPPED');

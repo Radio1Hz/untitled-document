@@ -12,7 +12,7 @@ export const track9 =
   "n": 8,
   "tau_omega": "2019-08-19 20:00:00.00",
   "dedication": "før aurøra",
-  "audioUrl": "https://untitled-document.net/knowledge/agents/viktor-r/projects/vikktør/tracks/9. untitled-track/9. untitled-track.wav",
+  "audioUrl": "/knowledge/agents/viktor-r/projects/vikktør/tracks/9. untitled-track/9. untitled-track.wav",
   "actions": [
     {
       "actionStartState": { "i": 0, "j": 0, "k": 0 },
@@ -59,7 +59,7 @@ export const track9 =
         "ru": "вступление",
         "ar": "مقدمة"
       },
-      "imageUrl": "https://untitled-document.net/knowledge/agents/viktor-r/projects/vikktør/tracks/9. untitled-track/images/9-untitled-track-image-intro.jpg",
+      "imageUrl": "/knowledge/agents/viktor-r/projects/vikktør/tracks/9. untitled-track/images/9-untitled-track-image-intro.jpg",
       "timeboxes": [
         {
           "description": {
@@ -80,7 +80,7 @@ export const track9 =
         "ru": "I Единица времени (τ)",
         "ar": "I وحدة الزمن (τ)"
       },
-      "imageUrl": "https://untitled-document.net/knowledge/agents/viktor-r/projects/vikktør/tracks/9. untitled-track/images/9-untitled-track-image-section-2.jpg",
+      "imageUrl": "/knowledge/agents/viktor-r/projects/vikktør/tracks/9. untitled-track/images/9-untitled-track-image-section-2.jpg",
       "timeboxes": [
         {
           "description": {"en": "Am (aeolian)", "zh": "Am (aeolian)", "ru": "Am (aeolian)", "ar": "Am (aeolian)"},
@@ -92,7 +92,7 @@ export const track9 =
           "description": {"en": "Am", "zh": "Am", "ru": "Am", "ar": "Am"},
           "nT": 8,
 
-          "imageUrl": "https://untitled-document.net/knowledge/agents/viktor-r/projects/vikktør/tracks/9. untitled-track/images/9-untitled-track-image-section-10.jpg"
+          "imageUrl": "/knowledge/agents/viktor-r/projects/vikktør/tracks/9. untitled-track/images/9-untitled-track-image-section-10.jpg"
         },
         {
           "description": {"en": "Am", "zh": "Am", "ru": "Am", "ar": "Am"},
@@ -119,7 +119,7 @@ export const track9 =
         "ru": "II Таймбокс (T)", 
         "ar": "II صندوق الوقت (T)"
       },
-      "imageUrl": "https://untitled-document.net/knowledge/agents/viktor-r/projects/vikktør/tracks/9. untitled-track/images/9-untitled-track-image-section-2.jpg",
+      "imageUrl": "/knowledge/agents/viktor-r/projects/vikktør/tracks/9. untitled-track/images/9-untitled-track-image-section-2.jpg",
       "timeboxes": [
         {
           "description": {"en": "Am", "zh": "Am", "ru": "Am", "ar": "Am"},
@@ -160,7 +160,7 @@ export const track9 =
         "ru": "III Секция (S)",
         "ar": "III القسم (S)"
       },
-      "imageUrl": "https://untitled-document.net/knowledge/agents/viktor-r/projects/vikktør/tracks/9. untitled-track/images/9-untitled-track-image-section-2.jpg",
+      "imageUrl": "/knowledge/agents/viktor-r/projects/vikktør/tracks/9. untitled-track/images/9-untitled-track-image-section-2.jpg",
       "timeboxes": [
         {
           "description": {"en": "F (lydian)", "zh": "F (lydian)", "ru": "F (lydian)", "ar": "F (lydian)"},
@@ -205,7 +205,7 @@ export const track9 =
         "ru": "IV Трек (Θ)", 
         "ar": "IV المسار (Θ)"
       },
-      "imageUrl": "https://untitled-document.net/knowledge/agents/viktor-r/projects/vikktør/tracks/9. untitled-track/images/9-untitled-track-image-section-10.jpg",
+      "imageUrl": "/knowledge/agents/viktor-r/projects/vikktør/tracks/9. untitled-track/images/9-untitled-track-image-section-10.jpg",
       "timeboxes": [
         {
           "description": {"en": "F", "zh": "F", "ru": "F", "ar": "F"},
@@ -253,7 +253,7 @@ export const track9 =
         "ru": "V Единица времени (τ)",
         "ar": "V وحدة الزمن (τ)"
       },
-      "imageUrl": "https://untitled-document.net/knowledge/agents/viktor-r/projects/vikktør/tracks/9. untitled-track/images/9-untitled-track-image-section-2.jpg",
+      "imageUrl": "/knowledge/agents/viktor-r/projects/vikktør/tracks/9. untitled-track/images/9-untitled-track-image-section-2.jpg",
       "timeboxes": [
         {
           "description": {"en": "Am", "zh": "Am", "ru": "Am", "ar": "Am"},
@@ -294,7 +294,7 @@ export const track9 =
         "ru": "VI Таймбокс (T)", 
         "ar": "VI صندوق الوقت (T)"
       },
-      "imageUrl": "https://untitled-document.net/knowledge/agents/viktor-r/projects/vikktør/tracks/9. untitled-track/images/9-untitled-track-image-section-2.jpg",
+      "imageUrl": "/knowledge/agents/viktor-r/projects/vikktør/tracks/9. untitled-track/images/9-untitled-track-image-section-2.jpg",
       "timeboxes": [
         {
           "description": {"en": "Am", "zh": "Am", "ru": "Am", "ar": "Am"},
@@ -335,7 +335,7 @@ export const track9 =
         "ru": "VII Секция (S)",
         "ar": "VII القسم (S)"
       },
-      "imageUrl": "https://untitled-document.net/knowledge/agents/viktor-r/projects/vikktør/tracks/9. untitled-track/images/9-untitled-track-image-section-10.jpg",
+      "imageUrl": "/knowledge/agents/viktor-r/projects/vikktør/tracks/9. untitled-track/images/9-untitled-track-image-section-10.jpg",
       "timeboxes": [
         {
           "description": {"en": "F", "zh": "F", "ru": "F", "ar": "F"},
@@ -382,7 +382,7 @@ export const track9 =
         "ru": "VIII Трек (Θ)", 
         "ar": "VIII المسار (Θ)"
       },
-      "imageUrl": "https://untitled-document.net/knowledge/agents/viktor-r/projects/vikktør/tracks/9. untitled-track/images/9-untitled-track-image-section-10.jpg",
+      "imageUrl": "/knowledge/agents/viktor-r/projects/vikktør/tracks/9. untitled-track/images/9-untitled-track-image-section-10.jpg",
       "timeboxes": [
         {
           "description": {"en": "F", "zh": "F", "ru": "F", "ar": "F"},
@@ -428,7 +428,7 @@ export const track9 =
         "ru": "X леви немного хвастается :) <3",
         "ar": "X ليفي يتفاخر قليلاً :) <3"
       },
-      "imageUrl": "https://untitled-document.net/knowledge/agents/viktor-r/projects/vikktør/tracks/9. untitled-track/images/9-untitled-track-image-section-10.jpg",
+      "imageUrl": "/knowledge/agents/viktor-r/projects/vikktør/tracks/9. untitled-track/images/9-untitled-track-image-section-10.jpg",
       "timeboxes": [
         {
           "description": {"en": "F", "zh": "F", "ru": "F", "ar": "F"},

@@ -155,8 +155,15 @@ export class TrackPlayer {
     update(deltaTime) {
         if (this.mode !== PlaybackMode.PLAYING || !this.currentTrack) return;
 
+        // Update time
+        const previousTime = this.time;
         this.time += deltaTime * this.speed;
-        this.checkStateTransitions();
+        
+        // Only check transitions if we haven't just seeked
+        // (seek operations will set state directly)
+        if (Math.abs(this.time - previousTime) <= (deltaTime * this.speed * 1.1)) {
+            this.checkStateTransitions();
+        }
     }
 
     /**
@@ -176,11 +183,6 @@ export class TrackPlayer {
                 this.state.j !== nextTransition.state.j || 
                 this.state.k !== nextTransition.state.k) {
                 
-                //console.log('State transition:', {
-                //    from: this.state ? `(${this.state.i},${this.state.j},${this.state.k})` : 'null',
-                //    to: `(${nextTransition.state.i},${nextTransition.state.j},${nextTransition.state.k})`,
-                //    time: this.time.toFixed(2)
-                //});
 
                 this.setState(nextTransition.state);
             }
@@ -270,13 +272,19 @@ export class TrackPlayer {
      * @returns {TrackPlayer} Updated player instance
      */
     seek(time) {
-        if (time < 0 || time > this.currentTrack.totalDuration()) {
+        if (!this.currentTrack || time < 0 || time > this.currentTrack.totalDuration()) {
             return this;
         }
 
-        let currentTime = 0;
-        let state = new TrackState();
+        // Store current mode and temporarily stop updates
+        const wasPlaying = this.mode === PlaybackMode.PLAYING;
+        this.mode = PlaybackMode.PAUSED;
 
+        // Start with initial state
+        let state = new TrackState(0, 0, 0);
+        let currentTime = state.absoluteTime(this.currentTrack);
+
+        // Find the state that corresponds to the target time
         while (currentTime < time) {
             const nextState = state.advance(this.currentTrack);
             if (!nextState) break;
@@ -288,7 +296,40 @@ export class TrackPlayer {
             currentTime = nextTime;
         }
 
-        this.state = state;
+
+        // Set the state first, then update time
+        this.setState(state);
+        this.time = currentTime;
+        
+        // Update audio element's time to match
+        const audioElement = document.getElementById('track-audio');
+        if (audioElement) {
+            audioElement.currentTime = currentTime;
+        }
+        
+        // Resume playback only after audio has seeked to new position
+        if (wasPlaying) {
+            const audioElement = document.getElementById('track-audio');
+            if (audioElement) {
+                audioElement.addEventListener('seeked', () => {
+                    this.mode = PlaybackMode.PLAYING;
+                    this.emit('stateChange', {
+                        state: this.state,
+                        mode: this.mode,
+                        time: this.time
+                    });
+                }, { once: true });
+            } else {
+                // If no audio element, resume immediately
+                this.mode = PlaybackMode.PLAYING;
+                this.emit('stateChange', {
+                    state: this.state,
+                    mode: this.mode,
+                    time: this.time
+                });
+            }
+        }
+        
         return this;
     }
 
@@ -299,7 +340,14 @@ export class TrackPlayer {
      */
     jumpToSection(sectionIndex) {
         if (sectionIndex >= 0 && sectionIndex < this.currentTrack.sections.length) {
-            this.state = new TrackState(sectionIndex, 0, 0);
+            // Create new state at start of section
+            const newState = new TrackState(sectionIndex, 0, 0);
+            
+            // Calculate the absolute time for this state
+            const targetTime = newState.absoluteTime(this.currentTrack);
+            
+            // Use seek to properly handle the jump
+            this.seek(targetTime);
         }
         return this;
     }
@@ -326,7 +374,6 @@ export class TrackPlayer {
         
         return {
             subscribe: (callback) => {
-                //console.log('Event subscription added');
                 listeners.add(callback);
                 return () => listeners.delete(callback);
             },
@@ -432,7 +479,6 @@ export class TrackPlayer {
      * @param {Function} callback - Event handler
      */
     addEventListener(event, callback) {
-        //console.log('Adding event listener for:', event);  // Debug log
         if (!this.listeners.has(event)) {
             this.listeners.set(event, new Set());
         }
@@ -461,7 +507,6 @@ export class TrackPlayer {
                 try {
                     callback(data);
                 } catch (error) {
-                    console.error('Error in event handler:', error);
                 }
             });
         }

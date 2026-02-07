@@ -12,7 +12,7 @@ export const track1 =
   "n": 4,
   "tau_omega": null,
   "dedication": "før søfia",
-  "audioUrl": "https://untitled-document.net/knowledge/agents/viktor-r/projects/vikktør/tracks/1. there is no wisdom without kindness v1.1/1. there is no wisdom without kindness.wav",
+  "audioUrl": "/knowledge/agents/viktor-r/projects/vikktør/tracks/1. there is no wisdom without kindness v1.1/1. there is no wisdom without kindness.wav",
   "sections": [
     {
       "description": {
@@ -21,7 +21,7 @@ export const track1 =
         "ru": "вступление", 
         "ar": "مقدمة"
       },
-      "imageUrl": "https://untitled-document.net/knowledge/agents/viktor-r/projects/vikktør/tracks/1. there is no wisdom without kindness v1.1/images/1-0-image-d2.jpg",
+      "imageUrl": "/knowledge/agents/viktor-r/projects/vikktør/tracks/1. there is no wisdom without kindness v1.1/images/1-0-image-d2.jpg",
       "timeboxes": [
         {
           "description": { "en": "intro", "zh": "intro", "ru": "intro", "ar": "intro" },
@@ -36,7 +36,7 @@ export const track1 =
         "ru": "без доброты нет мудрости",
         "ar": "لا حكمة بدون لطف"
       },
-      "imageUrl": "https://untitled-document.net/knowledge/agents/viktor-r/projects/vikktør/tracks/1. there is no wisdom without kindness v1.1/images/1-1-image-sd.webp",
+      "imageUrl": "/knowledge/agents/viktor-r/projects/vikktør/tracks/1. there is no wisdom without kindness v1.1/images/1-1-image-sd.webp",
       "timeboxes": [
         {
           "description": { "en": "Em (aeolian)", "zh": "Em (爱奥尼亚调式)", "ru": "Em (эолийский режим)", "ar": "Em (عويلية)" },
@@ -87,7 +87,7 @@ export const track1 =
         "ru": "без доброты нет мудрости",
         "ar": "لا حكمة بدون لطف"
       },
-      "imageUrl": "https://untitled-document.net/knowledge/agents/viktor-r/projects/vikktør/tracks/1. there is no wisdom without kindness v1.1/images/1-2-image-sd.webp",
+      "imageUrl": "/knowledge/agents/viktor-r/projects/vikktør/tracks/1. there is no wisdom without kindness v1.1/images/1-2-image-sd.webp",
       "timeboxes": [
         {
           "description": { "en": "Em", "zh": "Em", "ru": "Em", "ar": "Em" },
@@ -138,7 +138,7 @@ export const track1 =
         "ru": "без доброты нет мудрости",
         "ar": "لا حكمة بدون لطف"
       },
-      "imageUrl": "https://untitled-document.net/knowledge/agents/viktor-r/projects/vikktør/tracks/1. there is no wisdom without kindness v1.1/images/1-3-image-sd.webp",
+      "imageUrl": "/knowledge/agents/viktor-r/projects/vikktør/tracks/1. there is no wisdom without kindness v1.1/images/1-3-image-sd.webp",
       "timeboxes": [
         {
           "description": { "en": "Em", "zh": "Em", "ru": "Em", "ar": "Em" },
@@ -163,27 +163,27 @@ export const track1 =
         {
           "description": { "en": "Am", "zh": "Am", "ru": "Am", "ar": "Am" },
           "nT": 4,
-          "imageUrl": "https://untitled-document.net/knowledge/agents/viktor-r/projects/vikktør/tracks/1. there is no wisdom without kindness v1.1/images/faten-hamama.png"
+          "imageUrl": "/knowledge/agents/viktor-r/projects/vikktør/tracks/1. there is no wisdom without kindness v1.1/images/faten-hamama.png"
         },
         {
           "description": { "en": "C", "zh": "C", "ru": "C", "ar": "C" },
-          "imageUrl": "https://untitled-document.net/knowledge/agents/viktor-r/projects/vikktør/tracks/1. there is no wisdom without kindness v1.1/images/faten-hamama.png",
+          "imageUrl": "/knowledge/agents/viktor-r/projects/vikktør/tracks/1. there is no wisdom without kindness v1.1/images/faten-hamama.png",
           "nT": 4
         },
 
         {
           "description": { "en": "Am", "zh": "Am", "ru": "Am", "ar": "Am" },
-          "imageUrl": "https://untitled-document.net/knowledge/agents/viktor-r/projects/vikktør/tracks/1. there is no wisdom without kindness v1.1/images/faten-hamama.png",
+          "imageUrl": "/knowledge/agents/viktor-r/projects/vikktør/tracks/1. there is no wisdom without kindness v1.1/images/faten-hamama.png",
           "nT": 4
         },
         {
           "description": { "en": "Bm", "zh": "Bm", "ru": "Bm", "ar": "Bm" },
-          "imageUrl": "https://untitled-document.net/knowledge/agents/viktor-r/projects/vikktør/tracks/1. there is no wisdom without kindness v1.1/images/faten-hamama.png",
+          "imageUrl": "/knowledge/agents/viktor-r/projects/vikktør/tracks/1. there is no wisdom without kindness v1.1/images/faten-hamama.png",
           "nT": 2
         },
         {
           "description": { "en": "G", "zh": "G", "ru": "G", "ar": "G" },
-          "imageUrl": "https://untitled-document.net/knowledge/agents/viktor-r/projects/vikktør/tracks/1. there is no wisdom without kindness v1.1/images/faten-hamama.png",
+          "imageUrl": "/knowledge/agents/viktor-r/projects/vikktør/tracks/1. there is no wisdom without kindness v1.1/images/faten-hamama.png",
           "nT": 2
         }
       ]
@@ -195,7 +195,7 @@ export const track1 =
         "ru": "Em (выход)",
         "ar": "Em (خروج)"
       },
-      "imageUrl": "https://untitled-document.net/knowledge/agents/viktor-r/projects/vikktør/tracks/images/vikktor-key-knowledge-2025-1000x1000.png",
+      "imageUrl": "/knowledge/agents/viktor-r/projects/vikktør/tracks/images/vikktor-key-knowledge-2025-1000x1000.png",
       "timeboxes": [
         {
           "description": {

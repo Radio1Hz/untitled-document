@@ -12,7 +12,7 @@ export const track11 =
   "n": 4,
   "tau_omega": "",
   "dedication": "før alexandra",
-  "audioUrl": "https://untitled-document.net/knowledge/agents/viktor-r/projects/vikktør/tracks/11. balkan folk song - karanfil se na put sprema/11. balkan folk song - karanfil se na put sprema.wav",
+  "audioUrl": "/knowledge/agents/viktor-r/projects/vikktør/tracks/11. balkan folk song - karanfil se na put sprema/11. balkan folk song - karanfil se na put sprema.wav",
   "sections": [
     {
       "description": {
@@ -212,7 +212,7 @@ export const track11 =
             "ru": "C",
             "ar": "C"
           },
-          "nT": 1
+          "nT": 2
         },
         {
           "description": {
@@ -225,12 +225,12 @@ export const track11 =
         },
         {
           "description": {
-            "en": "Em",
-            "zh": "Em",
-            "ru": "Em",
-            "ar": "Em"
+            "en": "D",
+            "zh": "D",
+            "ru": "D",
+            "ar": "D"
           },
-          "nT": 2
+          "nT": 1
         },
         {
           "description": {
@@ -293,7 +293,7 @@ export const track11 =
             "ru": "C",
             "ar": "C"
           },
-          "nT": 1
+          "nT": 2
         },
         {
           "description": {
@@ -306,12 +306,12 @@ export const track11 =
         },
         {
           "description": {
-            "en": "Em",
-            "zh": "Em",
-            "ru": "Em",
-            "ar": "Em"
+            "en": "D",
+            "zh": "D",
+            "ru": "D",
+            "ar": "D"
           },
-          "nT": 2
+          "nT": 1
         },
         {
           "description": {
@@ -385,7 +385,7 @@ export const track11 =
             "ru": "C",
             "ar": "C"
           },
-          "nT": 1
+          "nT": 2
         },
         {
           "description": {
@@ -398,12 +398,12 @@ export const track11 =
         },
         {
           "description": {
-            "en": "Em",
-            "zh": "Em",
-            "ru": "Em",
-            "ar": "Em"
+            "en": "D",
+            "zh": "D",
+            "ru": "D",
+            "ar": "D"
           },
-          "nT": 2
+          "nT": 1
         },
         {
           "description": {
@@ -466,7 +466,7 @@ export const track11 =
             "ru": "C",
             "ar": "C"
           },
-          "nT": 1
+          "nT": 2
         },
         {
           "description": {
@@ -479,12 +479,12 @@ export const track11 =
         },
         {
           "description": {
-            "en": "Em",
-            "zh": "Em",
-            "ru": "Em",
-            "ar": "Em"
+            "en": "D",
+            "zh": "D",
+            "ru": "D",
+            "ar": "D"
           },
-          "nT": 2
+          "nT": 1
         },
         {
           "description": {

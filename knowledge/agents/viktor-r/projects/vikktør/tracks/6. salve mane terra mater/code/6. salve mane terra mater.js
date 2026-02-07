@@ -11,7 +11,7 @@ export const track6 = {
   "n": 8,
   "tau_omega": "2025-02-22 08:00:00.00",
   "dedication": "",
-  "audioUrl": "https://untitled-document.net/knowledge/agents/viktor-r/projects/vikktør/tracks/6. salve mane terra mater/6. salve mane terra mater.wav",
+  "audioUrl": "/knowledge/agents/viktor-r/projects/vikktør/tracks/6. salve mane terra mater/6. salve mane terra mater.wav",
   "sections": [
     {
       "description": {

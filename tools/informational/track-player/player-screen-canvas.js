@@ -83,9 +83,7 @@ export class PlayerScreenCanvas extends Component {
         
         try {
             await Promise.all(loadPromises);
-            console.log('All images preloaded successfully');
         } catch (error) {
-            console.error('Error preloading images:', error);
         }
     }
 

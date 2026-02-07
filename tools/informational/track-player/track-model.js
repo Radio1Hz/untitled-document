@@ -77,19 +77,16 @@ class TrackState {
     advance(track) {
         // Validate current state first
         if (this.i >= track.sections.length) {
-            //console.log('Invalid section index:', this.i);
             return undefined;
         }
 
         const section = track.sections[this.i];
         if (!section) {
-            //console.log('Section not found:', this.i);
             return undefined;
         }
 
         const timebox = section.timeboxes[this.j];
         if (!timebox) {
-            //console.log('Timebox not found:', this.j);
             return undefined;
         }
 
@@ -113,13 +110,11 @@ class TrackState {
             if (nextSection && nextSection.timeboxes.length > 0) {
                 return new TrackState(this.i + 1, 0, 0);
             } else {
-                //console.log('Next section invalid:', this.i + 1);
                 return undefined;
             }
         }
 
         // We've reached the end of the track
-        //console.log('End of track reached');
         return undefined;
     }
 
