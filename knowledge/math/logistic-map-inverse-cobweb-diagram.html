@@ -39,7 +39,7 @@
       document.getElementById("content").innerHTML = md.render(text);
     }
 
-    renderMarkdown("knowledge/math/logistic-map-inverse-cobweb-diagram.md")
+    renderMarkdown("logistic-map-inverse-cobweb-diagram.md")
       .catch(err => {
         document.getElementById("content").textContent = err.message;
       });
