@@ -1,0 +1,48 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Article</title>
+
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.css">
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.js"></script>
+
+  <style>
+    body { font-family: Georgia, serif; max-width: 900px; margin: 40px auto; padding: 0 16px; line-height: 1.65; }
+    img { max-width: 100%; height: auto; }
+    pre { overflow-x: auto; padding: 12px; background: #f6f8fa; }
+    code { font-family: Consolas, monospace; }
+  </style>
+</head>
+<body>
+  <main id="content">Loading...</main>
+
+  <script src="https://cdn.jsdelivr.net/npm/markdown-it@14/dist/markdown-it.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/markdown-it-texmath@1/texmath.min.js"></script>
+
+  <script>
+    const md = window.markdownit({
+      html: false,
+      linkify: true,
+      typographer: true
+    }).use(window.texmath, {
+      engine: window.katex,
+      delimiters: "dollars",
+      katexOptions: { throwOnError: false }
+    });
+
+    async function renderMarkdown(markdownUrl) {
+      const res = await fetch(markdownUrl);
+      if (!res.ok) throw new Error("Failed to load markdown: " + markdownUrl);
+      const text = await res.text();
+      document.getElementById("content").innerHTML = md.render(text);
+    }
+
+    renderMarkdown("knowledge/math/logistic-map-inverse-cobweb-diagram.md")
+      .catch(err => {
+        document.getElementById("content").textContent = err.message;
+      });
+  </script>
+</body>
+</html>
