@@ -9,7 +9,7 @@
   <script src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.js"></script>
 
   <style>
-    body { font-family: Georgia, serif; max-width: 900px; margin: 40px auto; padding: 0 16px; line-height: 1.65; }
+    body { background-color: black; font-family: Georgia, serif; max-width: 900px; margin: 40px auto; padding: 0 16px; line-height: 1.65; }
     img { max-width: 100%; height: auto; }
     pre { overflow-x: auto; padding: 12px; background: #f6f8fa; }
     code { font-family: Consolas, monospace; }
@@ -43,10 +43,30 @@
         katexOptions: { throwOnError: false }
       });
 
+      // Derive a base URL from the markdown file's location so that
+      // relative image paths in the .md resolve correctly regardless of
+      // where this HTML page lives.
+      const mdBase = markdownUrl.startsWith("http")
+        ? markdownUrl.substring(0, markdownUrl.lastIndexOf("/") + 1)
+        : new URL(markdownUrl, document.baseURI).href.substring(
+            0, new URL(markdownUrl, document.baseURI).href.lastIndexOf("/") + 1
+          );
+
       const res = await fetch(markdownUrl);
       if (!res.ok) throw new Error("Failed to load markdown: " + markdownUrl);
       const text = await res.text();
-      document.getElementById("content").innerHTML = md.render(text);
+
+      const container = document.getElementById("content");
+      container.innerHTML = md.render(text);
+
+      // Rewrite every relative img src to be relative to the .md file,
+      // not to this HTML page.
+      container.querySelectorAll("img").forEach(img => {
+        const src = img.getAttribute("src");
+        if (src && !src.startsWith("http") && !src.startsWith("data:") && !src.startsWith("/")) {
+          img.src = mdBase + src;
+        }
+      });
     }
 
     renderMarkdown("logistic-map-inverse-cobweb-diagram.md")

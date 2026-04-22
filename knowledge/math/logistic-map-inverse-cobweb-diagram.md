@@ -20,6 +20,7 @@ where:
 - $r \in [0,4]$
 
 ![Cobweb diagram](images/logistic-map.jpg)
+
 The logistic map is an endofunction on the interval $[0,1]$, mapping values within this range back into the same interval.
 
 ---
