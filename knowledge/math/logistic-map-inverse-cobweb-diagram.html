@@ -6,7 +6,7 @@
   <title>Article</title>
 
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.css">
-  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.js"></script>
 
   <style>
     body { font-family: Georgia, serif; max-width: 900px; margin: 40px auto; padding: 0 16px; line-height: 1.65; }
@@ -22,17 +22,27 @@
   <script src="https://cdn.jsdelivr.net/npm/markdown-it-texmath@1/texmath.min.js"></script>
 
   <script>
-    const md = window.markdownit({
-      html: false,
-      linkify: true,
-      typographer: true
-    }).use(window.texmath, {
-      engine: window.katex,
-      delimiters: "dollars",
-      katexOptions: { throwOnError: false }
-    });
-
     async function renderMarkdown(markdownUrl) {
+      if (!window.markdownit) {
+        throw new Error("markdown-it failed to load.");
+      }
+      if (!window.texmath) {
+        throw new Error("markdown-it-texmath failed to load.");
+      }
+      if (!window.katex) {
+        throw new Error("KaTeX failed to load.");
+      }
+
+      const md = window.markdownit({
+        html: false,
+        linkify: true,
+        typographer: true
+      }).use(window.texmath, {
+        engine: window.katex,
+        delimiters: "dollars",
+        katexOptions: { throwOnError: false }
+      });
+
       const res = await fetch(markdownUrl);
       if (!res.ok) throw new Error("Failed to load markdown: " + markdownUrl);
       const text = await res.text();
