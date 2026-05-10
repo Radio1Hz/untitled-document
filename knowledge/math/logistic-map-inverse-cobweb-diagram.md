@@ -1,8 +1,6 @@
 # Interpreting the Dynamics of the Logistic Map Using an Inverse Cobweb Diagram
 
-**Author:** Viktor Rom
-
-**Date:** March 15, 2026
+**Author:** Viktor Rom, Stockholm, March 15, 2026
 
 ---
 
@@ -12,18 +10,18 @@ This paper explores the mathematical intricacies of the logistic map, its invers
 
 ---
 
-## 1. Introduction
+## Introduction
 
-The logistic map is a fundamental mathematical model used to describe population dynamics, chaos theory, and bifurcation phenomena [1]. Defined as a simple quadratic recurrence relation, the logistic map exhibits a rich variety of behaviors, ranging from fixed points to chaotic oscillations [4, 5]. This paper extends the classical analysis by incorporating the inverse logistic map and exploring the interplay between the two maps.
+The logistic map is a fundamental mathematical model used to describe population dynamics, chaos theory, and bifurcation phenomena. Defined as a simple quadratic recurrence relation, the logistic map exhibits a rich variety of behaviors, ranging from fixed points to chaotic oscillations. This paper extends the classical analysis by incorporating the inverse logistic map and exploring the interplay between the two maps.
 
 ---
 
-## 2. The Logistic Map
+## The Logistic Map
 
-We consider the logistic map as a function $f : [0,1] \to [0,1]$ defined by:
-$$
-f(x) = r x (1 - x)
-$$
+Logistic Map as a function $f : [0,1] \to [0,1]$ is defined by:
+
+$ f(x) = r x (1 - x)$
+
 where:
 
 - $x \in [0,1]$
@@ -35,12 +33,13 @@ The logistic map is an endofunction on the interval $[0,1]$, mapping values with
 
 ---
 
-## 3. The Inverse Logistic Map
+## The Inverse Logistic Map
 
 The inverse of the logistic map is given by:
-$$
+
+$
 f^{-1}(x) = \frac{1}{2}\left(1 \pm \sqrt{1 - 4\frac{x}{r}}\right)
-$$
+$
 
 ![Inverse Logistic Map](images/inverse-logistic-map.jpg)
 
@@ -52,7 +51,7 @@ This inverse function is defined for $x \in [0, r/4]$, ensuring that the square 
 
 ---
 
-## 4. Intersection Points
+## Intersection Points
 
 The intersection points of $f(x)$ and $f^{-1}(x)$ depend on the parameter $r$:
 
@@ -60,45 +59,52 @@ The intersection points of $f(x)$ and $f^{-1}(x)$ depend on the parameter $r$:
 ### Case 1: $0 \leq r \leq 1$
 
 There is only one intersection point:
-$$
+
+$
 X_0 = 0
-$$
+$
 
 ![Intersection Points 1](images/intersection-points-1.jpg)
 
 ### Case 2: $1 < r \leq 3$
 
 There are two intersection points:
-$$
+
+$
 X_0 = 0
-$$
-$$
+$
+
+$
 X_1 = \frac{r-1}{r}
-$$
+$
 
 ![Intersection Points 2](images/intersection-points-2.jpg)
 
 ### Case 3: $3 < r \leq 4$
 
 There are four intersection points:
-$$
+
+$
 X_0 = 0
-$$
-$$
+$
+
+$
 X_1 = \frac{r-1}{r}
-$$
-$$
+$
+
+$
 X_2 = \frac{1}{2r}(r+1 - \sqrt{r^2 - 2r - 3})
-$$
-$$
+$
+
+$
 X_3 = \frac{1}{2r}(r+1 + \sqrt{r^2 - 2r - 3})
-$$
+$
 
 ![Intersection Points 3](images/intersection-points-3.jpg)
 
 ---
 
-## 5. Iteration Sequence
+## Iteration Sequence
 
 ### Step 1
 
@@ -141,97 +147,101 @@ The sequence continues in the same manner — "bouncing" between the direct and 
 
 ---
 
-## 6. Inverse Cobweb Diagram
+## Inverse Cobweb Diagram
 
-A cobweb diagram is a geometric visualization of repeated function iteration [4]. Traditionally, it shows how values "bounce" between the function curve $y = f(x)$ and the diagonal line $y = x$. In this paper, we replace the diagonal line with the inverse function curve $y = f^{-1}(x)$:
-$$
+A cobweb diagram is a geometric visualization of repeated function iteration. Traditionally, it shows how values "bounce" between the function curve $y = f(x)$ and the diagonal line $y = x$. In this case, we replace the diagonal line with the inverse function curve $y = f^{-1}(x)$:
+
+$
 y = \frac{1}{2}\left(1 \pm \sqrt{1-4\frac{x}{r}}\right)
-$$
+$
+
 This approach provides an alternative geometric perspective on the dynamics of the logistic map.
 
 ![Cobweb diagram](images/100-iterations.jpg)
 
 ---
 
-## 7. Stable Iteration Cycle with Three Nodes
+## Stable Iteration Cycle with Three Nodes
 
-For certain values of $r$ (denoted as $r_{o3}$), the iteration sequence stabilizes into a three-node cycle. The existence of a period-3 orbit is of particular significance: by the theorem of Li and Yorke [2], period three implies chaos for any continuous self-map of an interval. To calculate $r_{o3}$, we need to solve the following two equations:
+For certain values of $r$ (denoted as $r_{o3}$), the iteration sequence stabilizes into a three-node cycle. To calculate $r_{o3}$, we need to solve the following two equations:
 
 ![Orbit of 3](images/orbit-3.jpg)
 
 ### Equation 1
 
-$$
+$
 f(x) = \frac{1}{2}, \quad r > 2
-$$
-$$
-rx(1-x) = \frac{1}{2}
-$$
+$
+
 Solutions for $r > 2$:
-$$
+
+$
 x_{o1} = \frac{r-\sqrt{(r-2)r}}{2r}
-$$
-$$
+$
+
+$
 x_{o2} = \frac{r+\sqrt{(r-2)r}}{2r}
-$$
+$
 
 ### Equation 2
 
-$$
+$
 f^{-1}(x_{o1}) = f\left(\frac{1}{2}\right), \quad r > 2
-$$
-$$
+$
+
+$
 \frac{1}{2}\left(1+\sqrt{1-4\frac{r-\sqrt{(r-2)r}}{2r^2}}\right) = \frac{r}{4}
-$$
+$
 
 The solution for $r > 2$ is:
-$$
+
+$
 r_{o3} = 1 + \sqrt{1 + \frac{1}{3}\left(8 + (800 - 96\sqrt{69})^{1/3} + 2 \cdot 2^{2/3}(25 + 3\sqrt{69})^{1/3}\right)}
-$$
-$$
+$
+
+$
 r_{o3} \approx 3.8318740552833155684103627754961065557978278526036946304788904477
-$$
+$
 
 ---
 
-## 8. Bifurcation Diagrams
+## Bifurcation Diagrams
 
-### 8.1 Logistic Map
+### Logistic Map
 
 Since the iteration values "bounce" between the direct and inverse Logistic Map, we can identify two bifurcation sets [3]:
 
-#### 8.1.1 Bifurcation diagram on y-axis
+#### Bifurcation diagram on y-axis
 
 ![Bifurcation diagram on y-axis](images/bifurcation-y.jpg)
 
-#### 8.1.2 Bifurcation diagram on x-axis
+#### Bifurcation diagram on x-axis
 
 ![Bifurcation diagram on x-axis](images/bifurcation-x.jpg)
 
-### 8.2 Sinusoidal Variant
+### Sinusoidal Variant
 
 The bifurcation diagram for $f(x) = \frac{r}{4} \sin(\pi x)$ provides an alternative perspective on the dynamics of similar endofunctions.
 
-#### 8.2.1 Bifurcation diagram on y-axis
+#### Bifurcation diagram on y-axis
 
-![Bifurcation diagram on y-axis (sinusoidal variant)](images/bifurcation-y-sinus.jpg)
+![Bifurcation diagram on y-axis (sinusoidal variant)](images/bifurcation-sinus-y.jpg)
 
-#### 8.2.2 Bifurcation diagram on x-axis
+#### Bifurcation diagram on x-axis
 
-![Bifurcation diagram on x-axis (sinusoidal variant)](images/bifurcation-x-sinus.jpg)
-
----
-
-## 9. Conclusion
-
-This paper has presented a detailed analysis of the logistic map, its inverse, and their interplay. By exploring the iterative dynamics and constructing the inverse cobweb diagram, we have gained new insights into the behavior of controlled chaos. The identification of a stable three-node cycle and the bifurcation diagrams further highlight the richness of this mathematical system.
+![Bifurcation diagram on x-axis (sinusoidal variant)](images/bifurcation-sinus-x.jpg)
 
 ---
 
-## References
+### Comparison of logistic map and sinusoidal bifurcation diagrams
 
-1. May, R. M. (1976). "Simple mathematical models with very complicated dynamics." *Nature*, 261(5560), 459–467.
-2. Li, T. Y., & Yorke, J. A. (1975). "Period three implies chaos." *The American Mathematical Monthly*, 82(10), 985–992.
-3. Feigenbaum, M. J. (1978). "Quantitative universality for a class of nonlinear transformations." *Journal of Statistical Physics*, 19(1), 25–52.
-4. Strogatz, S. H. (2018). *Nonlinear Dynamics and Chaos: With Applications to Physics, Biology, Chemistry, and Engineering* (2nd ed.). CRC Press.
-5. Devaney, R. L. (1989). *An Introduction to Chaotic Dynamical Systems* (2nd ed.). Addison-Wesley.
+![Bifurcation diagram on x-axis (sinusoidal variant)](images/bifurcation-comparison.jpg)
+
+---
+
+## Conclusion
+
+This paper has presented an analysis of the logistic map, its inverse, and their interplay. By exploring the iterative dynamics and constructing the inverse cobweb diagram, we have gained new insights into the behavior of controlled chaos. The identification of a stable three-node cycle and the bifurcation diagrams further highlight the richness of this mathematical system.
+
+---
+
