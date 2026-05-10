@@ -14,6 +14,8 @@ This paper explores the mathematical intricacies of the logistic map, its invers
 
 The logistic map is a fundamental mathematical model used to describe population dynamics, chaos theory, and bifurcation phenomena. Defined as a simple quadratic recurrence relation, the logistic map exhibits a rich variety of behaviors, ranging from fixed points to chaotic oscillations. This paper extends the classical analysis by incorporating the inverse logistic map and exploring the interplay between the two maps.
 
+Visualization video: https://www.youtube.com/watch?v=2kVNS7NUNkw
+
 ---
 
 ## The Logistic Map
