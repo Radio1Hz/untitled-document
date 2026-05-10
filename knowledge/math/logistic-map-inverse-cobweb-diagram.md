@@ -119,7 +119,7 @@ Applying the Logistic Map to $x_0$, we get the value $x_1$ on the $y$-axis.
 
 ### Step 2
 
-The next iteration value $x_2$ is obtained by applying $x_1$ to the same Logistic Map projected onto the $y$-axis ($$x = f(y)$$):
+The next iteration value $x_2$ is obtained by applying $x_1$ to the same Logistic Map projected onto the $y$-axis (x = f(y)):
 
 $x_2 = f(x_1)$
 
