@@ -20,7 +20,7 @@ The logistic map is a fundamental mathematical model used to describe population
 
 Logistic Map as a function $f : [0,1] \to [0,1]$ is defined by:
 
-$ f(x) = r x (1 - x)$
+$$ f(x) = r x (1 - x) $$
 
 where:
 
@@ -37,9 +37,9 @@ The logistic map is an endofunction on the interval $[0,1]$, mapping values with
 
 The inverse of the logistic map is given by:
 
-$
+$$
 f^{-1}(x) = \frac{1}{2}\left(1 \pm \sqrt{1 - 4\frac{x}{r}}\right)
-$
+$$
 
 ![Inverse Logistic Map](images/inverse-logistic-map.jpg)
 
@@ -60,9 +60,9 @@ The intersection points of $f(x)$ and $f^{-1}(x)$ depend on the parameter $r$:
 
 There is only one intersection point:
 
-$
+$$
 X_0 = 0
-$
+$$
 
 ![Intersection Points 1](images/intersection-points-1.jpg)
 
@@ -70,13 +70,13 @@ $
 
 There are two intersection points:
 
-$
+$$
 X_0 = 0
-$
+$$
 
-$
+$$
 X_1 = \frac{r-1}{r}
-$
+$$
 
 ![Intersection Points 2](images/intersection-points-2.jpg)
 
@@ -84,21 +84,21 @@ $
 
 There are four intersection points:
 
-$
+$$
 X_0 = 0
-$
+$$
 
-$
+$$
 X_1 = \frac{r-1}{r}
-$
+$$
 
-$
+$$
 X_2 = \frac{1}{2r}(r+1 - \sqrt{r^2 - 2r - 3})
-$
+$$
 
-$
+$$
 X_3 = \frac{1}{2r}(r+1 + \sqrt{r^2 - 2r - 3})
-$
+$$
 
 ![Intersection Points 3](images/intersection-points-3.jpg)
 
@@ -119,7 +119,7 @@ Applying the Logistic Map to $x_0$, we get the value $x_1$ on the $y$-axis.
 
 ### Step 2
 
-The next iteration value $x_2$ is obtained by applying $x_1$ to the same Logistic Map projected onto the $y$-axis ($x = f(y)$):
+The next iteration value $x_2$ is obtained by applying $x_1$ to the same Logistic Map projected onto the $y$-axis ($$x = f(y)$$):
 
 $x_2 = f(x_1)$
 
@@ -151,9 +151,9 @@ The sequence continues in the same manner — "bouncing" between the direct and 
 
 A cobweb diagram is a geometric visualization of repeated function iteration. Traditionally, it shows how values "bounce" between the function curve $y = f(x)$ and the diagonal line $y = x$. In this case, we replace the diagonal line with the inverse function curve $y = f^{-1}(x)$:
 
-$
+$$
 y = \frac{1}{2}\left(1 \pm \sqrt{1-4\frac{x}{r}}\right)
-$
+$$
 
 This approach provides an alternative geometric perspective on the dynamics of the logistic map.
 
@@ -169,35 +169,35 @@ For certain values of $r$ (denoted as $r_{o3}$), the iteration sequence stabiliz
 
 ### Equation 1
 
-$
+$$
 f(x) = \frac{1}{2}, \quad r > 2
-$
+$$
 
 Solutions for $r > 2$:
 
-$
+$$
 x_{o1} = \frac{r-\sqrt{(r-2)r}}{2r}
-$
+$$
 
-$
+$$
 x_{o2} = \frac{r+\sqrt{(r-2)r}}{2r}
-$
+$$
 
 ### Equation 2
 
-$
+$$
 f^{-1}(x_{o1}) = f\left(\frac{1}{2}\right), \quad r > 2
-$
+$$
 
-$
+$$
 \frac{1}{2}\left(1+\sqrt{1-4\frac{r-\sqrt{(r-2)r}}{2r^2}}\right) = \frac{r}{4}
-$
+$$
 
 The solution for $r > 2$ is:
 
-$
+$$
 r_{o3} = 1 + \sqrt{1 + \frac{1}{3}\left(8 + (800 - 96\sqrt{69})^{1/3} + 2 \cdot 2^{2/3}(25 + 3\sqrt{69})^{1/3}\right)}
-$
+$$
 
 $
 r_{o3} \approx 3.8318740552833155684103627754961065557978278526036946304788904477
@@ -209,7 +209,7 @@ $
 
 ### Logistic Map
 
-Since the iteration values "bounce" between the direct and inverse Logistic Map, we can identify two bifurcation sets [3]:
+Since the iteration values "bounce" between the direct and inverse Logistic Map, we can identify two bifurcation sets:
 
 #### Bifurcation diagram on y-axis
 
